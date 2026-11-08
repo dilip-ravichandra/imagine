@@ -1,0 +1,15 @@
+{
+    "pairs":  40,
+    "successful_reviews":  10,
+    "unreviewed_pairs":  30,
+    "winner_counts":  {
+                          "A":  2,
+                          "B":  7,
+                          "TIE":  1
+                      },
+    "ai_A_not_worse_fraction":  0.3,
+    "variant_mapping_deferred":  true,
+    "quota_blocked":  true,
+    "approval_written":  false,
+    "human_review_required":  true
+}

@@ -1,7 +1,7 @@
-"""Launch a LoRA fine-tune of SD-Turbo with the pinned, unmodified diffusers trainer.
+"""Launch a LoRA fine-tune of Stable Diffusion 1.5 with a pinned diffusers trainer.
 
     python -m ai_engine.training.train_lora --data training_data\\p3a_smoke --out adapters\\smoke ^
-        --revision <40-char SD-Turbo commit from your P1A smoke test> --preset smoke
+        --revision <40-char SD 1.5 commit> --preset smoke
     (add --dry-run to print the command and run every check without a GPU)
 
 Status written to <out>/adaptation.json is one of: started | failed | training_completed_not_validated.
@@ -16,13 +16,15 @@ import subprocess
 import sys
 from pathlib import Path
 
-from .adapter import BASE_MODEL, LORA_WEIGHT_NAME, STATUS_DONE, sha256_file  # noqa: F401 (re-exported)
+from .adapter import SD15_BASE_MODEL, LORA_WEIGHT_NAME, STATUS_DONE, sha256_file
 from .data import DataError, assert_no_leakage, load_exclusions
+
+BASE_MODEL = SD15_BASE_MODEL
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 TRAINER = HERE / "third_party" / "train_text_to_image_lora.py"
-TRAINER_SHA256 = "3dcc88d582bb9f20d4e72278f0a76749a1190ed43a6521b2cdb297efa512136a"
+TRAINER_SHA256 = "a50c34fa31addef037e00f66b345ddb1f4e92628f463f1f9c6a89f19e85f5351"
 TRAINER_URL = ("https://raw.githubusercontent.com/huggingface/diffusers/v0.35.1/"
                "examples/text_to_image/train_text_to_image_lora.py")
 # UNTUNED starting points, not recommendations. steps counts optimizer updates.
@@ -35,7 +37,8 @@ def resolve_settings(a) -> dict:
     base = PRESETS.get(a.preset, {})
     pick = lambda v, k: v if v is not None else base.get(k)  # explicit None check: 0 must NOT fall back to the preset
     s = dict(steps=pick(a.steps, "steps"), accum=pick(a.accum, "accum"), warmup=pick(a.warmup, "warmup"),
-             rank=a.rank, learning_rate=a.learning_rate, resolution=a.resolution, seed=a.seed)
+             rank=a.rank, learning_rate=a.learning_rate, resolution=a.resolution, seed=a.seed,
+             checkpoint_every=(a.checkpoint_every if a.checkpoint_every is not None else pick(a.steps, "steps")))
     if None in (s["steps"], s["accum"], s["warmup"]):
         raise DataError("Give --preset or all of --steps, --accum, --warmup")
     if s["steps"] < 1 or s["accum"] < 1 or s["rank"] < 1 or s["learning_rate"] <= 0:
@@ -45,6 +48,8 @@ def resolve_settings(a) -> dict:
         raise DataError("warmup must be 0 <= warmup <= steps/2 (upstream's default of 500 would swamp a short run)")
     if s["resolution"] not in (384, 512):
         raise DataError("resolution must be 384 or 512")
+    if s["checkpoint_every"] < 1:
+        raise DataError("checkpoint interval must be positive")
     return s
 
 
@@ -53,24 +58,25 @@ def build_command(a, s: dict) -> list:
     data = Path(a.data).resolve()
     return [sys.executable, "-m", "accelerate.commands.launch", "--num_processes=1", "--mixed_precision=fp16",
             str(TRAINER),
-            f"--pretrained_model_name_or_path={BASE_MODEL}", f"--revision={a.revision}", "--variant=fp16",
+            f"--pretrained_model_name_or_path={SD15_BASE_MODEL}", f"--revision={a.revision}", "--variant=fp16",
             f"--train_data_dir={data / 'train'}", "--image_column=image", "--caption_column=text",
             f"--resolution={s['resolution']}", "--center_crop",
             # NOTE: no --random_flip. Flipping turns "left of" into "right of" and corrupts spatial captions.
-            # NOTE: no --validation_prompt. Upstream validates at 30 steps / default guidance, wrong for SD-Turbo.
+            # NOTE: no --validation_prompt. Comparison handles validation with the SD 1.5 inference settings.
             "--train_batch_size=1", f"--gradient_accumulation_steps={s['accum']}", "--gradient_checkpointing",
             "--mixed_precision=fp16", f"--rank={s['rank']}", f"--learning_rate={s['learning_rate']}",
             "--lr_scheduler=constant", f"--lr_warmup_steps={s['warmup']}", "--max_grad_norm=1.0",
             f"--max_train_steps={s['steps']}", f"--seed={s['seed']}", "--dataloader_num_workers=0",
-            f"--checkpointing_steps={s['steps']}", "--report_to=none", f"--output_dir={Path(a.out).resolve()}"]
+            f"--checkpointing_steps={s['checkpoint_every']}", "--checkpoints_total_limit=2",
+            "--report_to=none", f"--output_dir={Path(a.out).resolve()}"]
 
 
 def preflight(a, s: dict, *, check_cuda: bool = True, cuda_available=None) -> list:
     """Return a list of problem strings (empty = ready). Never launches anything."""
     problems = []
     if not re.fullmatch(r"[0-9a-f]{40}", a.revision or ""):
-        problems.append("--revision must be the full 40-character commit hash of stabilityai/sd-turbo "
-                        "(pin it from your P1A smoke test; 'main' is not reproducible).")
+        problems.append("--revision must be the full 40-character commit hash of runwayml/stable-diffusion-v1-5 "
+                        "('main' is not reproducible).")
     if not TRAINER.is_file():
         problems.append(f"Vendored trainer missing: {TRAINER}")
     elif sha256_file(TRAINER) != TRAINER_SHA256:
@@ -137,11 +143,11 @@ def run(a) -> int:
     out.mkdir(parents=True)
     import torch
     man = Path(a.data) / "manifest.json"
-    meta = dict(base_model=BASE_MODEL, base_revision=a.revision, settings=s, trainer_url=TRAINER_URL,
+    meta = dict(base_model=SD15_BASE_MODEL, base_revision=a.revision, settings=s, trainer_url=TRAINER_URL,
                 trainer_sha256=TRAINER_SHA256, manifest_sha256=sha256_file(man), command=cmd, status="started",
                 gpu=torch.cuda.get_device_name(0), torch=torch.__version__,
-                warning="Experimental plain denoising-loss LoRA on an already-distilled SD-Turbo, trained at random "
-                        "timesteps. It can degrade 1-4 step quality. Keep the base model as default until "
+                warning="Experimental plain denoising-loss LoRA for Stable Diffusion 1.5; quality must be established "
+                        "by held-out comparison and blind review. Keep the base model as default until "
                         "ai_engine.training.compare and human review say otherwise.")
     _write_meta(out, meta)
     with (out / "training.log").open("w", encoding="utf-8") as log:
@@ -167,7 +173,7 @@ def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--data", required=True)
     p.add_argument("--out", required=True)
-    p.add_argument("--revision", required=True, help="40-char sd-turbo commit hash")
+    p.add_argument("--revision", required=True, help="40-char SD 1.5 commit hash")
     p.add_argument("--preset", choices=sorted(PRESETS))
     p.add_argument("--steps", type=int)
     p.add_argument("--accum", type=int)
@@ -176,6 +182,8 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--learning-rate", type=float, default=5e-5, help="untuned default; see docs/ADAPTATION.md")
     p.add_argument("--resolution", type=int, default=512)
     p.add_argument("--seed", type=int, default=2026)
+    p.add_argument("--checkpoint-every", type=int,
+                   help="save resumable checkpoints every N optimizer steps (default: final step only)")
     p.add_argument("--eval-prompts", nargs="+")
     p.add_argument("--dry-run", action="store_true")
     return p

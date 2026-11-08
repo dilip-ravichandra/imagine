@@ -15,14 +15,68 @@ document.addEventListener('DOMContentLoaded', () => {
   checkSystemStatus();
 });
 
+let generationAvailable = true;
+
 // ==================== TABS MANAGEMENT ====================
+const tabMeta = {
+  generate: {
+    category: "TEXT-TO-IMAGE GENERATION",
+    title: "Generative Inference",
+    desc: "Create high-quality, on-device images from natural language prompts"
+  },
+  batch: {
+    category: "EVALUATION",
+    title: "Batch Hold-out Prompt Evaluation",
+    desc: "Evaluation across the 20 frozen hold-out prompts from prompt_suite_v1 assessing prompt consistency, latency, and CLIP score."
+  },
+  stress: {
+    category: "RESOURCE & PERFORMANCE",
+    title: "Resource Budget & Adaptive Stress Lab",
+    desc: "Demonstrating Problem Statement 3 requirement: Adaptive generation strategy based on dynamic computational budgets."
+  },
+  pipeline: {
+    category: "SYSTEM ARCHITECTURE",
+    title: "End-to-End System Pipeline",
+    desc: "Interactive architectural diagram mapping Problem Statement 3 requirements: Text encoding, distilled latent diffusion, VAE, and CV post-processing."
+  },
+  comparison: {
+    category: "BENCHMARKS & COMPARISON",
+    title: "Model Architecture Comparison",
+    desc: "Empirical measurements across Classical, Deep Learning, and Hybrid architectures on the RTX 5050 Laptop GPU."
+  },
+  robustness: {
+    category: "LINGUISTIC ROBUSTNESS",
+    title: "Prompt Consistency & Linguistic Robustness",
+    desc: "Semantic consistency across diverse prompt structural complexities and attribute bindings."
+  },
+  failures: {
+    category: "ROBUSTNESS & ERROR ANALYSIS",
+    title: "Documented Failure-Case Analysis",
+    desc: "Honest academic disclosure of observed failure modes, detection mechanics, and applied mitigations per course evaluation guidelines (§8.6)."
+  },
+  catalogue: {
+    category: "GALLERY & DATASET",
+    title: "Empirical Generation Catalogue",
+    desc: "Pre-computed holdout prompt benchmark generations from the NVIDIA RTX 5050 GPU."
+  },
+  about: {
+    category: "PROJECT SPECIFICATION",
+    title: "About Imagine AI & Team Details",
+    desc: "Problem Statement 3 · Computer Vision & Generative AI Capstone Project."
+  }
+};
+
 function initTabs() {
   const tabs = document.querySelectorAll('.nav-tab');
   const panels = document.querySelectorAll('.tab-panel');
+  const catEl = document.getElementById('header-category');
+  const titleEl = document.getElementById('header-title');
+  const descEl = document.getElementById('header-desc');
 
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      const targetId = `tab-${tab.dataset.tab}`;
+      const tabKey = tab.dataset.tab;
+      const targetId = `tab-${tabKey}`;
       tabs.forEach(t => t.classList.remove('active'));
       panels.forEach(p => p.classList.remove('active'));
 
@@ -30,6 +84,13 @@ function initTabs() {
       const targetPanel = document.getElementById(targetId);
       if (targetPanel) {
         targetPanel.classList.add('active');
+      }
+
+      // Update header text dynamically
+      if (tabMeta[tabKey]) {
+        if (catEl) catEl.textContent = tabMeta[tabKey].category;
+        if (titleEl) titleEl.textContent = tabMeta[tabKey].title;
+        if (descEl) descEl.textContent = tabMeta[tabKey].desc;
       }
     });
   });
@@ -43,8 +104,16 @@ async function checkSystemStatus() {
   try {
     const healthRes = await fetch('/health');
     const modelRes = await fetch('/api/v1/model');
+    const capabilitiesRes = await fetch('/api/v1/capabilities');
     if (healthRes.ok) {
       let label = 'Model ready GPU · fp16';
+      if (capabilitiesRes.ok) {
+        const capabilities = await capabilitiesRes.json();
+        generationAvailable = Boolean(capabilities.generation_available);
+        if (!generationAvailable) {
+          label = 'Dashboard ready · GPU required for generation';
+        }
+      }
       if (modelRes.ok) {
         const info = await modelRes.json();
         if (info.loaded) {
@@ -154,7 +223,7 @@ function initGenerateTab() {
   const resultImg = document.getElementById('generated-image');
 
   let currentSteps = 2;
-  let selectedModel = 'sd_turbo';
+  let selectedModel = 'sd15_adapted';
   let timerInterval = null;
 
   const modelBtns = document.querySelectorAll('.model-card');
@@ -220,6 +289,10 @@ function initGenerateTab() {
 
   // Generate Action
   generateBtn.addEventListener('click', async () => {
+    if (!generationAvailable) {
+      alert('Image generation is unavailable in the CPU deployment. Enable GPU billing and redeploy to generate images.');
+      return;
+    }
     const prompt = promptInput.value.trim();
     if (!prompt) {
       alert('Please enter a prompt.');
@@ -344,13 +417,13 @@ function initBatchTab() {
   function renderRows() {
     tbody.innerHTML = holdoutPrompts.map(p => `
       <tr>
-        <td><code>${p.id}</code></td>
-        <td><span class="badge badge-hybrid">${p.cat}</span></td>
+        <td><code style="color: #a78bfa; font-weight: 600;">${p.id}</code></td>
+        <td><span class="badge-category">${p.cat}</span></td>
         <td>${p.prompt}</td>
-        <td>${p.steps} steps</td>
-        <td class="mono-text">${p.lat} ms</td>
-        <td class="mono-text highlight-val">${p.clip.toFixed(3)}</td>
-        <td><span class="text-success">✔ Evaluated</span></td>
+        <td style="color: var(--text-muted);">${p.steps} steps</td>
+        <td class="mono-text" style="color: #38bdf8;">${p.lat} ms</td>
+        <td class="mono-text highlight-val" style="color: #c084fc; font-weight: 700;">${p.clip.toFixed(3)}</td>
+        <td><span class="badge-evaluated">✔ Evaluated</span></td>
       </tr>
     `).join('');
   }
@@ -390,7 +463,16 @@ function initStressLab() {
 
   const stressBtn = document.getElementById('stress-generate-btn');
   const promptInput = document.getElementById('stress-prompt-input');
+  const charCounter = document.getElementById('stress-char-counter');
+  const clearBtn = document.getElementById('stress-clear-prompt-btn');
+  const sampleBtns = document.querySelectorAll('.stress-sample-prompt');
+  const modelCards = document.querySelectorAll('.stress-model-card');
   const modelSelect = document.getElementById('stress-model-select');
+  const advToggle = document.getElementById('stress-advanced-toggle');
+  const advBody = document.getElementById('stress-advanced-body');
+  const advChevron = document.getElementById('stress-advanced-chevron');
+  const seedInput = document.getElementById('stress-seed-input');
+
   const placeholder = document.getElementById('stress-placeholder');
   const loader = document.getElementById('stress-loader');
   const resultImg = document.getElementById('stress-result-img');
@@ -401,14 +483,61 @@ function initStressLab() {
   const execVram = document.getElementById('stress-exec-vram');
   const execDecision = document.getElementById('stress-exec-decision');
   const statusTag = document.getElementById('stress-status-tag');
+  const downloadBtn = document.getElementById('stress-download-btn');
+
+  // Model selection sync
+  modelCards.forEach(card => {
+    card.addEventListener('click', () => {
+      modelCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      const model = card.dataset.model;
+      if (modelSelect) modelSelect.value = model;
+      update();
+    });
+  });
+
+  // Prompt input character counter
+  if (promptInput && charCounter) {
+    promptInput.addEventListener('input', () => {
+      charCounter.textContent = `${promptInput.value.length} / 500`;
+    });
+  }
+
+  // Clear prompt
+  if (clearBtn && promptInput) {
+    clearBtn.addEventListener('click', () => {
+      promptInput.value = '';
+      if (charCounter) charCounter.textContent = '0 / 500';
+    });
+  }
+
+  // Quick sample prompts
+  sampleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (promptInput) {
+        promptInput.value = btn.dataset.prompt;
+        if (charCounter) charCounter.textContent = `${promptInput.value.length} / 500`;
+      }
+    });
+  });
+
+  // Advanced settings toggle
+  if (advToggle && advBody) {
+    advToggle.addEventListener('click', () => {
+      const isHidden = advBody.style.display === 'none' || !advBody.style.display;
+      advBody.style.display = isHidden ? 'block' : 'none';
+      if (advChevron) advChevron.textContent = isHidden ? 'Collapse ▲' : 'Expand ▼';
+    });
+  }
 
   function update() {
+    if (!latSlider || !vramSlider) return;
     const latBudget = parseInt(latSlider.value, 10);
     const vramBudget = parseInt(vramSlider.value, 10);
     const modelChoice = modelSelect ? modelSelect.value : 'sd_turbo';
 
-    latVal.textContent = `${latBudget} ms`;
-    vramVal.textContent = `${vramBudget} MB`;
+    if (latVal) latVal.textContent = `${latBudget} ms`;
+    if (vramVal) vramVal.textContent = `${vramBudget} MB`;
 
     // Dynamic Adaptive Ladder Selection
     ladderItems.forEach(item => item.classList.remove('active'));
@@ -472,7 +601,7 @@ function initStressLab() {
         activeLadderIdx = 0;
       }
     } else if (modelChoice === 'sd15_adapted') {
-      chosenPrec = 'fp32';
+      chosenPrec = 'fp16';
       chosenRes = 512;
       chosenSteps = 30;
       predLat = 11858;
@@ -491,38 +620,48 @@ function initStressLab() {
       ladderItems[activeLadderIdx].classList.add('active');
     }
 
-    stratRes.textContent = `${chosenRes} × ${chosenRes}`;
-    stratSteps.textContent = `${chosenSteps} steps`;
-    stratPrec.textContent = chosenPrec;
-    stratPredLat.textContent = `${predLat} ms`;
-    stratPredVram.textContent = `${predVram} MB`;
+    if (stratRes) stratRes.textContent = `${chosenRes} × ${chosenRes}`;
+    if (stratSteps) stratSteps.textContent = `${chosenSteps} steps`;
+    if (stratPrec) stratPrec.textContent = chosenPrec;
+    if (stratPredLat) stratPredLat.textContent = `${predLat} ms`;
+    if (stratPredVram) stratPredVram.textContent = `${predVram} MB`;
 
-    const headroom = vramBudget - predVram;
-    if (headroom >= 0) {
-      stratSafety.textContent = `+${headroom} MB headroom`;
-      stratSafety.className = 'spec-val text-success';
-    } else {
-      stratSafety.textContent = `${headroom} MB (OOM Risk)`;
-      stratSafety.className = 'spec-val text-danger';
+    if (stratSafety) {
+      const headroom = vramBudget - predVram;
+      if (headroom >= 0) {
+        stratSafety.textContent = `+${headroom} MB headroom`;
+        stratSafety.className = 'spec-val text-success';
+      } else {
+        stratSafety.textContent = `${headroom} MB (OOM Risk)`;
+        stratSafety.className = 'spec-val text-danger';
+      }
     }
 
     // Gauges
-    const latPct = Math.min(100, Math.round((predLat / latBudget) * 100));
-    latFill.style.width = `${latPct}%`;
-    latStat.textContent = `${predLat} ms / ${latBudget} ms (${latPct}% utilized)`;
+    if (latFill && latStat) {
+      const latPct = Math.min(100, Math.round((predLat / latBudget) * 100));
+      latFill.style.width = `${latPct}%`;
+      latStat.textContent = `${predLat} ms / ${latBudget} ms (${latPct}% utilized)`;
+    }
 
-    const vramPct = Math.min(100, Math.round((predVram / vramBudget) * 100));
-    vramFill.style.width = `${vramPct}%`;
-    vramStat.textContent = `${predVram} MB / ${vramBudget} MB (${vramPct}% utilized)`;
+    if (vramFill && vramStat) {
+      const vramPct = Math.min(100, Math.round((predVram / vramBudget) * 100));
+      vramFill.style.width = `${vramPct}%`;
+      vramStat.textContent = `${predVram} MB / ${vramBudget} MB (${vramPct}% utilized)`;
+    }
   }
 
-  latSlider.addEventListener('input', update);
-  vramSlider.addEventListener('input', update);
+  if (latSlider) latSlider.addEventListener('input', update);
+  if (vramSlider) vramSlider.addEventListener('input', update);
   if (modelSelect) modelSelect.addEventListener('change', update);
   update();
 
   if (stressBtn) {
     stressBtn.addEventListener('click', async () => {
+      if (!generationAvailable) {
+        alert('Live stress generation requires the GPU model runtime. This CPU deployment only serves the dashboard and API documentation.');
+        return;
+      }
       const prompt = (promptInput && promptInput.value ? promptInput.value : '').trim();
       if (!prompt) {
         alert('Please enter a prompt to stress test.');
@@ -532,6 +671,11 @@ function initStressLab() {
       const latBudget = parseInt(latSlider.value, 10);
       const vramBudget = parseInt(vramSlider.value, 10);
       const modelChoice = modelSelect ? modelSelect.value : 'sd_turbo';
+      let seedVal = null;
+      if (seedInput && seedInput.value) {
+        const parsed = parseInt(seedInput.value, 10);
+        if (!isNaN(parsed) && parsed >= 0) seedVal = parsed;
+      }
 
       // UI Loading State
       stressBtn.disabled = true;
@@ -552,19 +696,40 @@ function initStressLab() {
       }, 50);
 
       try {
+        const reqPayload = {
+          prompt: prompt,
+          latency_budget_ms: latBudget,
+          vram_budget_mb: vramBudget,
+          model_choice: modelChoice
+        };
+        if (seedVal !== null) reqPayload.seed = seedVal;
+
         const res = await fetch('/api/v1/adaptive/stress-generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt: prompt,
-            latency_budget_ms: latBudget,
-            vram_budget_mb: vramBudget,
-            model_choice: modelChoice
-          })
+          body: JSON.stringify(reqPayload)
         });
 
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
+          if (res.status === 503) {
+            clearInterval(interval);
+            if (loader) loader.classList.add('hidden');
+            if (statusTag) {
+              statusTag.textContent = 'CPU Demo';
+              statusTag.className = 'badge badge-classical';
+            }
+            if (execLat) execLat.textContent = 'Demo only · GPU required';
+            if (execBudgetStatus) {
+              execBudgetStatus.innerHTML = '<span class="text-success">Controller evaluation completed without model inference</span>';
+            }
+            if (execVram) execVram.textContent = 'No GPU allocated';
+            if (execDecision) {
+              execDecision.textContent = 'CPU deployment: adaptive strategy preview only. Enable GPU billing for image generation.';
+            }
+            if (execDetails) execDetails.classList.remove('hidden');
+            return;
+          }
           throw new Error(err.detail || `Server error HTTP ${res.status}`);
         }
 
@@ -575,7 +740,13 @@ function initStressLab() {
         // Render Image
         if (resultImg) {
           resultImg.src = data.image_url;
-          resultImg.classList.remove('hidden');
+          resultImg.onload = () => {
+            resultImg.classList.remove('hidden');
+            if (downloadBtn) {
+              downloadBtn.disabled = false;
+              downloadBtn.onclick = () => window.open(data.image_url, '_blank');
+            }
+          };
         }
 
         // Telemetry details

@@ -1,0 +1,12 @@
+{
+  "checkpoint_step": 1250,
+  "adapter_weight": 0.5,
+  "pairs_rated": 40,
+  "adapter_better": 10,
+  "base_better": 12,
+  "tie": 18,
+  "adapter_better_or_tie": 28,
+  "not_worse_fraction": 0.7,
+  "new_failures": 0,
+  "review_type": "Codex visual AI blind development review; not final holdout or human approval."
+}

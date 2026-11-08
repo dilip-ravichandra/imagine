@@ -1,0 +1,654 @@
+{
+  "summary": {
+    "reviewer": "Codex visual AI review",
+    "pairs": 40,
+    "adapted_better": 9,
+    "base_better": 16,
+    "tie": 15,
+    "adapted_not_worse_fraction": 0.6,
+    "new_failures": 0,
+    "method": "Visual side-by-side review of all randomized blind pairs; prompt adherence, anatomy/object count, composition, and visible artifacts. Subjective advisory result; not human approval."
+  },
+  "reviews": [
+    {
+      "pair": "adaptive_animal_01|steps30|seed42",
+      "prompt": "a golden retriever sitting on a porch",
+      "image_A": "blind/0001_A.png",
+      "image_B": "blind/0001_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B has more natural face and paws; A shows awkward tongue and paw artifacts.",
+      "mapping": {
+        "pair": "adaptive_animal_01|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00005.png",
+        "B_source": "adapted/00005.png"
+      }
+    },
+    {
+      "pair": "adaptive_animal_02|steps30|seed42",
+      "prompt": "a red fox walking through autumn leaves",
+      "image_A": "blind/0002_A.png",
+      "image_B": "blind/0002_B.png",
+      "winner": "A",
+      "confidence": "medium",
+      "notes": "A fox has the more coherent face; B has a distorted muzzle.",
+      "mapping": {
+        "pair": "adaptive_animal_02|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00006.png",
+        "B_source": "adapted/00006.png"
+      }
+    },
+    {
+      "pair": "adaptive_animal_03|steps30|seed42",
+      "prompt": "a white horse running across a beach",
+      "image_A": "blind/0003_A.png",
+      "image_B": "blind/0003_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Near-identical horse and beach; no clear preference.",
+      "mapping": {
+        "pair": "adaptive_animal_03|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00007.png",
+        "B_source": "base/00007.png"
+      }
+    },
+    {
+      "pair": "adaptive_animal_04|steps30|seed42",
+      "prompt": "a tiger resting beside a river",
+      "image_A": "blind/0004_A.png",
+      "image_B": "blind/0004_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B has slightly clearer face and eye detail.",
+      "mapping": {
+        "pair": "adaptive_animal_04|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00008.png",
+        "B_source": "adapted/00008.png"
+      }
+    },
+    {
+      "pair": "adaptive_animal_05|steps30|seed42",
+      "prompt": "a rabbit holding a red flower in a garden",
+      "image_A": "blind/0005_A.png",
+      "image_B": "blind/0005_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B places the flower near the rabbit rather than intersecting its body.",
+      "mapping": {
+        "pair": "adaptive_animal_05|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00009.png",
+        "B_source": "base/00009.png"
+      }
+    },
+    {
+      "pair": "adaptive_basic_01|steps30|seed42",
+      "prompt": "a mountain under a cloudy sky",
+      "image_A": "blind/0006_A.png",
+      "image_B": "blind/0006_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Both are strong mountain scenes with no decisive difference.",
+      "mapping": {
+        "pair": "adaptive_basic_01|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00030.png",
+        "B_source": "adapted/00030.png"
+      }
+    },
+    {
+      "pair": "adaptive_basic_02|steps30|seed42",
+      "prompt": "a red car parked beside a house",
+      "image_A": "blind/0007_A.png",
+      "image_B": "blind/0007_B.png",
+      "winner": "A",
+      "confidence": "medium",
+      "notes": "A shows the full red car and house; B crops the car heavily.",
+      "mapping": {
+        "pair": "adaptive_basic_02|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00031.png",
+        "B_source": "adapted/00031.png"
+      }
+    },
+    {
+      "pair": "adaptive_basic_03|steps30|seed42",
+      "prompt": "a vase of flowers on a dining table",
+      "image_A": "blind/0008_A.png",
+      "image_B": "blind/0008_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Both show a similar flower arrangement; no clear quality difference.",
+      "mapping": {
+        "pair": "adaptive_basic_03|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00032.png",
+        "B_source": "base/00032.png"
+      }
+    },
+    {
+      "pair": "adaptive_basic_04|steps30|seed42",
+      "prompt": "a lighthouse beside the ocean",
+      "image_A": "blind/0009_A.png",
+      "image_B": "blind/0009_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B gives one lighthouse beside the ocean; A duplicates the lighthouse.",
+      "mapping": {
+        "pair": "adaptive_basic_04|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00033.png",
+        "B_source": "adapted/00033.png"
+      }
+    },
+    {
+      "pair": "adaptive_basic_05|steps30|seed42",
+      "prompt": "a colorful hot air balloon above fields",
+      "image_A": "blind/0010_A.png",
+      "image_B": "blind/0010_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Both depict colorful balloons above fields; no decisive difference.",
+      "mapping": {
+        "pair": "adaptive_basic_05|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00034.png",
+        "B_source": "adapted/00034.png"
+      }
+    },
+    {
+      "pair": "adaptive_count_01|steps30|seed42",
+      "prompt": "one dog sitting beside two cats",
+      "image_A": "blind/0011_A.png",
+      "image_B": "blind/0011_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Both clearly show two cats and one dog; no clear quality difference.",
+      "mapping": {
+        "pair": "adaptive_count_01|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00035.png",
+        "B_source": "adapted/00035.png"
+      }
+    },
+    {
+      "pair": "adaptive_count_02|steps30|seed42",
+      "prompt": "two birds on a branch above a sleeping dog",
+      "image_A": "blind/0012_A.png",
+      "image_B": "blind/0012_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Both are stylized bird illustrations and miss the sleeping dog; tie.",
+      "mapping": {
+        "pair": "adaptive_count_02|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00036.png",
+        "B_source": "adapted/00036.png"
+      }
+    },
+    {
+      "pair": "adaptive_count_03|steps30|seed42",
+      "prompt": "four oranges in a white bowl",
+      "image_A": "blind/0013_A.png",
+      "image_B": "blind/0013_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B places four oranges in one bowl, closer to the requested count and grouping.",
+      "mapping": {
+        "pair": "adaptive_count_03|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00037.png",
+        "B_source": "adapted/00037.png"
+      }
+    },
+    {
+      "pair": "adaptive_count_04|steps30|seed42",
+      "prompt": "a woman holding one umbrella with two children",
+      "image_A": "blind/0014_A.png",
+      "image_B": "blind/0014_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Both are similar family scenes; the requested people count is ambiguous.",
+      "mapping": {
+        "pair": "adaptive_count_04|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00038.png",
+        "B_source": "base/00038.png"
+      }
+    },
+    {
+      "pair": "adaptive_count_05|steps30|seed42",
+      "prompt": "three colorful balloons tied to a chair",
+      "image_A": "blind/0015_A.png",
+      "image_B": "blind/0015_B.png",
+      "winner": "A",
+      "confidence": "medium",
+      "notes": "A has cleaner balloons and chair shapes; B adds distracting tangled strings.",
+      "mapping": {
+        "pair": "adaptive_count_05|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00039.png",
+        "B_source": "adapted/00039.png"
+      }
+    },
+    {
+      "pair": "adaptive_object_01|steps30|seed42",
+      "prompt": "a red apple on a wooden table",
+      "image_A": "blind/0016_A.png",
+      "image_B": "blind/0016_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Both depict a red apple on wood with similar framing.",
+      "mapping": {
+        "pair": "adaptive_object_01|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00015.png",
+        "B_source": "adapted/00015.png"
+      }
+    },
+    {
+      "pair": "adaptive_object_02|steps30|seed42",
+      "prompt": "a blue ceramic cup beside an open book",
+      "image_A": "blind/0017_A.png",
+      "image_B": "blind/0017_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B includes the open book next to the blue cup; A omits the book.",
+      "mapping": {
+        "pair": "adaptive_object_02|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00016.png",
+        "B_source": "base/00016.png"
+      }
+    },
+    {
+      "pair": "adaptive_object_03|steps30|seed42",
+      "prompt": "a yellow bicycle leaning against a brick wall",
+      "image_A": "blind/0018_A.png",
+      "image_B": "blind/0018_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Near-identical yellow bicycle against brick; no decisive difference.",
+      "mapping": {
+        "pair": "adaptive_object_03|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00017.png",
+        "B_source": "base/00017.png"
+      }
+    },
+    {
+      "pair": "adaptive_object_04|steps30|seed42",
+      "prompt": "a green suitcase on a train platform",
+      "image_A": "blind/0019_A.png",
+      "image_B": "blind/0019_B.png",
+      "winner": "A",
+      "confidence": "medium",
+      "notes": "A more clearly reads as a green suitcase on a platform; B composition is less coherent.",
+      "mapping": {
+        "pair": "adaptive_object_04|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00018.png",
+        "B_source": "base/00018.png"
+      }
+    },
+    {
+      "pair": "adaptive_object_05|steps30|seed42",
+      "prompt": "a silver alarm clock on a bedside table",
+      "image_A": "blind/0020_A.png",
+      "image_B": "blind/0020_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B makes the alarm clock the clear bedside subject.",
+      "mapping": {
+        "pair": "adaptive_object_05|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00019.png",
+        "B_source": "adapted/00019.png"
+      }
+    },
+    {
+      "pair": "adaptive_people_01|steps30|seed42",
+      "prompt": "a smiling woman wearing a yellow coat",
+      "image_A": "blind/0021_A.png",
+      "image_B": "blind/0021_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B is a cleaner, centered portrait matching the yellow coat prompt.",
+      "mapping": {
+        "pair": "adaptive_people_01|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00010.png",
+        "B_source": "base/00010.png"
+      }
+    },
+    {
+      "pair": "adaptive_people_02|steps30|seed42",
+      "prompt": "a man riding a bicycle on a city street",
+      "image_A": "blind/0022_A.png",
+      "image_B": "blind/0022_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Both show a cyclist in a city street; similar prompt fit.",
+      "mapping": {
+        "pair": "adaptive_people_02|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00011.png",
+        "B_source": "adapted/00011.png"
+      }
+    },
+    {
+      "pair": "adaptive_people_03|steps30|seed42",
+      "prompt": "two children playing with a kite in a park",
+      "image_A": "blind/0023_A.png",
+      "image_B": "blind/0023_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B shows two children playing with a kite; A shows only one child.",
+      "mapping": {
+        "pair": "adaptive_people_03|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00012.png",
+        "B_source": "base/00012.png"
+      }
+    },
+    {
+      "pair": "adaptive_people_04|steps30|seed42",
+      "prompt": "a chef standing in a small kitchen",
+      "image_A": "blind/0024_A.png",
+      "image_B": "blind/0024_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B reads more clearly as a chef cooking in a kitchen.",
+      "mapping": {
+        "pair": "adaptive_people_04|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00013.png",
+        "B_source": "adapted/00013.png"
+      }
+    },
+    {
+      "pair": "adaptive_people_05|steps30|seed42",
+      "prompt": "a musician playing guitar on a stage",
+      "image_A": "blind/0025_A.png",
+      "image_B": "blind/0025_B.png",
+      "winner": "A",
+      "confidence": "medium",
+      "notes": "A has stronger stage lighting and a clearer guitar-playing scene.",
+      "mapping": {
+        "pair": "adaptive_people_05|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00014.png",
+        "B_source": "adapted/00014.png"
+      }
+    },
+    {
+      "pair": "adaptive_scene_01|steps30|seed42",
+      "prompt": "a red ball on the left of a blue box",
+      "image_A": "blind/0026_A.png",
+      "image_B": "blind/0026_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Neither depicts the red ball left of a blue box; both miss key spatial objects.",
+      "mapping": {
+        "pair": "adaptive_scene_01|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00020.png",
+        "B_source": "adapted/00020.png"
+      }
+    },
+    {
+      "pair": "adaptive_scene_02|steps30|seed42",
+      "prompt": "a cat sitting behind a small wooden chair",
+      "image_A": "blind/0027_A.png",
+      "image_B": "blind/0027_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Both show the cat seated on a chair rather than behind it; no clear winner.",
+      "mapping": {
+        "pair": "adaptive_scene_02|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00021.png",
+        "B_source": "adapted/00021.png"
+      }
+    },
+    {
+      "pair": "adaptive_scene_03|steps30|seed42",
+      "prompt": "three apples inside a glass bowl",
+      "image_A": "blind/0028_A.png",
+      "image_B": "blind/0028_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B better matches three apples inside a bowl; A appears to have extra apples.",
+      "mapping": {
+        "pair": "adaptive_scene_03|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00022.png",
+        "B_source": "base/00022.png"
+      }
+    },
+    {
+      "pair": "adaptive_scene_04|steps30|seed42",
+      "prompt": "a bird flying above a lake with mountains behind it",
+      "image_A": "blind/0029_A.png",
+      "image_B": "blind/0029_B.png",
+      "winner": "A",
+      "confidence": "medium",
+      "notes": "A has the clearer mountain lake scene and visible bird above it.",
+      "mapping": {
+        "pair": "adaptive_scene_04|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00023.png",
+        "B_source": "adapted/00023.png"
+      }
+    },
+    {
+      "pair": "adaptive_scene_05|steps30|seed42",
+      "prompt": "a child holding an umbrella beside a parked bicycle",
+      "image_A": "blind/0030_A.png",
+      "image_B": "blind/0030_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B presents the child, umbrella, and bicycle more clearly.",
+      "mapping": {
+        "pair": "adaptive_scene_05|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00024.png",
+        "B_source": "base/00024.png"
+      }
+    },
+    {
+      "pair": "adaptive_style_01|steps30|seed42",
+      "prompt": "a unicorn in a detailed watercolor illustration",
+      "image_A": "blind/0031_A.png",
+      "image_B": "blind/0031_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Both are watercolor unicorn paintings with comparable quality.",
+      "mapping": {
+        "pair": "adaptive_style_01|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00025.png",
+        "B_source": "base/00025.png"
+      }
+    },
+    {
+      "pair": "adaptive_style_02|steps30|seed42",
+      "prompt": "a horse in a cinematic 3D render",
+      "image_A": "blind/0032_A.png",
+      "image_B": "blind/0032_B.png",
+      "winner": "A",
+      "confidence": "medium",
+      "notes": "A is the less distorted horse render; B crops the head and neck awkwardly.",
+      "mapping": {
+        "pair": "adaptive_style_02|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00026.png",
+        "B_source": "adapted/00026.png"
+      }
+    },
+    {
+      "pair": "adaptive_style_03|steps30|seed42",
+      "prompt": "a fox in a colorful comic book illustration",
+      "image_A": "blind/0033_A.png",
+      "image_B": "blind/0033_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B has a cleaner comic-book fox composition and fewer distracting frame artifacts.",
+      "mapping": {
+        "pair": "adaptive_style_03|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00027.png",
+        "B_source": "base/00027.png"
+      }
+    },
+    {
+      "pair": "adaptive_style_04|steps30|seed42",
+      "prompt": "a dragon in a realistic fantasy landscape",
+      "image_A": "blind/0034_A.png",
+      "image_B": "blind/0034_B.png",
+      "winner": "A",
+      "confidence": "medium",
+      "notes": "A gives the more coherent single-dragon landscape; B introduces a second dragon.",
+      "mapping": {
+        "pair": "adaptive_style_04|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00028.png",
+        "B_source": "adapted/00028.png"
+      }
+    },
+    {
+      "pair": "adaptive_style_05|steps30|seed42",
+      "prompt": "a robot in a clean studio product photograph",
+      "image_A": "blind/0035_A.png",
+      "image_B": "blind/0035_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Both are plausible studio robot photographs; no decisive difference.",
+      "mapping": {
+        "pair": "adaptive_style_05|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00029.png",
+        "B_source": "adapted/00029.png"
+      }
+    },
+    {
+      "pair": "adaptive_unicorn_01|steps30|seed42",
+      "prompt": "a realistic white unicorn standing in a green meadow",
+      "image_A": "blind/0036_A.png",
+      "image_B": "blind/0036_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B more clearly centers one unicorn in the meadow.",
+      "mapping": {
+        "pair": "adaptive_unicorn_01|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00000.png",
+        "B_source": "adapted/00000.png"
+      }
+    },
+    {
+      "pair": "adaptive_unicorn_02|steps30|seed42",
+      "prompt": "a blue unicorn running through a snowy forest",
+      "image_A": "blind/0037_A.png",
+      "image_B": "blind/0037_B.png",
+      "winner": "B",
+      "confidence": "medium",
+      "notes": "B makes the blue unicorn more visible against the snowy forest.",
+      "mapping": {
+        "pair": "adaptive_unicorn_02|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00001.png",
+        "B_source": "base/00001.png"
+      }
+    },
+    {
+      "pair": "adaptive_unicorn_03|steps30|seed42",
+      "prompt": "a unicorn with a golden horn beside a crystal waterfall",
+      "image_A": "blind/0038_A.png",
+      "image_B": "blind/0038_B.png",
+      "winner": "TIE",
+      "confidence": "low",
+      "notes": "Both golden-unicorn images have noticeable prompt/shape issues; tie.",
+      "mapping": {
+        "pair": "adaptive_unicorn_03|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00002.png",
+        "B_source": "adapted/00002.png"
+      }
+    },
+    {
+      "pair": "adaptive_unicorn_04|steps30|seed42",
+      "prompt": "a small unicorn foal under a rainbow",
+      "image_A": "blind/0039_A.png",
+      "image_B": "blind/0039_B.png",
+      "winner": "A",
+      "confidence": "medium",
+      "notes": "A better matches a small foal under a rainbow; B is a cropped close-up with extra horses.",
+      "mapping": {
+        "pair": "adaptive_unicorn_04|steps30|seed42",
+        "A": "base",
+        "B": "adapted",
+        "A_source": "base/00003.png",
+        "B_source": "adapted/00003.png"
+      }
+    },
+    {
+      "pair": "adaptive_unicorn_05|steps30|seed42",
+      "prompt": "a cinematic portrait of a unicorn at sunset",
+      "image_A": "blind/0040_A.png",
+      "image_B": "blind/0040_B.png",
+      "winner": "A",
+      "confidence": "medium",
+      "notes": "A gives the stronger sunset portrait; B turns the unicorn away and crops the scene.",
+      "mapping": {
+        "pair": "adaptive_unicorn_05|steps30|seed42",
+        "A": "adapted",
+        "B": "base",
+        "A_source": "adapted/00004.png",
+        "B_source": "base/00004.png"
+      }
+    }
+  ]
+}

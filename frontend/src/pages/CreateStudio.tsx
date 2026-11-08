@@ -36,6 +36,8 @@ import {
 import { Link } from 'react-router-dom';
 import WorkspaceLayout from '../components/WorkspaceLayout';
 import InteractiveCanvasMask from '../components/InteractiveCanvasMask';
+import { generateImage, generateWithModel } from '../lib/api';
+import { getModelCatalogue, ModelCatalogueEntry } from '../lib/api';
 
 interface GenerationItem {
   id: string;
@@ -64,16 +66,19 @@ const STYLE_OPTIONS = [
   'Retro Pixel',
 ];
 
-const MODEL_OPTIONS = [
-  'SD-Turbo (Realtime 0.8s)',
-  'Stable Diffusion 1.5',
-  'MobileDiffusion (Efficient)',
-  'BK-SDM-Tiny',
-  'Multimodal Vision-Diffuser',
-];
-
 const ASPECT_OPTIONS = ['1:1 Square', '16:9 Landscape', '9:16 Portrait', '4:3 Standard'];
 const QUALITY_OPTIONS = ['Quick (1-step)', 'Balanced (4-step)', 'Best (High Res)'];
+
+const STYLE_PROMPTS: Record<string, string> = {
+  Photorealistic: 'photorealistic, natural lighting, realistic materials, high detail',
+  'Cinematic 3D': 'cinematic 3D render, physically based materials, dramatic lighting, depth of field',
+  'Anime & Manga': 'anime and manga illustration, clean linework, expressive composition, cel shading',
+  'Comic Book': 'comic book art, bold ink lines, dynamic composition, rich colors, halftone detail',
+  'Fantasy Art': 'fantasy concept art, imaginative worldbuilding, atmospheric lighting, intricate detail',
+  Cyberpunk: 'cyberpunk concept art, neon lighting, futuristic technology, rain-slick atmosphere',
+  Watercolor: 'watercolor painting, visible brush texture, soft washes, paper grain',
+  'Retro Pixel': 'retro pixel art, crisp pixel clusters, limited color palette, readable silhouette',
+};
 
 const LANGUAGES = [
   { code: 'hi', name: 'Hindi (हिंदी)', sample: 'एक जादुई जंगल जिसमें चमकते हुए पेड़ और नीले फूल हैं' },
@@ -146,11 +151,13 @@ const CreateStudio: React.FC = () => {
 
   const [prompt, setPrompt] = useState('');
   const [style, setStyle] = useState('Photorealistic');
-  const [model, setModel] = useState('SD-Turbo (Realtime 0.8s)');
+  const [model, setModel] = useState('SD 1.5 Adaptive LoRA');
   const [aspect, setAspect] = useState('16:9 Landscape');
   const [quality, setQuality] = useState('Balanced (4-step)');
   const [isGenerating, setIsGenerating] = useState(false);
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+  const [modelCatalogue, setModelCatalogue] = useState<ModelCatalogueEntry[]>([]);
 
   // Voice Translation Modal State
   const [isVoiceOpen, setIsVoiceOpen] = useState(false);
@@ -170,6 +177,12 @@ const CreateStudio: React.FC = () => {
   const [showVisionAnalysis, setShowVisionAnalysis] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    getModelCatalogue()
+      .then((result) => setModelCatalogue(result.models))
+      .catch((error) => setGenerationError(error instanceof Error ? error.message : 'Unable to load model catalogue.'));
+  }, []);
 
   // Voice Recording Simulation
   const handleToggleRecord = () => {
@@ -219,22 +232,50 @@ const CreateStudio: React.FC = () => {
   };
 
   // Generate new image
-  const handleGenerate = () => {
-    if (!prompt.trim() && !attachedImage) return;
+  const handleGenerate = async () => {
+    if (!prompt.trim() && !attachedImage) {
+      setGenerationError('Enter a prompt or attach a reference image before generating.');
+      return;
+    }
 
     setIsGenerating(true);
-    const newId = `gen-${Date.now()}`;
     const newPrompt = prompt.trim() || 'Visual remix from uploaded reference image';
-
-    setTimeout(() => {
+    setGenerationError(null);
+    try {
+      const qualityMode = quality.startsWith('Quick')
+        ? 'quick'
+        : quality.startsWith('Best')
+          ? 'best'
+          : 'balanced';
+      const styledPrompt = `${newPrompt}, ${STYLE_PROMPTS[style] || STYLE_PROMPTS.Photorealistic}`;
+      const selectedModelId = modelCatalogue.find((entry) => entry.display_name === model)?.id;
+      const modelChoice = selectedModelId === 'sd15'
+        ? 'sd15_baseline'
+        : selectedModelId === 'sd15_optimized'
+          ? 'sd15_optimized'
+          : selectedModelId === 'sd15_adapted'
+            ? 'sd15_adapted'
+            : null;
+      const result = modelChoice
+        ? await generateWithModel({
+            prompt: styledPrompt,
+            modelChoice,
+            resolution: 512,
+            steps: modelChoice === 'sd15_optimized' ? 8 : 30,
+          })
+        : await generateImage({
+            prompt: styledPrompt,
+            qualityMode,
+            resolution: 512,
+          });
       const newGen: GenerationItem = {
-        id: newId,
+        id: result.request_id,
         timestamp: 'Just now',
         prompt: newPrompt,
         style,
         model,
         aspect,
-        imageUrl: `https://picsum.photos/seed/${Date.now()}/${aspect.includes('16:9') ? '900/500' : '600/600'}`,
+        imageUrl: result.image_url,
         referenceImage: attachedImage || undefined,
         voiceLanguage: spokenText && prompt.includes(translatedPrompt) ? voiceLang.name : undefined,
         originalVoiceText: spokenText && prompt.includes(translatedPrompt) ? spokenText : undefined,
@@ -247,7 +288,10 @@ const CreateStudio: React.FC = () => {
       setIsGenerating(false);
       setPrompt('');
       setAttachedImage(null);
-    }, 1400);
+    } catch (error) {
+      setGenerationError(error instanceof Error ? error.message : 'Image generation failed.');
+      setIsGenerating(false);
+    }
   };
 
   // Selective Recreation Handler
@@ -285,6 +329,21 @@ const CreateStudio: React.FC = () => {
     <WorkspaceLayout>
       <Box p={{ base: 4, md: 6 }} minH="100vh" bg="#080B0A" display="flex" flexDir="column">
         {/* Top Professional Toolbar */}
+        {generationError && (
+          <Box
+            mb={3}
+            px={4}
+            py={3}
+            borderRadius="10px"
+            bg="rgba(255,68,68,0.12)"
+            border="1px solid rgba(255,68,68,0.4)"
+            color="#FFB3B3"
+            fontSize="sm"
+            role="alert"
+          >
+            {generationError}
+          </Box>
+        )}
         <Box
           bg="#111713"
           border="1px solid #2A3A2C"
@@ -343,9 +402,25 @@ const CreateStudio: React.FC = () => {
                 w={{ base: 'full', sm: '190px' }}
                 _hover={{ borderColor: '#B7FF35' }}
               >
-                {MODEL_OPTIONS.map((m) => (
-                  <option key={m} value={m} style={{ background: '#111713' }}>
-                    {m}
+                {(modelCatalogue.length > 0 ? modelCatalogue : [{
+                  id: 'sd_turbo',
+                  display_name: 'SD-Turbo',
+                  task: 'text-to-image',
+                  role: 'Quick generation',
+                  checkpoint: 'stabilityai/sd-turbo',
+                  license_reference: 'Hugging Face model card',
+                  quality_modes: ['quick', 'balanced', 'best'],
+                  available: true,
+                  availability_reason: 'Configured and available.',
+                  configured: true,
+                }]).map((entry) => (
+                  <option
+                    key={entry.id}
+                    value={entry.display_name}
+                    disabled={!entry.available}
+                    style={{ background: '#111713' }}
+                  >
+                    {entry.display_name}{entry.available ? '' : ' (Unavailable)'}
                   </option>
                 ))}
               </Select>

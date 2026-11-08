@@ -44,8 +44,8 @@ const App: React.FC = () => {
       <Route path="/edit" element={<ProtectedRoute><ImageEditor /></ProtectedRoute>} />
       <Route path="/canvas" element={<ProtectedRoute><ImagineCanvas /></ProtectedRoute>} />
       <Route path="/storybook" element={<ProtectedRoute><StoryBookStudio /></ProtectedRoute>} />
-      <Route path="/ask-image" element={<Navigate to="/create" replace />} />
-      <Route path="/voice" element={<Navigate to="/create" replace />} />
+      <Route path="/ask-image" element={<ProtectedRoute><AskYourImage /></ProtectedRoute>} />
+      <Route path="/voice" element={<ProtectedRoute><VoiceTranslation /></ProtectedRoute>} />
       <Route path="/gallery" element={<ProtectedRoute><Gallery /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
       <Route path="/research" element={<ProtectedRoute><ModelPerformance /></ProtectedRoute>} />

@@ -13,6 +13,24 @@ DEFAULT_MODEL_ID = "stabilityai/sd-turbo"
 DEFAULT_SUPPORTED_RESOLUTIONS = (256, 384, 512, 640, 768)
 
 
+def _load_dotenv() -> None:
+    """Load simple KEY=VALUE entries without overriding explicit process variables."""
+    env_file = REPO_ROOT / ".env"
+    if not env_file.is_file():
+        return
+    for raw_line in env_file.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        name, value = line.split("=", 1)
+        name, value = name.strip(), value.strip()
+        if name and name not in os.environ:
+            os.environ[name] = value
+
+
+_load_dotenv()
+
+
 def _bool(name: str, default: bool) -> bool:
     raw = os.getenv(name)
     return default if raw is None else raw.strip().lower() in {"1", "true", "yes", "on"}
@@ -59,9 +77,14 @@ class Settings:
     adaptive_allow_synthetic: bool = False  # a profile marked synthetic is refused unless this is true
     adaptive_decision_log: Path | None = None  # optional JSON-lines file, one line per controller decision
     adapter_path: Path | None = None  # P3B: optional approved LoRA folder; None = base model only
+    adapter_weight: float = 1.0  # LoRA influence scale; must match the scale used for quality review
     # Safety: optional shared secret for /api/v1/*. None = auth OFF (default, unchanged behaviour). repr=False so the
     # key can never leak through logging/printing a Settings object.
     api_key: str | None = field(default=None, repr=False)
+    groq_api_key: str | None = field(default=None, repr=False)
+    groq_model: str = "llama-3.1-8b-instant"
+    gemini_api_key: str | None = field(default=None, repr=False)
+    gemini_model: str = "gemini-3.8-flash"
 
 
 def _path(name: str) -> Path | None:
@@ -79,6 +102,17 @@ def _api_key() -> str | None:
     if len(key) < MIN_API_KEY_CHARS:
         raise ValueError(f"API_KEY must be at least {MIN_API_KEY_CHARS} characters (use a long random value)")
     return key
+
+
+def _adapter_weight() -> float:
+    raw = os.getenv("ADAPTER_WEIGHT", "1.0").strip()
+    try:
+        weight = float(raw)
+    except ValueError as exc:
+        raise ValueError("ADAPTER_WEIGHT must be a number between 0 and 1") from exc
+    if not 0.0 <= weight <= 1.0:
+        raise ValueError("ADAPTER_WEIGHT must be between 0 and 1")
+    return weight
 
 
 def load_settings() -> Settings:
@@ -103,5 +137,10 @@ def load_settings() -> Settings:
         adaptive_allow_synthetic=_bool("ADAPTIVE_ALLOW_SYNTHETIC", False),
         adaptive_decision_log=_path("ADAPTIVE_DECISION_LOG"),
         adapter_path=Path(os.environ["ADAPTER_PATH"]) if os.getenv("ADAPTER_PATH", "").strip() else None,
+        adapter_weight=_adapter_weight(),
         api_key=_api_key(),
+        groq_api_key=os.getenv("GROQ_API_KEY") or None,
+        groq_model=os.getenv("GROQ_MODEL", "llama-3.1-8b-instant"),
+        gemini_api_key=os.getenv("GEMINI_API_KEY") or None,
+        gemini_model=os.getenv("GEMINI_MODEL", "gemini-3.8-flash"),
     )

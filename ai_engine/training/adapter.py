@@ -1,7 +1,7 @@
 """Adapter validation + the approval gate. Pure Python: no torch, safe to import from the API process.
 
 An adapter is usable by the API only if ALL hold:
-  1. adaptation.json says training completed, for stabilityai/sd-turbo at exactly the server's pinned revision;
+  1. adaptation.json says training completed for the configured base model at exactly the server's pinned revision;
   2. the weights file still has the SHA-256 recorded at training time;
   3. approval.json exists, is bound to that same SHA-256, and records a blind review that meets RULE below.
 Anything else => the caller falls back to the base model. This is an integrity check against accidents
@@ -15,12 +15,13 @@ from pathlib import Path
 from .data import DataError
 
 BASE_MODEL = "stabilityai/sd-turbo"
+SD15_BASE_MODEL = "stable-diffusion-v1-5/stable-diffusion-v1-5"
 STATUS_DONE = "training_completed_not_validated"
 LORA_WEIGHT_NAME = "pytorch_lora_weights.safetensors"  # shared by train, compare and the API so all load it identically
 APPROVAL_FILE = "approval.json"
 APPROVAL_SCHEMA = "p3b-approval-1"
 # Written before any result existed (docs/ADAPTATION.md). Judgement calls, not statistics.
-RULE = dict(required_steps=(1, 4), min_rated_pairs_per_steps=40, min_not_worse_fraction=0.70, max_new_failures=0)
+RULE = dict(required_steps=(30,), min_rated_pairs_per_steps=40, min_not_worse_fraction=0.70, max_new_failures=0)
 
 
 class AdapterRejected(DataError):
@@ -35,7 +36,7 @@ def sha256_file(p) -> str:
     return h.hexdigest()
 
 
-def validate_adapter(adapter_dir, expected_revision=None) -> dict:
+def validate_adapter(adapter_dir, expected_revision=None, expected_model=BASE_MODEL) -> dict:
     """Refuse adapters that are incomplete, mismatched, or altered since training. Returns adaptation.json."""
     adapter_dir = Path(adapter_dir)
     meta_file, weights = adapter_dir / "adaptation.json", adapter_dir / LORA_WEIGHT_NAME
@@ -44,7 +45,7 @@ def validate_adapter(adapter_dir, expected_revision=None) -> dict:
     meta = json.loads(meta_file.read_text(encoding="utf-8"))
     if meta.get("status") != STATUS_DONE:
         raise DataError(f"Adapter status is {meta.get('status')!r}, expected {STATUS_DONE!r}")
-    if meta.get("base_model") != BASE_MODEL:
+    if meta.get("base_model") != expected_model:
         raise DataError("Adapter was trained for a different base model")
     if expected_revision and meta.get("base_revision") != expected_revision:
         raise DataError("Adapter base revision differs from the revision you asked to compare against")
@@ -105,9 +106,9 @@ def evaluate_rule(per_steps: dict, failures: int, rule: dict = None) -> tuple:
 
 
 def write_approval(adapter_dir, *, per_steps: dict, failures: int, reviewer: str, sheet_sha256: str,
-                   artifacts_confirmed: bool) -> dict:
+                   artifacts_confirmed: bool, expected_model=BASE_MODEL) -> dict:
     """Write approval.json ONLY if the rule passes and the human artefact check was confirmed. Raises otherwise."""
-    meta = validate_adapter(adapter_dir)
+    meta = validate_adapter(adapter_dir, expected_model=expected_model)
     passed, reasons = evaluate_rule(per_steps, failures)
     if not artifacts_confirmed:
         reasons.append("reviewer did not confirm the absence of systematic artefacts (colour cast, texture collapse)")
@@ -123,7 +124,7 @@ def write_approval(adapter_dir, *, per_steps: dict, failures: int, reviewer: str
     return doc
 
 
-def load_approved_adapter(adapter_dir, expected_revision) -> dict:
+def load_approved_adapter(adapter_dir, expected_revision, expected_model=BASE_MODEL) -> dict:
     """What the API calls. Returns {path, sha256, bytes, base_revision, reviewer}; raises AdapterRejected otherwise.
 
     Re-evaluates the recorded tallies against the CURRENT rule, so tightening RULE later invalidates old approvals.
@@ -131,7 +132,9 @@ def load_approved_adapter(adapter_dir, expected_revision) -> dict:
     try:
         if not expected_revision:
             raise AdapterRejected("MODEL_REVISION must be pinned to the adapter's base revision before an adapter can be used")
-        meta = validate_adapter(adapter_dir, expected_revision)
+        meta = validate_adapter(adapter_dir, expected_revision, expected_model)
+        if meta.get("base_model") != expected_model:
+            raise AdapterRejected("Adapter base model differs from the configured model")
         f = Path(adapter_dir) / APPROVAL_FILE
         if not f.is_file():
             raise AdapterRejected("Adapter has not been approved (no approval.json). Run ai_engine.training.approve after a blind review")

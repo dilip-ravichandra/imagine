@@ -1,0 +1,282 @@
+[
+  {
+    "pair": "adaptive_animal_01|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00005.png",
+    "B_source": "adapted/00005.png"
+  },
+  {
+    "pair": "adaptive_animal_02|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00006.png",
+    "B_source": "adapted/00006.png"
+  },
+  {
+    "pair": "adaptive_animal_03|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00007.png",
+    "B_source": "base/00007.png"
+  },
+  {
+    "pair": "adaptive_animal_04|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00008.png",
+    "B_source": "adapted/00008.png"
+  },
+  {
+    "pair": "adaptive_animal_05|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00009.png",
+    "B_source": "base/00009.png"
+  },
+  {
+    "pair": "adaptive_basic_01|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00030.png",
+    "B_source": "adapted/00030.png"
+  },
+  {
+    "pair": "adaptive_basic_02|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00031.png",
+    "B_source": "adapted/00031.png"
+  },
+  {
+    "pair": "adaptive_basic_03|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00032.png",
+    "B_source": "base/00032.png"
+  },
+  {
+    "pair": "adaptive_basic_04|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00033.png",
+    "B_source": "adapted/00033.png"
+  },
+  {
+    "pair": "adaptive_basic_05|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00034.png",
+    "B_source": "adapted/00034.png"
+  },
+  {
+    "pair": "adaptive_count_01|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00035.png",
+    "B_source": "adapted/00035.png"
+  },
+  {
+    "pair": "adaptive_count_02|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00036.png",
+    "B_source": "adapted/00036.png"
+  },
+  {
+    "pair": "adaptive_count_03|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00037.png",
+    "B_source": "adapted/00037.png"
+  },
+  {
+    "pair": "adaptive_count_04|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00038.png",
+    "B_source": "base/00038.png"
+  },
+  {
+    "pair": "adaptive_count_05|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00039.png",
+    "B_source": "adapted/00039.png"
+  },
+  {
+    "pair": "adaptive_object_01|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00015.png",
+    "B_source": "adapted/00015.png"
+  },
+  {
+    "pair": "adaptive_object_02|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00016.png",
+    "B_source": "base/00016.png"
+  },
+  {
+    "pair": "adaptive_object_03|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00017.png",
+    "B_source": "base/00017.png"
+  },
+  {
+    "pair": "adaptive_object_04|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00018.png",
+    "B_source": "base/00018.png"
+  },
+  {
+    "pair": "adaptive_object_05|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00019.png",
+    "B_source": "adapted/00019.png"
+  },
+  {
+    "pair": "adaptive_people_01|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00010.png",
+    "B_source": "base/00010.png"
+  },
+  {
+    "pair": "adaptive_people_02|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00011.png",
+    "B_source": "adapted/00011.png"
+  },
+  {
+    "pair": "adaptive_people_03|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00012.png",
+    "B_source": "base/00012.png"
+  },
+  {
+    "pair": "adaptive_people_04|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00013.png",
+    "B_source": "adapted/00013.png"
+  },
+  {
+    "pair": "adaptive_people_05|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00014.png",
+    "B_source": "adapted/00014.png"
+  },
+  {
+    "pair": "adaptive_scene_01|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00020.png",
+    "B_source": "adapted/00020.png"
+  },
+  {
+    "pair": "adaptive_scene_02|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00021.png",
+    "B_source": "adapted/00021.png"
+  },
+  {
+    "pair": "adaptive_scene_03|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00022.png",
+    "B_source": "base/00022.png"
+  },
+  {
+    "pair": "adaptive_scene_04|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00023.png",
+    "B_source": "adapted/00023.png"
+  },
+  {
+    "pair": "adaptive_scene_05|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00024.png",
+    "B_source": "base/00024.png"
+  },
+  {
+    "pair": "adaptive_style_01|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00025.png",
+    "B_source": "base/00025.png"
+  },
+  {
+    "pair": "adaptive_style_02|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00026.png",
+    "B_source": "adapted/00026.png"
+  },
+  {
+    "pair": "adaptive_style_03|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00027.png",
+    "B_source": "base/00027.png"
+  },
+  {
+    "pair": "adaptive_style_04|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00028.png",
+    "B_source": "adapted/00028.png"
+  },
+  {
+    "pair": "adaptive_style_05|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00029.png",
+    "B_source": "adapted/00029.png"
+  },
+  {
+    "pair": "adaptive_unicorn_01|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00000.png",
+    "B_source": "adapted/00000.png"
+  },
+  {
+    "pair": "adaptive_unicorn_02|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00001.png",
+    "B_source": "base/00001.png"
+  },
+  {
+    "pair": "adaptive_unicorn_03|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00002.png",
+    "B_source": "adapted/00002.png"
+  },
+  {
+    "pair": "adaptive_unicorn_04|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00003.png",
+    "B_source": "adapted/00003.png"
+  },
+  {
+    "pair": "adaptive_unicorn_05|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00004.png",
+    "B_source": "base/00004.png"
+  }
+]

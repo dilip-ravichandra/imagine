@@ -1,0 +1,422 @@
+[
+  {
+    "id": "val_338558",
+    "prompt": "Bright yellow walls in a living room add a blast of warm color.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 338558
+  },
+  {
+    "id": "val_515107",
+    "prompt": "a man walking down a street and lots of signs and lights",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 515107
+  },
+  {
+    "id": "val_114653",
+    "prompt": "a group of young people watching a young boy skateboard down a rail over some steps",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 114653
+  },
+  {
+    "id": "val_355727",
+    "prompt": "A desk with various items, including a laptop and mouse.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 355727
+  },
+  {
+    "id": "val_537772",
+    "prompt": "a tractor trailer and a white car facing each other",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 537772
+  },
+  {
+    "id": "val_62348",
+    "prompt": "A table topped with plates and bowls of food.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 62348
+  },
+  {
+    "id": "val_59693",
+    "prompt": "A bathroom displays a sink, a toilet and a shower.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 59693
+  },
+  {
+    "id": "val_327988",
+    "prompt": "A truck is drying several items of clothing in the sun.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 327988
+  },
+  {
+    "id": "val_149027",
+    "prompt": "An elephant walking away through thick brush in Africa.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 149027
+  },
+  {
+    "id": "val_383929",
+    "prompt": "A man and a woman are standing under the umbrella.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 383929
+  },
+  {
+    "id": "val_570430",
+    "prompt": "Some people are standing on a dock by a boat.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 570430
+  },
+  {
+    "id": "val_414276",
+    "prompt": "a man is throwing a baseball at a game",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 414276
+  },
+  {
+    "id": "val_104248",
+    "prompt": "Two men play with a Wii on a family room couch.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 104248
+  },
+  {
+    "id": "val_343255",
+    "prompt": "Person performing a show in middle of field.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 343255
+  },
+  {
+    "id": "val_338431",
+    "prompt": "A little boy sitting in the grass behind an umbrella.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 338431
+  },
+  {
+    "id": "val_179735",
+    "prompt": "A toilet, sink, and shower are located inside this bathroom.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 179735
+  },
+  {
+    "id": "val_351364",
+    "prompt": "A man doing a trick on a skateboard on a ramp.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 351364
+  },
+  {
+    "id": "val_404205",
+    "prompt": "Two sheep standing next to each other on a lush green field.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 404205
+  },
+  {
+    "id": "val_563929",
+    "prompt": "A group of zebra standing side by side in a pasture.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 563929
+  },
+  {
+    "id": "val_365345",
+    "prompt": "A person skiing down a very blurry mountain.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 365345
+  },
+  {
+    "id": "val_171564",
+    "prompt": "a barn with many cows in their own places",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 171564
+  },
+  {
+    "id": "val_520940",
+    "prompt": "Asian elephant with handler in brown river, jungle in background.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 520940
+  },
+  {
+    "id": "val_452799",
+    "prompt": "Looking up into a stormy sky at a jet coming in to land",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 452799
+  },
+  {
+    "id": "val_448161",
+    "prompt": "Someone has cut their hair and left it on this plate.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 448161
+  },
+  {
+    "id": "val_283312",
+    "prompt": "Large commercial jetliner at gate on airport tarmac.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 283312
+  },
+  {
+    "id": "val_385913",
+    "prompt": "Three people are cutting a cake at a military ceremony.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 385913
+  },
+  {
+    "id": "val_316132",
+    "prompt": "A kitchen with stove, refrigerator, and sink in it.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 316132
+  },
+  {
+    "id": "val_149679",
+    "prompt": "A couple of people on bikes standing near cars.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 149679
+  },
+  {
+    "id": "val_328383",
+    "prompt": "An elephant is photographed standing in the dirt.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 328383
+  },
+  {
+    "id": "val_372554",
+    "prompt": "A man standing in grass, trying to fly an octopus kite.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 372554
+  },
+  {
+    "id": "val_487962",
+    "prompt": "A bed under a window covered in a white blanket.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 487962
+  },
+  {
+    "id": "val_277663",
+    "prompt": "A cat sitting on the arm of a chair next to a speaker.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 277663
+  },
+  {
+    "id": "val_8807",
+    "prompt": "A man standing on a tennis court holding a racquet.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 8807
+  },
+  {
+    "id": "val_487567",
+    "prompt": "A boy wearing a baseball glove and baseball shirt.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 487567
+  },
+  {
+    "id": "val_326770",
+    "prompt": "Chicken, vegetables, and rice on a plate with a fork.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 326770
+  },
+  {
+    "id": "val_577586",
+    "prompt": "Three young people pose with an award at an event",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 577586
+  },
+  {
+    "id": "val_448826",
+    "prompt": "A man holding a tennis racquet and ball on a court.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 448826
+  },
+  {
+    "id": "val_180169",
+    "prompt": "A group of men and women eating food and drinking wine while sitting on indoor picnic benches.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 180169
+  },
+  {
+    "id": "val_453409",
+    "prompt": "Crowd of attendees among colorful display on banners.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 453409
+  },
+  {
+    "id": "val_357241",
+    "prompt": "a man gets ready to toss the frisbee inside.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 357241
+  },
+  {
+    "id": "val_61803",
+    "prompt": "two kids on a horse riding a brown horse",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 61803
+  },
+  {
+    "id": "val_564898",
+    "prompt": "A herd of black goats lies on the hill near the sea.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 564898
+  },
+  {
+    "id": "val_230572",
+    "prompt": "there are many motorcycles that are parked together on the grass",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 230572
+  },
+  {
+    "id": "val_138956",
+    "prompt": "A person holding out a large sheet in a market area.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 138956
+  },
+  {
+    "id": "val_4385",
+    "prompt": "A person holds up their filled doughnut for the camera.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 4385
+  },
+  {
+    "id": "val_457067",
+    "prompt": "The person is holding a cell phone with a text message on it.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 457067
+  },
+  {
+    "id": "val_323634",
+    "prompt": "A bathroom nook has a toilet and a white sink.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 323634
+  },
+  {
+    "id": "val_527243",
+    "prompt": "A selection of cakes and cookies sitting on a table.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 527243
+  },
+  {
+    "id": "val_498651",
+    "prompt": "A man wearing a blue tie and a jacket with a beard.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 498651
+  },
+  {
+    "id": "val_540577",
+    "prompt": "A person wearing a helmet riding a skateboard",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 540577
+  },
+  {
+    "id": "val_390567",
+    "prompt": "the truck is parked on the road and is yellow",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 390567
+  },
+  {
+    "id": "val_299163",
+    "prompt": "Dog sitting on toilet and cat on small cabinet in bathroom.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 299163
+  },
+  {
+    "id": "val_207625",
+    "prompt": "A bookshelf with a clock and many books.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 207625
+  },
+  {
+    "id": "val_577207",
+    "prompt": "A black-and-white photo of a woman playing baseball.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 577207
+  },
+  {
+    "id": "val_216551",
+    "prompt": "Two zebra standing together with a black background.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 216551
+  },
+  {
+    "id": "val_371376",
+    "prompt": "A desk that includes a computer and light.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 371376
+  },
+  {
+    "id": "val_297104",
+    "prompt": "Mother and daughter enjoying a sidewalk cafe meal",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 297104
+  },
+  {
+    "id": "val_259951",
+    "prompt": "A granite kitchen counter with a laptop and cutting board on it.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 259951
+  },
+  {
+    "id": "val_398697",
+    "prompt": "a man that has something in his mouth",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 398697
+  },
+  {
+    "id": "val_370768",
+    "prompt": "An airliner travels upward on a cloudy day.",
+    "split": "dev",
+    "original_split": "unused_validation",
+    "source_image_id": 370768
+  }
+]

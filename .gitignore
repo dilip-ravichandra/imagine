@@ -11,8 +11,14 @@ __pycache__/
 *.bin
 *.onnx
 models_cache/
+data_cache/
 datasets/
 generated_images/
+# Node / Frontend / Mobile
+node_modules/
+.expo/
+dist/
+
 # Android
 android/.gradle/
 android/build/
@@ -20,13 +26,33 @@ android/app/build/
 android/local.properties
 *.apk
 *.aab
+*.keystore
+*.jks
 .idea/
 evaluation/results/p4/images/
 evaluation/results/p6_profile/images/
 evaluation/results/p7/images/
 scratch_*.py
 
+# Logs and error dumps
+*.log
+*.err
+*.err.log
+*.out.log
+
+# Temporary and backup scripts
+modal_deploy_backup.py
+modal_deploy_fixed.py
+
 # P3A adaptation (images are third-party data; adapters are large and licence-bound)
 training_data/
 adapters/
 evaluation/results/p3a_*/
+evaluation/results/**/adapted/
+evaluation/results/**/base/
+evaluation/results/**/blind/
+evaluation/results/**/blind_small/
+evaluation/results/**/*.png
+!evaluation/results/p5a/*.png
+!evaluation/results/p5b/*.png
+evaluation/results/**/*.jpg

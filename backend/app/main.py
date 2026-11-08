@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Optional
 
+import httpx
 from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
@@ -16,6 +17,7 @@ from pydantic import BaseModel, Field
 
 from .config import Settings, load_settings
 from .schemas.model import AdapterStatus, ModelInfoResponse
+from .schemas.registry import ModelCatalogueEntry, ModelCatalogueResponse
 from .schemas.prompt import PromptAnalysisRequest
 from .schemas.v1 import (API_VERSION, CapabilitiesResponse, ErrorBody, ErrorResponse,
                          GenerateRequest, GenerateResponse, HealthResponse)
@@ -25,8 +27,38 @@ from .services.errors import ServiceError
 from .services.generation import GenerationService
 from .services.multi_model import generate_with_model
 from .services.storage import ImageStore
+from .services.vision_review import review_pair
 
 log = logging.getLogger("imagineai")
+
+
+class ChatRequest(BaseModel):
+    messages: list[dict[str, str]] = Field(min_length=1, max_length=50)
+
+
+class ChatResponse(BaseModel):
+    message: str
+    model: str
+
+
+class VisionReviewRequest(BaseModel):
+    prompt: str = Field(min_length=1, max_length=500)
+    image_a: str = Field(min_length=20, max_length=12_000_000)
+    image_b: str = Field(min_length=20, max_length=12_000_000)
+
+
+class VisionReviewResponse(BaseModel):
+    winner: str
+    confidence: float
+    prompt_accuracy_A: float
+    prompt_accuracy_B: float
+    anatomy_A: float
+    anatomy_B: float
+    artifacts_A: list[str]
+    artifacts_B: list[str]
+    objects_correct_A: bool
+    objects_correct_B: bool
+    reason: str
 
 
 def _err(status_code: int, code: str, message: str, retryable: bool, action: str, rid=None):
@@ -43,6 +75,12 @@ def create_app(engine: Optional[DiffusionEngine] = None, settings: Optional[Sett
     if controller is None:  # P6: stays None unless ADAPTIVE_PROFILE is configured
         controller, monitor = build_controller(settings)
     service = GenerationService(engine, store, settings, controller, monitor)
+
+    def adapted_model_status() -> tuple[bool, str]:
+        status = engine.adapter_status()
+        reason = str(status.get("reason") or "Adapter is not configured.")
+        ready = bool(status.get("configured")) and reason.lower().startswith("approved adapter")
+        return ready, reason
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
@@ -114,6 +152,89 @@ def create_app(engine: Optional[DiffusionEngine] = None, settings: Optional[Sett
         return ModelInfoResponse(model=settings.model_id, model_revision=settings.model_revision,
                                  loaded=engine.is_loaded(), adapter=AdapterStatus(**engine.adapter_status()))
 
+    @app.get("/api/v1/models", response_model=ModelCatalogueResponse, dependencies=auth)
+    def model_catalogue():
+        """Return the backend-owned model catalogue and truthful runtime availability."""
+        generation_available, reason = engine.availability()
+        adapted_available, adapted_reason = adapted_model_status()
+        entries = [
+            ModelCatalogueEntry(
+                id="sd_turbo",
+                display_name="SD-Turbo",
+                task="text-to-image",
+                role="Quick generation",
+                checkpoint="stabilityai/sd-turbo",
+                license_reference="Hugging Face model card",
+                quality_modes=["quick", "balanced", "best"],
+                available=generation_available,
+                availability_reason=(
+                    "Available through the multi-model runtime." if generation_available
+                    else reason or "The backend is configured for a different model."
+                ),
+                configured=generation_available,
+            ),
+            ModelCatalogueEntry(
+                id="sd15",
+                display_name="Stable Diffusion 1.5",
+                task="text-to-image",
+                role="Balanced generation and LoRA base",
+                checkpoint="stable-diffusion-v1-5/stable-diffusion-v1-5",
+                license_reference="Stable Diffusion model card",
+                quality_modes=["balanced"],
+                available=generation_available,
+                availability_reason=(
+                    "Available through the multi-model runtime." if generation_available
+                    else reason or "The backend is configured for a different model."
+                ),
+                configured=generation_available,
+            ),
+            ModelCatalogueEntry(
+                id="sd15_optimized",
+                display_name="SD 1.5 Optimized (LCM)",
+                task="text-to-image",
+                role="Fast SD 1.5 generation",
+                checkpoint="stable-diffusion-v1-5/stable-diffusion-v1-5 + LCM-LoRA",
+                license_reference="Stable Diffusion and LCM model cards",
+                quality_modes=["quick", "balanced"],
+                available=generation_available,
+                availability_reason=(
+                    "Available through the multi-model runtime." if generation_available
+                    else reason or "The backend is unavailable."
+                ),
+                configured=generation_available,
+            ),
+            ModelCatalogueEntry(
+                id="sd15_adapted",
+                display_name="SD 1.5 Adaptive LoRA",
+                task="text-to-image",
+                role="COCO-trained adaptive model",
+                checkpoint="stable-diffusion-v1-5/stable-diffusion-v1-5 + COCO LoRA",
+                license_reference="Stable Diffusion model card",
+                quality_modes=["balanced"],
+                available=generation_available and adapted_available,
+                availability_reason=(
+                    f"Approved LoRA ready at weight {settings.adapter_weight:g}."
+                    if generation_available and adapted_available
+                    else adapted_reason if not adapted_available
+                    else reason or "The backend is unavailable."
+                ),
+                configured=adapted_available,
+            ),
+            ModelCatalogueEntry(
+                id="sdxl",
+                display_name="Stable Diffusion XL",
+                task="text-to-image",
+                role="Best-quality research path",
+                checkpoint="stabilityai/stable-diffusion-xl-base-1.0",
+                license_reference="Stable Diffusion XL model card",
+                quality_modes=["best"],
+                available=False,
+                availability_reason="Requires explicit model configuration and hardware validation.",
+                configured=False,
+            ),
+        ]
+        return ModelCatalogueResponse(models=entries)
+
     @app.post("/api/v1/generate", response_model=GenerateResponse, dependencies=auth)
     def generate(req: GenerateRequest, request: Request):
         # sync endpoint -> runs in the threadpool, so /health stays responsive during generation
@@ -125,6 +246,69 @@ def create_app(engine: Optional[DiffusionEngine] = None, settings: Optional[Sett
     def prompt_analysis(req: PromptAnalysisRequest):
         """Additive (P2): structured analysis of the prompt TEXT. Does not touch the model or the GPU."""
         return analyze_prompt(req.prompt)
+
+    @app.post("/api/v1/chat", response_model=ChatResponse, dependencies=auth)
+    def chat(req: ChatRequest):
+        """Proxy approved chat messages to Groq without exposing the server-side API key."""
+        if not settings.groq_api_key:
+            raise ServiceError(
+                503,
+                "CHAT_UNAVAILABLE",
+                "The assistant is unavailable because GROQ_API_KEY is not configured.",
+                False,
+                "Configure GROQ_API_KEY on the backend and retry.",
+            )
+
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    "You are ImagineAI's product assistant. Give concise, practical help about "
+                    "image generation, learning, storybooks, editing, and this product. "
+                    "Do not claim access to private data or tools you were not given."
+                ),
+            },
+            *req.messages,
+        ]
+        try:
+            response = httpx.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {settings.groq_api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={"model": settings.groq_model, "messages": messages, "temperature": 0.4},
+                timeout=30.0,
+            )
+            response.raise_for_status()
+            payload = response.json()
+            content = payload["choices"][0]["message"]["content"]
+            if not isinstance(content, str) or not content.strip():
+                raise ValueError("Groq returned an empty assistant message.")
+            return ChatResponse(message=content.strip(), model=settings.groq_model)
+        except httpx.HTTPStatusError as exc:
+            log.warning("Groq request failed with status %s", exc.response.status_code)
+            raise ServiceError(
+                502,
+                "CHAT_PROVIDER_ERROR",
+                "The assistant provider rejected the request.",
+                True,
+                "Retry the request later.",
+            ) from exc
+        except (httpx.RequestError, KeyError, IndexError, TypeError, ValueError) as exc:
+            log.warning("Groq request could not be completed: %s", type(exc).__name__)
+            raise ServiceError(
+                502,
+                "CHAT_PROVIDER_ERROR",
+                "The assistant provider did not return a usable response.",
+                True,
+                "Retry the request later.",
+            ) from exc
+
+    @app.post("/api/v1/review/pair", response_model=VisionReviewResponse, dependencies=auth)
+    def review_pair_endpoint(req: VisionReviewRequest):
+        """Return advisory structured feedback for a blinded A/B image pair."""
+        return review_pair(settings, req.prompt, req.image_a, req.image_b)
 
     @app.get("/api/v1/metrics/summary")
     def metrics_summary():
@@ -165,8 +349,23 @@ def create_app(engine: Optional[DiffusionEngine] = None, settings: Optional[Sett
 
     @app.post("/api/v1/generate/multimodel")
     def generate_multimodel(req: MultiModelRequest, request: Request):
+        if req.model_choice == "sd15_adapted":
+            ready, adapter_reason = adapted_model_status()
+            if not ready:
+                raise ServiceError(503, "MODEL_UNAVAILABLE", "The approved adapted model is unavailable.",
+                                   False, adapter_reason)
+        available, reason = engine.availability()
+        if not available:
+            raise ServiceError(
+                503,
+                "MODEL_UNAVAILABLE",
+                "Image generation is unavailable in this CPU deployment.",
+                True,
+                reason,
+            )
         rid = uuid.uuid4().hex
-        res = generate_with_model(req.prompt, req.model_choice, req.seed, req.resolution, req.steps)
+        res = generate_with_model(req.prompt, req.model_choice, req.seed, req.resolution, req.steps,
+                                  settings=settings)
         image_name = store.save(res["image"], rid)
         base = str(request.base_url).rstrip("/")
         return {
@@ -193,7 +392,21 @@ def create_app(engine: Optional[DiffusionEngine] = None, settings: Optional[Sett
     @app.post("/api/v1/adaptive/stress-generate")
     def stress_generate(req: StressGenerateRequest, request: Request):
         """Simulates real-time hardware budget stress and runs adaptive generation."""
+        available, reason = engine.availability()
+        if not available:
+            raise ServiceError(
+                503,
+                "MODEL_UNAVAILABLE",
+                "Live stress generation requires the GPU model runtime.",
+                True,
+                reason,
+            )
         model_choice = req.model_choice or "sd_turbo"
+        if model_choice == "sd15_adapted":
+            ready, adapter_reason = adapted_model_status()
+            if not ready:
+                raise ServiceError(503, "MODEL_UNAVAILABLE", "The approved adapted model is unavailable.",
+                                   False, adapter_reason)
         upscale_bicubic = False
 
         if model_choice == "sd_turbo":
@@ -250,7 +463,8 @@ def create_app(engine: Optional[DiffusionEngine] = None, settings: Optional[Sett
                 expl = f"Adequate budget ({req.latency_budget_ms} ms, {req.vram_budget_mb} MB VRAM): Full quality pipeline configuration selected."
 
         rid = uuid.uuid4().hex
-        res = generate_with_model(req.prompt, model_choice, req.seed, chosen_res, chosen_steps)
+        res = generate_with_model(req.prompt, model_choice, req.seed, chosen_res, chosen_steps,
+                                  settings=settings)
         img = res["image"]
         if upscale_bicubic:
             from PIL import Image

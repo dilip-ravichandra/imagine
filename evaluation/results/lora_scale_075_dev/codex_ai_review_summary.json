@@ -1,0 +1,11 @@
+{
+  "adapter_weight": 0.75,
+  "pairs_rated": 40,
+  "adapter_better": 14,
+  "base_better": 10,
+  "tie": 16,
+  "adapter_better_or_tie": 30,
+  "not_worse_fraction": 0.75,
+  "new_failures": 0,
+  "review_type": "Codex visual AI blind review for tuning only; not human approval."
+}

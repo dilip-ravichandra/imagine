@@ -4,9 +4,14 @@ import com.google.gson.Gson
 import com.imagineai.app.BuildConfig
 import com.imagineai.app.model.CapabilitiesResponse
 import com.imagineai.app.model.ErrorResponse
-import com.imagineai.app.model.GenerateRequest
-import com.imagineai.app.model.GenerateResponse
 import com.imagineai.app.model.HealthResponse
+import com.imagineai.app.model.MetricsSummaryResponse
+import com.imagineai.app.model.MultiModelGenerateRequest
+import com.imagineai.app.model.MultiModelGenerateResponse
+import com.imagineai.app.model.PromptAnalysisRequest
+import com.imagineai.app.model.PromptAnalysisResponse
+import com.imagineai.app.model.StressGenerateRequest
+import com.imagineai.app.model.StressGenerateResponse
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -25,8 +30,17 @@ interface ImagineAiApi {
     @GET("api/v1/capabilities")
     suspend fun capabilities(): CapabilitiesResponse
 
-    @POST("api/v1/generate")
-    suspend fun generate(@Body request: GenerateRequest): Response<GenerateResponse>
+    @GET("api/v1/metrics/summary")
+    suspend fun metricsSummary(): Response<MetricsSummaryResponse>
+
+    @POST("api/v1/generate/multimodel")
+    suspend fun generateAdapted(@Body request: MultiModelGenerateRequest): Response<MultiModelGenerateResponse>
+
+    @POST("api/v1/adaptive/stress-generate")
+    suspend fun stressGenerate(@Body request: StressGenerateRequest): Response<StressGenerateResponse>
+
+    @POST("api/v1/prompt/analysis")
+    suspend fun analyzePrompt(@Body request: PromptAnalysisRequest): Response<PromptAnalysisResponse>
 }
 
 object ApiClient {
@@ -75,7 +89,7 @@ object ApiClient {
 
         val client = OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(120, TimeUnit.SECONDS)  // Generous timeout for first-run model load
+            .readTimeout(300, TimeUnit.SECONDS)  // First request loads model pipelines
             .writeTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(authInterceptor)
             .addInterceptor(logging)

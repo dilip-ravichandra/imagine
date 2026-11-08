@@ -1,0 +1,296 @@
+{
+  "summary": {
+    "checkpoint_step": 2500,
+    "adapter_weight": 0.5,
+    "pairs_rated": 40,
+    "adapter_better": 13,
+    "base_better": 11,
+    "tie": 16,
+    "adapter_better_or_tie": 29,
+    "not_worse_fraction": 0.725,
+    "new_failures": 0,
+    "review_type": "Codex visual AI blind development review; not final holdout or human approval."
+  },
+  "reviews": [
+    {
+      "pair": "adaptive_animal_01|steps30|seed42",
+      "prompt": "a golden retriever sitting on a porch",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_animal_02|steps30|seed42",
+      "prompt": "a red fox walking through autumn leaves",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_animal_03|steps30|seed42",
+      "prompt": "a white horse running across a beach",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_animal_04|steps30|seed42",
+      "prompt": "a tiger resting beside a river",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_animal_05|steps30|seed42",
+      "prompt": "a rabbit holding a red flower in a garden",
+      "winner": "A",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_basic_01|steps30|seed42",
+      "prompt": "a mountain under a cloudy sky",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_basic_02|steps30|seed42",
+      "prompt": "a red car parked beside a house",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_basic_03|steps30|seed42",
+      "prompt": "a vase of flowers on a dining table",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_basic_04|steps30|seed42",
+      "prompt": "a lighthouse beside the ocean",
+      "winner": "A",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_basic_05|steps30|seed42",
+      "prompt": "a colorful hot air balloon above fields",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_count_01|steps30|seed42",
+      "prompt": "one dog sitting beside two cats",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_count_02|steps30|seed42",
+      "prompt": "two birds on a branch above a sleeping dog",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_count_03|steps30|seed42",
+      "prompt": "four oranges in a white bowl",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_count_04|steps30|seed42",
+      "prompt": "a woman holding one umbrella with two children",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_count_05|steps30|seed42",
+      "prompt": "three colorful balloons tied to a chair",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_object_01|steps30|seed42",
+      "prompt": "a red apple on a wooden table",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_object_02|steps30|seed42",
+      "prompt": "a blue ceramic cup beside an open book",
+      "winner": "B",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_object_03|steps30|seed42",
+      "prompt": "a yellow bicycle leaning against a brick wall",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_object_04|steps30|seed42",
+      "prompt": "a green suitcase on a train platform",
+      "winner": "A",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_object_05|steps30|seed42",
+      "prompt": "a silver alarm clock on a bedside table",
+      "winner": "A",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_people_01|steps30|seed42",
+      "prompt": "a smiling woman wearing a yellow coat",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_people_02|steps30|seed42",
+      "prompt": "a man riding a bicycle on a city street",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_people_03|steps30|seed42",
+      "prompt": "two children playing with a kite in a park",
+      "winner": "B",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_people_04|steps30|seed42",
+      "prompt": "a chef standing in a small kitchen",
+      "winner": "A",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_people_05|steps30|seed42",
+      "prompt": "a musician playing guitar on a stage",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_scene_01|steps30|seed42",
+      "prompt": "a red ball on the left of a blue box",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_scene_02|steps30|seed42",
+      "prompt": "a cat sitting behind a small wooden chair",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_scene_03|steps30|seed42",
+      "prompt": "three apples inside a glass bowl",
+      "winner": "B",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_scene_04|steps30|seed42",
+      "prompt": "a bird flying above a lake with mountains behind it",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_scene_05|steps30|seed42",
+      "prompt": "a child holding an umbrella beside a parked bicycle",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_style_01|steps30|seed42",
+      "prompt": "a unicorn in a detailed watercolor illustration",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_style_02|steps30|seed42",
+      "prompt": "a horse in a cinematic 3D render",
+      "winner": "A",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_style_03|steps30|seed42",
+      "prompt": "a fox in a colorful comic book illustration",
+      "winner": "B",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_style_04|steps30|seed42",
+      "prompt": "a dragon in a realistic fantasy landscape",
+      "winner": "A",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_style_05|steps30|seed42",
+      "prompt": "a robot in a clean studio product photograph",
+      "winner": "A",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_unicorn_01|steps30|seed42",
+      "prompt": "a realistic white unicorn standing in a green meadow",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_unicorn_02|steps30|seed42",
+      "prompt": "a blue unicorn running through a snowy forest",
+      "winner": "A",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_unicorn_03|steps30|seed42",
+      "prompt": "a unicorn with a golden horn beside a crystal waterfall",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_unicorn_04|steps30|seed42",
+      "prompt": "a small unicorn foal under a rainbow",
+      "winner": "A",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_unicorn_05|steps30|seed42",
+      "prompt": "a cinematic portrait of a unicorn at sunset",
+      "winner": "A",
+      "A_is": "adapted",
+      "B_is": "base"
+    }
+  ]
+}

@@ -3,6 +3,12 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+val backendBaseUrl = providers.gradleProperty("IMAGINEAI_BASE_URL")
+    .orElse("http://10.0.2.2:8080/")
+    .get()
+    .replace("\\", "\\\\")
+    .replace("\"", "\\\"")
+
 android {
     namespace = "com.imagineai.app"
     compileSdk = 34
@@ -14,7 +20,7 @@ android {
         versionCode = 1
         versionName = "0.0.1"
 
-        buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8000/\"")
+        buildConfigField("String", "BASE_URL", "\"$backendBaseUrl\"")
         buildConfigField("String", "API_KEY", "\"\"")
     }
 

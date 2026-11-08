@@ -13,6 +13,7 @@ class AdapterStatus(BaseModel):
     adapter_sha256: Optional[str] = None
     adapter_bytes: Optional[int] = None
     base_revision: Optional[str] = None
+    weight: Optional[float] = None
 
 
 class ModelInfoResponse(BaseModel):

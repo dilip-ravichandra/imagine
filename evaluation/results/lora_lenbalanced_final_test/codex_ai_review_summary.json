@@ -1,0 +1,22 @@
+{
+  "pairs": 99,
+  "successful_reviews": 99,
+  "failed_reviews": 0,
+  "unblinded_winner_counts": {
+    "adapted_better": 33,
+    "base_better": 13,
+    "tie": 53
+  },
+  "adapted_better_or_tie": 86,
+  "adapted_not_worse_fraction": 0.8686868686868687,
+  "new_failures": 1,
+  "threshold": {
+    "min_pairs": 40,
+    "min_adapted_not_worse_fraction": 0.7,
+    "max_new_failures": 0
+  },
+  "ai_review_threshold_passed": true,
+  "human_artifact_review_required": true,
+  "approval_written": false,
+  "adapter_weight": 0.5
+}

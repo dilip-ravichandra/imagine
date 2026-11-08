@@ -8,10 +8,9 @@ export default defineConfig({
     // Proxy API requests to backend Modal URL (replace with actual URL later)
     proxy: {
       '/api': {
-        target: 'https://your-modal-backend-url.com',
+        target: process.env.VITE_BACKEND_URL || 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },

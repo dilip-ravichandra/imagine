@@ -1,0 +1,13 @@
+{
+  "adapter_sha256": "b573dc82f72fb8f5b8ee96e491c2a479cfd85c4d5d086d29cc04341319411c40",
+  "base_revision": "451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
+  "steps": [
+    30
+  ],
+  "seeds": [
+    42
+  ],
+  "adapter_weight": 0.5,
+  "planned_runs": 40,
+  "pairs_in_sheet": 40
+}

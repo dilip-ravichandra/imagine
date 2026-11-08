@@ -380,7 +380,8 @@ def parse_args():
         default="tensorboard",
         help=(
             'The integration to report the results and logs to. Supported platforms are `"tensorboard"`'
-            ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations.'
+            ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations, or `"none"`'
+            " to disable experiment tracking."
         ),
     )
     parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
@@ -452,6 +453,8 @@ def main():
             "You cannot use both --report_to=wandb and --hub_token due to a security risk of exposing your token."
             " Please use `hf auth login` to authenticate with the Hub."
         )
+    if args.report_to == "none":
+        args.report_to = None
 
     logging_dir = Path(args.output_dir, args.logging_dir)
 

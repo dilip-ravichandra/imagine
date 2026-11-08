@@ -1,0 +1,992 @@
+[
+  {
+    "pair": "COCO_test_109454|steps30|seed42",
+    "prompt": "A young man holding up a green bottle as he drinks",
+    "image_A": "blind/0001_A.png",
+    "image_B": "blind/0001_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_123415|steps30|seed42",
+    "prompt": "An elephant standing next to a smaller elephant.",
+    "image_A": "blind/0002_A.png",
+    "image_B": "blind/0002_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_128679|steps30|seed42",
+    "prompt": "A gray and white cat sitting in window next to a tiger cat.",
+    "image_A": "blind/0003_A.png",
+    "image_B": "blind/0003_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_129663|steps30|seed42",
+    "prompt": "Two people on a tennis court swinging to hit a tennis ball.",
+    "image_A": "blind/0004_A.png",
+    "image_B": "blind/0004_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_129706|steps30|seed42",
+    "prompt": "A man is dressed like a clown magician while pointing at a picture on his cell phone.",
+    "image_A": "blind/0005_A.png",
+    "image_B": "blind/0005_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_141517|steps30|seed42",
+    "prompt": "THERE ARE ANIMALS THAT ARE GRASSING IN THE FIELD ",
+    "image_A": "blind/0006_A.png",
+    "image_B": "blind/0006_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_150538|steps30|seed42",
+    "prompt": "A lone man sitting on a bench on hill next to a large tree",
+    "image_A": "blind/0007_A.png",
+    "image_B": "blind/0007_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_159112|steps30|seed42",
+    "prompt": "A pizza covered with various toppings and some fruit wedges.",
+    "image_A": "blind/0008_A.png",
+    "image_B": "blind/0008_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_179720|steps30|seed42",
+    "prompt": "A half eaten sandwich sitting on a plate on a table.",
+    "image_A": "blind/0009_A.png",
+    "image_B": "blind/0009_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_185850|steps30|seed42",
+    "prompt": "A man with a black top hat and suit is staring at the viewer.",
+    "image_A": "blind/0010_A.png",
+    "image_B": "blind/0010_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_190595|steps30|seed42",
+    "prompt": "A little boy brushes his teeth and looks at the camera. ",
+    "image_A": "blind/0011_A.png",
+    "image_B": "blind/0011_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_192306|steps30|seed42",
+    "prompt": "A man standing on a tennis court near a large net.",
+    "image_A": "blind/0012_A.png",
+    "image_B": "blind/0012_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_194756|steps30|seed42",
+    "prompt": "A man driving a boat down a river next to shore.",
+    "image_A": "blind/0013_A.png",
+    "image_B": "blind/0013_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_200250|steps30|seed42",
+    "prompt": "People are walking by a truck with an advertisement against the former president of Iran.",
+    "image_A": "blind/0014_A.png",
+    "image_B": "blind/0014_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_211487|steps30|seed42",
+    "prompt": "A red and white fire hydrant is on the lawn.",
+    "image_A": "blind/0015_A.png",
+    "image_B": "blind/0015_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_220858|steps30|seed42",
+    "prompt": "A rowboat with paddles and no passengers is on the beach.",
+    "image_A": "blind/0016_A.png",
+    "image_B": "blind/0016_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_22213|steps30|seed42",
+    "prompt": "A group of people standing on a grass covered shore.",
+    "image_A": "blind/0017_A.png",
+    "image_B": "blind/0017_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_226883|steps30|seed42",
+    "prompt": "An animal grazing on a lush field of green grass.",
+    "image_A": "blind/0018_A.png",
+    "image_B": "blind/0018_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_229889|steps30|seed42",
+    "prompt": "A person wearing skis going up a hill in the snow.",
+    "image_A": "blind/0019_A.png",
+    "image_B": "blind/0019_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_263258|steps30|seed42",
+    "prompt": "A baseball field, in the dugout area with a young boy holding a bat with both hands and going toward the dugout.",
+    "image_A": "blind/0020_A.png",
+    "image_B": "blind/0020_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_272323|steps30|seed42",
+    "prompt": "A man is trying to pull off a skateboarding trick on his ramp. ",
+    "image_A": "blind/0021_A.png",
+    "image_B": "blind/0021_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_279030|steps30|seed42",
+    "prompt": "A shot of a tennis player in mid shot.",
+    "image_A": "blind/0022_A.png",
+    "image_B": "blind/0022_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_283910|steps30|seed42",
+    "prompt": "A group of sheep being herded by a black dog.",
+    "image_A": "blind/0023_A.png",
+    "image_B": "blind/0023_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_28506|steps30|seed42",
+    "prompt": "A kitchen with many pots and pans hanging on the wall ",
+    "image_A": "blind/0024_A.png",
+    "image_B": "blind/0024_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_289128|steps30|seed42",
+    "prompt": "A see through drink cooler in a store by the kitchen ",
+    "image_A": "blind/0025_A.png",
+    "image_B": "blind/0025_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_300034|steps30|seed42",
+    "prompt": "A picture of a modern bathroom with a glass door to the toilet and large glass mirror.",
+    "image_A": "blind/0026_A.png",
+    "image_B": "blind/0026_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_300233|steps30|seed42",
+    "prompt": "The ingredients are on the kitchen counter next to the blender.",
+    "image_A": "blind/0027_A.png",
+    "image_B": "blind/0027_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_307790|steps30|seed42",
+    "prompt": "A bird standing in the wooded area with leaves all around. ",
+    "image_A": "blind/0028_A.png",
+    "image_B": "blind/0028_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_32400|steps30|seed42",
+    "prompt": "A man in a blue outfit holding a white frisbee.",
+    "image_A": "blind/0029_A.png",
+    "image_B": "blind/0029_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_333286|steps30|seed42",
+    "prompt": "A sheep being pulled by a person with a rope.",
+    "image_A": "blind/0030_A.png",
+    "image_B": "blind/0030_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_336493|steps30|seed42",
+    "prompt": "A man holding a baseball bat while standing next to home plate.",
+    "image_A": "blind/0031_A.png",
+    "image_B": "blind/0031_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_341393|steps30|seed42",
+    "prompt": "A golden retriever laying down on the side of a pool.",
+    "image_A": "blind/0032_A.png",
+    "image_B": "blind/0032_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_34811|steps30|seed42",
+    "prompt": "A bathroom sink underneath a medicine cabinet next to a window.",
+    "image_A": "blind/0033_A.png",
+    "image_B": "blind/0033_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_361123|steps30|seed42",
+    "prompt": "A sheep in the snow with other sheep around him.",
+    "image_A": "blind/0034_A.png",
+    "image_B": "blind/0034_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_377984|steps30|seed42",
+    "prompt": "A small child riding a pony in the park.",
+    "image_A": "blind/0035_A.png",
+    "image_B": "blind/0035_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_384213|steps30|seed42",
+    "prompt": "A kitchen is shown with a variety of items on the counters.",
+    "image_A": "blind/0036_A.png",
+    "image_B": "blind/0036_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_388481|steps30|seed42",
+    "prompt": "The monitor is displaying a website for iTV.",
+    "image_A": "blind/0037_A.png",
+    "image_B": "blind/0037_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_408327|steps30|seed42",
+    "prompt": "A women with a tennis racquet in one hand and a towel in the other.",
+    "image_A": "blind/0038_A.png",
+    "image_B": "blind/0038_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_424432|steps30|seed42",
+    "prompt": "Dog watching a guinea pig on a bed sheet.",
+    "image_A": "blind/0039_A.png",
+    "image_B": "blind/0039_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_434900|steps30|seed42",
+    "prompt": "A room full of laptops and video displays",
+    "image_A": "blind/0040_A.png",
+    "image_B": "blind/0040_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_443969|steps30|seed42",
+    "prompt": "A baby girl standing in a shopping cart holding an umbrella.",
+    "image_A": "blind/0041_A.png",
+    "image_B": "blind/0041_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_469618|steps30|seed42",
+    "prompt": "A group of people sitting around  a lunch table.",
+    "image_A": "blind/0042_A.png",
+    "image_B": "blind/0042_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_474751|steps30|seed42",
+    "prompt": "A little girl laying on top of a Nintendo Wii controller.",
+    "image_A": "blind/0043_A.png",
+    "image_B": "blind/0043_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_484080|steps30|seed42",
+    "prompt": "A glass vase filled with oranges on a table next to a plate filled with even more oranges.",
+    "image_A": "blind/0044_A.png",
+    "image_B": "blind/0044_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_525616|steps30|seed42",
+    "prompt": "A group of people in a room with remotes.",
+    "image_A": "blind/0045_A.png",
+    "image_B": "blind/0045_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_527906|steps30|seed42",
+    "prompt": "breakfast sandwich with egg and meat has a bite taken out of it",
+    "image_A": "blind/0046_A.png",
+    "image_B": "blind/0046_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_529578|steps30|seed42",
+    "prompt": "A corner of a building contains a large red sign.",
+    "image_A": "blind/0047_A.png",
+    "image_B": "blind/0047_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_554595|steps30|seed42",
+    "prompt": "A man laying on top of a sandy beach laying next to a surfboard.",
+    "image_A": "blind/0048_A.png",
+    "image_B": "blind/0048_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_562121|steps30|seed42",
+    "prompt": "Two zebras fighting in a cloud of dust",
+    "image_A": "blind/0049_A.png",
+    "image_B": "blind/0049_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_570573|steps30|seed42",
+    "prompt": "A remote controller made by Sony with a disclaimer on it.",
+    "image_A": "blind/0050_A.png",
+    "image_B": "blind/0050_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_576714|steps30|seed42",
+    "prompt": "A sheep standing in a open grass field.",
+    "image_A": "blind/0051_A.png",
+    "image_B": "blind/0051_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_579548|steps30|seed42",
+    "prompt": "A pair of computer monitors a keyboard and a laptop.",
+    "image_A": "blind/0052_A.png",
+    "image_B": "blind/0052_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_68408|steps30|seed42",
+    "prompt": "A group of men kicking around a soccer ball.",
+    "image_A": "blind/0053_A.png",
+    "image_B": "blind/0053_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_69795|steps30|seed42",
+    "prompt": "A purple flower is in a watering can on the window sill.",
+    "image_A": "blind/0054_A.png",
+    "image_B": "blind/0054_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_70020|steps30|seed42",
+    "prompt": "A woman in a short pink skirt holding a tennis racquet.",
+    "image_A": "blind/0055_A.png",
+    "image_B": "blind/0055_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_73702|steps30|seed42",
+    "prompt": "A man with an umbrella hat stands next to another man.",
+    "image_A": "blind/0056_A.png",
+    "image_B": "blind/0056_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_78035|steps30|seed42",
+    "prompt": "A bathroom showing the bathtub and the sink and mirror.",
+    "image_A": "blind/0057_A.png",
+    "image_B": "blind/0057_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_89603|steps30|seed42",
+    "prompt": "A evil little doll hovering over a pile of small pumpkins.",
+    "image_A": "blind/0058_A.png",
+    "image_B": "blind/0058_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_90280|steps30|seed42",
+    "prompt": "A blender sitting next to a field full of grass.",
+    "image_A": "blind/0059_A.png",
+    "image_B": "blind/0059_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "COCO_test_97156|steps30|seed42",
+    "prompt": "A black cat sits contentedly in a suitcase.",
+    "image_A": "blind/0060_A.png",
+    "image_B": "blind/0060_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_11423|steps30|seed42",
+    "prompt": "Two large black dogs, one small black dog, and one large white dog are standing in some snow.",
+    "image_A": "blind/0061_A.png",
+    "image_B": "blind/0061_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_12356|steps30|seed42",
+    "prompt": "Three dogs playing together in a grassy field with trees in the background",
+    "image_A": "blind/0062_A.png",
+    "image_B": "blind/0062_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_12417|steps30|seed42",
+    "prompt": "There is a bunch of tourists standing around on the grass and looking at some old ruins.",
+    "image_A": "blind/0063_A.png",
+    "image_B": "blind/0063_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_13417|steps30|seed42",
+    "prompt": "A child leans over a display made up of blue and yellow plastic, while an adult looks on.",
+    "image_A": "blind/0064_A.png",
+    "image_B": "blind/0064_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_1358|steps30|seed42",
+    "prompt": "A woman's lower body can be seen as she wears blue jeans and walks in front of a large sign depicting another woman wearing a black top and sunglasses.",
+    "image_A": "blind/0065_A.png",
+    "image_B": "blind/0065_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_14558|steps30|seed42",
+    "prompt": "A man has his face in his hand and is sitting on a bench.",
+    "image_A": "blind/0066_A.png",
+    "image_B": "blind/0066_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_14796|steps30|seed42",
+    "prompt": "Two women in fluffy skirts dancing to music played by men, asking for money, while others pass them by.",
+    "image_A": "blind/0067_A.png",
+    "image_B": "blind/0067_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_16395|steps30|seed42",
+    "prompt": "A bulldozer works to demolish a decrepit building; in the background, another brick building waits for its demise, its face covered with a grid of blackened window-holes.",
+    "image_A": "blind/0068_A.png",
+    "image_B": "blind/0068_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_16416|steps30|seed42",
+    "prompt": "A woman on the uneven bars doing a gymnastics exercise while people are watch her out of focus.",
+    "image_A": "blind/0069_A.png",
+    "image_B": "blind/0069_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_16715|steps30|seed42",
+    "prompt": "An African woman in long, flowing garb, with a baby on her back, is working in a dry field with trees far off in the distance.",
+    "image_A": "blind/0070_A.png",
+    "image_B": "blind/0070_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_17208|steps30|seed42",
+    "prompt": "Two people with their hands expressively out towards a sporting event's field.",
+    "image_A": "blind/0071_A.png",
+    "image_B": "blind/0071_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_17731|steps30|seed42",
+    "prompt": "A woman sits at a restaurant with her back against a brick wall.",
+    "image_A": "blind/0072_A.png",
+    "image_B": "blind/0072_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_17733|steps30|seed42",
+    "prompt": "Three young women face each other while sitting on red plush chairs.",
+    "image_A": "blind/0073_A.png",
+    "image_B": "blind/0073_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_18979|steps30|seed42",
+    "prompt": "Three dogs running in grass, one carrying a tennis ball in mouth.",
+    "image_A": "blind/0074_A.png",
+    "image_B": "blind/0074_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_19071|steps30|seed42",
+    "prompt": "A man, dressed in bright blue jeans and a plaid shirt, mows a shaggy green lawn in his cozy suburban front yard.",
+    "image_A": "blind/0075_A.png",
+    "image_B": "blind/0075_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_219|steps30|seed42",
+    "prompt": "A mother decides to take her child on a piggyback ride outside their apartment complex.",
+    "image_A": "blind/0076_A.png",
+    "image_B": "blind/0076_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_22317|steps30|seed42",
+    "prompt": "A man strolling down the sidewalk wearing a red shirt and jeans.",
+    "image_A": "blind/0077_A.png",
+    "image_B": "blind/0077_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_23144|steps30|seed42",
+    "prompt": "There is six adults in front of a little kitchen some eating and others walking around.",
+    "image_A": "blind/0078_A.png",
+    "image_B": "blind/0078_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_23252|steps30|seed42",
+    "prompt": "At least one woman and several men are standing around outside an office building.",
+    "image_A": "blind/0079_A.png",
+    "image_B": "blind/0079_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_24043|steps30|seed42",
+    "prompt": "A man in a blue shirt lifts a long pole-handled tool towards a ceiling in a restaurant decorated in an Oriental style with small orange paper lanterns.",
+    "image_A": "blind/0080_A.png",
+    "image_B": "blind/0080_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_24425|steps30|seed42",
+    "prompt": "A man in a black hat and jacket is riding his bicycle.",
+    "image_A": "blind/0081_A.png",
+    "image_B": "blind/0081_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_24457|steps30|seed42",
+    "prompt": "A colorfully dressed young man with visible skin lesions is sitting and smoking a cigarette.",
+    "image_A": "blind/0082_A.png",
+    "image_B": "blind/0082_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_24829|steps30|seed42",
+    "prompt": "Overhead shot of 2 teenagers both looking at a shirt being held up by one of them.",
+    "image_A": "blind/0083_A.png",
+    "image_B": "blind/0083_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_26084|steps30|seed42",
+    "prompt": "Two young children working together to operate a bicycle.",
+    "image_A": "blind/0084_A.png",
+    "image_B": "blind/0084_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_26256|steps30|seed42",
+    "prompt": "A man in a laboratory coat looking into the lenses of a microscope.",
+    "image_A": "blind/0085_A.png",
+    "image_B": "blind/0085_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_26536|steps30|seed42",
+    "prompt": "A young woman is wearing a red shirt, black riding helmet, black pants, and black shoes, while riding in a saddle on a white horse.",
+    "image_A": "blind/0086_A.png",
+    "image_B": "blind/0086_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_27830|steps30|seed42",
+    "prompt": "A female runner dressed in blue athletic wear is running in a competition, while spectators line the street.",
+    "image_A": "blind/0087_A.png",
+    "image_B": "blind/0087_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_28240|steps30|seed42",
+    "prompt": "A man is resting next to his upside down bicycle taking his glove off.",
+    "image_A": "blind/0088_A.png",
+    "image_B": "blind/0088_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_29177|steps30|seed42",
+    "prompt": "A skateboarder rides the bowl of a skate park while a man watches in the background.",
+    "image_A": "blind/0089_A.png",
+    "image_B": "blind/0089_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_29250|steps30|seed42",
+    "prompt": "A group of people surrounding a man in a black and red striped shirt asking for his autograph.",
+    "image_A": "blind/0090_A.png",
+    "image_B": "blind/0090_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_3087|steps30|seed42",
+    "prompt": "A girl sits on a decorated bike with a younger boy while another girl takes a picture.",
+    "image_A": "blind/0091_A.png",
+    "image_B": "blind/0091_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_3437|steps30|seed42",
+    "prompt": "Man in black pants and vest balances between to pillars, holding two flaming torches in his right hand.",
+    "image_A": "blind/0092_A.png",
+    "image_B": "blind/0092_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_472|steps30|seed42",
+    "prompt": "A young girl wearing a blue shirt marching in a band playing a trumpet",
+    "image_A": "blind/0093_A.png",
+    "image_B": "blind/0093_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_4942|steps30|seed42",
+    "prompt": "A small boy plays with plastic blocks, cars, and animals with an adult watching closely.",
+    "image_A": "blind/0094_A.png",
+    "image_B": "blind/0094_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_5056|steps30|seed42",
+    "prompt": "A little girl in cuffed jeans, a long-sleeve pink shirt and no shoes is sleeping on the sofa.",
+    "image_A": "blind/0095_A.png",
+    "image_B": "blind/0095_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_5881|steps30|seed42",
+    "prompt": "A shirtless man with tattoos, glasses and a baseball hat, touching a spotlight that is on.",
+    "image_A": "blind/0096_A.png",
+    "image_B": "blind/0096_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_6242|steps30|seed42",
+    "prompt": "A man uses a bicycle to transport a sight that says \"Lovely,\" while another man on a motor scooter drives by.",
+    "image_A": "blind/0097_A.png",
+    "image_B": "blind/0097_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_9088|steps30|seed42",
+    "prompt": "A mountain biker makes his way up a grassy path on his red bicycle.",
+    "image_A": "blind/0098_A.png",
+    "image_B": "blind/0098_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "Flickr30K_test_9572|steps30|seed42",
+    "prompt": "A football player wearing an orange uniform smiling and holding the football.",
+    "image_A": "blind/0099_A.png",
+    "image_B": "blind/0099_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  }
+]

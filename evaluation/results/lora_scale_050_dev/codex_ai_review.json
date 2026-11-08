@@ -1,0 +1,375 @@
+{
+  "summary": {
+    "adapter_weight": 0.5,
+    "pairs_rated": 40,
+    "adapter_better": 13,
+    "base_better": 8,
+    "tie": 19,
+    "adapter_better_or_tie": 32,
+    "not_worse_fraction": 0.8,
+    "new_failures": 0,
+    "review_type": "Codex visual AI blind review for tuning only; not human approval."
+  },
+  "reviews": [
+    {
+      "pair": "adaptive_animal_01|steps30|seed42",
+      "prompt": "a golden retriever sitting on a porch",
+      "blind_A": "blind/0001_A.png",
+      "blind_B": "blind/0001_B.png",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_animal_02|steps30|seed42",
+      "prompt": "a red fox walking through autumn leaves",
+      "blind_A": "blind/0002_A.png",
+      "blind_B": "blind/0002_B.png",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_animal_03|steps30|seed42",
+      "prompt": "a white horse running across a beach",
+      "blind_A": "blind/0003_A.png",
+      "blind_B": "blind/0003_B.png",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_animal_04|steps30|seed42",
+      "prompt": "a tiger resting beside a river",
+      "blind_A": "blind/0004_A.png",
+      "blind_B": "blind/0004_B.png",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_animal_05|steps30|seed42",
+      "prompt": "a rabbit holding a red flower in a garden",
+      "blind_A": "blind/0005_A.png",
+      "blind_B": "blind/0005_B.png",
+      "winner": "A",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_basic_01|steps30|seed42",
+      "prompt": "a mountain under a cloudy sky",
+      "blind_A": "blind/0006_A.png",
+      "blind_B": "blind/0006_B.png",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_basic_02|steps30|seed42",
+      "prompt": "a red car parked beside a house",
+      "blind_A": "blind/0007_A.png",
+      "blind_B": "blind/0007_B.png",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_basic_03|steps30|seed42",
+      "prompt": "a vase of flowers on a dining table",
+      "blind_A": "blind/0008_A.png",
+      "blind_B": "blind/0008_B.png",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_basic_04|steps30|seed42",
+      "prompt": "a lighthouse beside the ocean",
+      "blind_A": "blind/0009_A.png",
+      "blind_B": "blind/0009_B.png",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_basic_05|steps30|seed42",
+      "prompt": "a colorful hot air balloon above fields",
+      "blind_A": "blind/0010_A.png",
+      "blind_B": "blind/0010_B.png",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_count_01|steps30|seed42",
+      "prompt": "one dog sitting beside two cats",
+      "blind_A": "blind/0011_A.png",
+      "blind_B": "blind/0011_B.png",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_count_02|steps30|seed42",
+      "prompt": "two birds on a branch above a sleeping dog",
+      "blind_A": "blind/0012_A.png",
+      "blind_B": "blind/0012_B.png",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_count_03|steps30|seed42",
+      "prompt": "four oranges in a white bowl",
+      "blind_A": "blind/0013_A.png",
+      "blind_B": "blind/0013_B.png",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_count_04|steps30|seed42",
+      "prompt": "a woman holding one umbrella with two children",
+      "blind_A": "blind/0014_A.png",
+      "blind_B": "blind/0014_B.png",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_count_05|steps30|seed42",
+      "prompt": "three colorful balloons tied to a chair",
+      "blind_A": "blind/0015_A.png",
+      "blind_B": "blind/0015_B.png",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_object_01|steps30|seed42",
+      "prompt": "a red apple on a wooden table",
+      "blind_A": "blind/0016_A.png",
+      "blind_B": "blind/0016_B.png",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_object_02|steps30|seed42",
+      "prompt": "a blue ceramic cup beside an open book",
+      "blind_A": "blind/0017_A.png",
+      "blind_B": "blind/0017_B.png",
+      "winner": "B",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_object_03|steps30|seed42",
+      "prompt": "a yellow bicycle leaning against a brick wall",
+      "blind_A": "blind/0018_A.png",
+      "blind_B": "blind/0018_B.png",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_object_04|steps30|seed42",
+      "prompt": "a green suitcase on a train platform",
+      "blind_A": "blind/0019_A.png",
+      "blind_B": "blind/0019_B.png",
+      "winner": "A",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_object_05|steps30|seed42",
+      "prompt": "a silver alarm clock on a bedside table",
+      "blind_A": "blind/0020_A.png",
+      "blind_B": "blind/0020_B.png",
+      "winner": "A",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_people_01|steps30|seed42",
+      "prompt": "a smiling woman wearing a yellow coat",
+      "blind_A": "blind/0021_A.png",
+      "blind_B": "blind/0021_B.png",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_people_02|steps30|seed42",
+      "prompt": "a man riding a bicycle on a city street",
+      "blind_A": "blind/0022_A.png",
+      "blind_B": "blind/0022_B.png",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_people_03|steps30|seed42",
+      "prompt": "two children playing with a kite in a park",
+      "blind_A": "blind/0023_A.png",
+      "blind_B": "blind/0023_B.png",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_people_04|steps30|seed42",
+      "prompt": "a chef standing in a small kitchen",
+      "blind_A": "blind/0024_A.png",
+      "blind_B": "blind/0024_B.png",
+      "winner": "A",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_people_05|steps30|seed42",
+      "prompt": "a musician playing guitar on a stage",
+      "blind_A": "blind/0025_A.png",
+      "blind_B": "blind/0025_B.png",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_scene_01|steps30|seed42",
+      "prompt": "a red ball on the left of a blue box",
+      "blind_A": "blind/0026_A.png",
+      "blind_B": "blind/0026_B.png",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_scene_02|steps30|seed42",
+      "prompt": "a cat sitting behind a small wooden chair",
+      "blind_A": "blind/0027_A.png",
+      "blind_B": "blind/0027_B.png",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_scene_03|steps30|seed42",
+      "prompt": "three apples inside a glass bowl",
+      "blind_A": "blind/0028_A.png",
+      "blind_B": "blind/0028_B.png",
+      "winner": "B",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_scene_04|steps30|seed42",
+      "prompt": "a bird flying above a lake with mountains behind it",
+      "blind_A": "blind/0029_A.png",
+      "blind_B": "blind/0029_B.png",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_scene_05|steps30|seed42",
+      "prompt": "a child holding an umbrella beside a parked bicycle",
+      "blind_A": "blind/0030_A.png",
+      "blind_B": "blind/0030_B.png",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_style_01|steps30|seed42",
+      "prompt": "a unicorn in a detailed watercolor illustration",
+      "blind_A": "blind/0031_A.png",
+      "blind_B": "blind/0031_B.png",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_style_02|steps30|seed42",
+      "prompt": "a horse in a cinematic 3D render",
+      "blind_A": "blind/0032_A.png",
+      "blind_B": "blind/0032_B.png",
+      "winner": "A",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_style_03|steps30|seed42",
+      "prompt": "a fox in a colorful comic book illustration",
+      "blind_A": "blind/0033_A.png",
+      "blind_B": "blind/0033_B.png",
+      "winner": "B",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_style_04|steps30|seed42",
+      "prompt": "a dragon in a realistic fantasy landscape",
+      "blind_A": "blind/0034_A.png",
+      "blind_B": "blind/0034_B.png",
+      "winner": "A",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_style_05|steps30|seed42",
+      "prompt": "a robot in a clean studio product photograph",
+      "blind_A": "blind/0035_A.png",
+      "blind_B": "blind/0035_B.png",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_unicorn_01|steps30|seed42",
+      "prompt": "a realistic white unicorn standing in a green meadow",
+      "blind_A": "blind/0036_A.png",
+      "blind_B": "blind/0036_B.png",
+      "winner": "B",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_unicorn_02|steps30|seed42",
+      "prompt": "a blue unicorn running through a snowy forest",
+      "blind_A": "blind/0037_A.png",
+      "blind_B": "blind/0037_B.png",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    },
+    {
+      "pair": "adaptive_unicorn_03|steps30|seed42",
+      "prompt": "a unicorn with a golden horn beside a crystal waterfall",
+      "blind_A": "blind/0038_A.png",
+      "blind_B": "blind/0038_B.png",
+      "winner": "TIE",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_unicorn_04|steps30|seed42",
+      "prompt": "a small unicorn foal under a rainbow",
+      "blind_A": "blind/0039_A.png",
+      "blind_B": "blind/0039_B.png",
+      "winner": "A",
+      "A_is": "base",
+      "B_is": "adapted"
+    },
+    {
+      "pair": "adaptive_unicorn_05|steps30|seed42",
+      "prompt": "a cinematic portrait of a unicorn at sunset",
+      "blind_A": "blind/0040_A.png",
+      "blind_B": "blind/0040_B.png",
+      "winner": "TIE",
+      "A_is": "adapted",
+      "B_is": "base"
+    }
+  ]
+}

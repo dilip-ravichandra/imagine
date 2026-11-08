@@ -51,7 +51,7 @@ class DiffusionEngine(ABC):
     def adapter_status(self) -> dict:
         """P3B. Safe to expose: never contains paths. Engines without adapter support report 'not configured'."""
         return dict(configured=False, active=False, reason="No adapter configured; using the base model.",
-                    adapter_sha256=None, adapter_bytes=None, base_revision=None)
+                    adapter_sha256=None, adapter_bytes=None, base_revision=None, weight=None)
 
     def is_loaded(self) -> bool:
         return False
@@ -161,12 +161,13 @@ class SDTurboEngine(DiffusionEngine):
         if not self.s.adapter_path:
             return pipe, None, "No adapter configured; using the base model."
         try:
-            info = load_approved_adapter(self.s.adapter_path, self.s.model_revision)
+            info = load_approved_adapter(self.s.adapter_path, self.s.model_revision, self.s.model_id)
         except AdapterRejected as e:
             log.warning("adapter rejected; serving the base model: %s", e)
             return pipe, None, f"Adapter not used: {e}"
         try:
             pipe.load_lora_weights(info["path"], weight_name=LORA_WEIGHT_NAME)
+            pipe.set_adapters("default_0", adapter_weights=self.s.adapter_weight)
         except Exception as exc:  # noqa: BLE001
             if _is_oom(exc, torch):
                 raise  # a real resource problem: let the caller translate it, do not hide it behind a fallback
@@ -174,8 +175,8 @@ class SDTurboEngine(DiffusionEngine):
             del pipe  # a failed load can leave half-injected layers, so never reuse this pipeline
             self._free(torch)
             return rebuild(), None, "Adapter not used: it failed to load."
-        log.info("approved adapter active sha256=%s", info["sha256"][:12])
-        return pipe, info, "Approved adapter active."
+        log.info("approved adapter active sha256=%s weight=%s", info["sha256"][:12], self.s.adapter_weight)
+        return pipe, info, f"Approved adapter active at weight {self.s.adapter_weight:g}."
 
     def is_loaded(self) -> bool:
         return self._pipe is not None
@@ -187,7 +188,7 @@ class SDTurboEngine(DiffusionEngine):
         """
         if self._precheck_reason is None:
             try:
-                load_approved_adapter(self.s.adapter_path, self.s.model_revision)
+                load_approved_adapter(self.s.adapter_path, self.s.model_revision, self.s.model_id)
                 self._precheck_reason = "Approved adapter will be applied when the model loads."
             except AdapterRejected as e:
                 log.warning("adapter will NOT be used (base model will be served): %s", e)
@@ -203,7 +204,8 @@ class SDTurboEngine(DiffusionEngine):
             reason = self._precheck() if cfg else "No adapter configured; using the base model."
         return dict(configured=cfg, active=a is not None, reason=reason,
                     adapter_sha256=a["sha256"] if a else None, adapter_bytes=a["bytes"] if a else None,
-                    base_revision=a["base_revision"] if a else None)
+                    base_revision=a["base_revision"] if a else None,
+                    weight=self.s.adapter_weight if cfg else None)
 
     @staticmethod
     def _free(torch) -> None:

@@ -1,0 +1,592 @@
+[
+  {
+    "pair": "val_104248|steps30|seed42",
+    "prompt": "Two men play with a Wii on a family room couch.",
+    "image_A": "blind/0001_A.png",
+    "image_B": "blind/0001_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_114653|steps30|seed42",
+    "prompt": "a group of young people watching a young boy skateboard down a rail over some steps",
+    "image_A": "blind/0002_A.png",
+    "image_B": "blind/0002_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_138956|steps30|seed42",
+    "prompt": "A person holding out a large sheet in a market area.",
+    "image_A": "blind/0003_A.png",
+    "image_B": "blind/0003_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_149027|steps30|seed42",
+    "prompt": "An elephant walking away through thick brush in Africa.",
+    "image_A": "blind/0004_A.png",
+    "image_B": "blind/0004_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_149679|steps30|seed42",
+    "prompt": "A couple of people on bikes standing near cars.",
+    "image_A": "blind/0005_A.png",
+    "image_B": "blind/0005_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_171564|steps30|seed42",
+    "prompt": "a barn with many cows in their own places",
+    "image_A": "blind/0006_A.png",
+    "image_B": "blind/0006_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_179735|steps30|seed42",
+    "prompt": "A toilet, sink, and shower are located inside this bathroom.",
+    "image_A": "blind/0007_A.png",
+    "image_B": "blind/0007_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_180169|steps30|seed42",
+    "prompt": "A group of men and women eating food and drinking wine while sitting on indoor picnic benches.",
+    "image_A": "blind/0008_A.png",
+    "image_B": "blind/0008_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_207625|steps30|seed42",
+    "prompt": "A bookshelf with a clock and many books.",
+    "image_A": "blind/0009_A.png",
+    "image_B": "blind/0009_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_216551|steps30|seed42",
+    "prompt": "Two zebra standing together with a black background.",
+    "image_A": "blind/0010_A.png",
+    "image_B": "blind/0010_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_230572|steps30|seed42",
+    "prompt": "there are many motorcycles that are parked together on the grass",
+    "image_A": "blind/0011_A.png",
+    "image_B": "blind/0011_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_259951|steps30|seed42",
+    "prompt": "A granite kitchen counter with a laptop and cutting board on it.",
+    "image_A": "blind/0012_A.png",
+    "image_B": "blind/0012_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_277663|steps30|seed42",
+    "prompt": "A cat sitting on the arm of a chair next to a speaker.",
+    "image_A": "blind/0013_A.png",
+    "image_B": "blind/0013_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_283312|steps30|seed42",
+    "prompt": "Large commercial jetliner at gate on airport tarmac.",
+    "image_A": "blind/0014_A.png",
+    "image_B": "blind/0014_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_297104|steps30|seed42",
+    "prompt": "Mother and daughter enjoying a sidewalk cafe meal",
+    "image_A": "blind/0015_A.png",
+    "image_B": "blind/0015_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_299163|steps30|seed42",
+    "prompt": "Dog sitting on toilet and cat on small cabinet in bathroom.",
+    "image_A": "blind/0016_A.png",
+    "image_B": "blind/0016_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_316132|steps30|seed42",
+    "prompt": "A kitchen with stove, refrigerator, and sink in it.",
+    "image_A": "blind/0017_A.png",
+    "image_B": "blind/0017_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_323634|steps30|seed42",
+    "prompt": "A bathroom nook has a toilet and a white sink.",
+    "image_A": "blind/0018_A.png",
+    "image_B": "blind/0018_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_326770|steps30|seed42",
+    "prompt": "Chicken, vegetables, and rice on a plate with a fork.",
+    "image_A": "blind/0019_A.png",
+    "image_B": "blind/0019_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_327988|steps30|seed42",
+    "prompt": "A truck is drying several items of clothing in the sun.",
+    "image_A": "blind/0020_A.png",
+    "image_B": "blind/0020_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_328383|steps30|seed42",
+    "prompt": "An elephant is photographed standing in the dirt.",
+    "image_A": "blind/0021_A.png",
+    "image_B": "blind/0021_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_338431|steps30|seed42",
+    "prompt": "A little boy sitting in the grass behind an umbrella.",
+    "image_A": "blind/0022_A.png",
+    "image_B": "blind/0022_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_338558|steps30|seed42",
+    "prompt": "Bright yellow walls in a living room add a blast of warm color.",
+    "image_A": "blind/0023_A.png",
+    "image_B": "blind/0023_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_343255|steps30|seed42",
+    "prompt": "Person performing a show in middle of field.",
+    "image_A": "blind/0024_A.png",
+    "image_B": "blind/0024_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_351364|steps30|seed42",
+    "prompt": "A man doing a trick on a skateboard on a ramp.",
+    "image_A": "blind/0025_A.png",
+    "image_B": "blind/0025_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_355727|steps30|seed42",
+    "prompt": "A desk with various items, including a laptop and mouse.",
+    "image_A": "blind/0026_A.png",
+    "image_B": "blind/0026_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_357241|steps30|seed42",
+    "prompt": "a man gets ready to toss the frisbee inside.",
+    "image_A": "blind/0027_A.png",
+    "image_B": "blind/0027_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_365345|steps30|seed42",
+    "prompt": "A person skiing down a very blurry mountain.",
+    "image_A": "blind/0028_A.png",
+    "image_B": "blind/0028_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_370768|steps30|seed42",
+    "prompt": "An airliner travels upward on a cloudy day.",
+    "image_A": "blind/0029_A.png",
+    "image_B": "blind/0029_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_371376|steps30|seed42",
+    "prompt": "A desk that includes a computer and light.",
+    "image_A": "blind/0030_A.png",
+    "image_B": "blind/0030_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_372554|steps30|seed42",
+    "prompt": "A man standing in grass, trying to fly an octopus kite.",
+    "image_A": "blind/0031_A.png",
+    "image_B": "blind/0031_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_383929|steps30|seed42",
+    "prompt": "A man and a woman are standing under the umbrella.",
+    "image_A": "blind/0032_A.png",
+    "image_B": "blind/0032_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_385913|steps30|seed42",
+    "prompt": "Three people are cutting a cake at a military ceremony.",
+    "image_A": "blind/0033_A.png",
+    "image_B": "blind/0033_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_390567|steps30|seed42",
+    "prompt": "the truck is parked on the road and is yellow",
+    "image_A": "blind/0034_A.png",
+    "image_B": "blind/0034_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_398697|steps30|seed42",
+    "prompt": "a man that has something in his mouth",
+    "image_A": "blind/0035_A.png",
+    "image_B": "blind/0035_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_404205|steps30|seed42",
+    "prompt": "Two sheep standing next to each other on a lush green field.",
+    "image_A": "blind/0036_A.png",
+    "image_B": "blind/0036_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_414276|steps30|seed42",
+    "prompt": "a man is throwing a baseball at a game",
+    "image_A": "blind/0037_A.png",
+    "image_B": "blind/0037_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_4385|steps30|seed42",
+    "prompt": "A person holds up their filled doughnut for the camera.",
+    "image_A": "blind/0038_A.png",
+    "image_B": "blind/0038_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_448161|steps30|seed42",
+    "prompt": "Someone has cut their hair and left it on this plate.",
+    "image_A": "blind/0039_A.png",
+    "image_B": "blind/0039_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_448826|steps30|seed42",
+    "prompt": "A man holding a tennis racquet and ball on a court.",
+    "image_A": "blind/0040_A.png",
+    "image_B": "blind/0040_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_452799|steps30|seed42",
+    "prompt": "Looking up into a stormy sky at a jet coming in to land",
+    "image_A": "blind/0041_A.png",
+    "image_B": "blind/0041_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_453409|steps30|seed42",
+    "prompt": "Crowd of attendees among colorful display on banners.",
+    "image_A": "blind/0042_A.png",
+    "image_B": "blind/0042_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_457067|steps30|seed42",
+    "prompt": "The person is holding a cell phone with a text message on it.",
+    "image_A": "blind/0043_A.png",
+    "image_B": "blind/0043_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_487567|steps30|seed42",
+    "prompt": "A boy wearing a baseball glove and baseball shirt.",
+    "image_A": "blind/0044_A.png",
+    "image_B": "blind/0044_B.png",
+    "blind_vote": "A",
+    "unblinded_result": "adapted_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_487962|steps30|seed42",
+    "prompt": "A bed under a window covered in a white blanket.",
+    "image_A": "blind/0045_A.png",
+    "image_B": "blind/0045_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_498651|steps30|seed42",
+    "prompt": "A man wearing a blue tie and a jacket with a beard.",
+    "image_A": "blind/0046_A.png",
+    "image_B": "blind/0046_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_515107|steps30|seed42",
+    "prompt": "a man walking down a street and lots of signs and lights",
+    "image_A": "blind/0047_A.png",
+    "image_B": "blind/0047_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_520940|steps30|seed42",
+    "prompt": "Asian elephant with handler in brown river, jungle in background.",
+    "image_A": "blind/0048_A.png",
+    "image_B": "blind/0048_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_527243|steps30|seed42",
+    "prompt": "A selection of cakes and cookies sitting on a table.",
+    "image_A": "blind/0049_A.png",
+    "image_B": "blind/0049_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_537772|steps30|seed42",
+    "prompt": "a tractor trailer and a white car facing each other",
+    "image_A": "blind/0050_A.png",
+    "image_B": "blind/0050_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_563929|steps30|seed42",
+    "prompt": "A group of zebra standing side by side in a pasture.",
+    "image_A": "blind/0051_A.png",
+    "image_B": "blind/0051_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_564898|steps30|seed42",
+    "prompt": "A herd of black goats lies on the hill near the sea.",
+    "image_A": "blind/0052_A.png",
+    "image_B": "blind/0052_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_570430|steps30|seed42",
+    "prompt": "Some people are standing on a dock by a boat.",
+    "image_A": "blind/0053_A.png",
+    "image_B": "blind/0053_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_577207|steps30|seed42",
+    "prompt": "A black-and-white photo of a woman playing baseball.",
+    "image_A": "blind/0054_A.png",
+    "image_B": "blind/0054_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_577586|steps30|seed42",
+    "prompt": "Three young people pose with an award at an event",
+    "image_A": "blind/0055_A.png",
+    "image_B": "blind/0055_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_59693|steps30|seed42",
+    "prompt": "A bathroom displays a sink, a toilet and a shower.",
+    "image_A": "blind/0056_A.png",
+    "image_B": "blind/0056_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_61803|steps30|seed42",
+    "prompt": "two kids on a horse riding a brown horse",
+    "image_A": "blind/0057_A.png",
+    "image_B": "blind/0057_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_62348|steps30|seed42",
+    "prompt": "A table topped with plates and bowls of food.",
+    "image_A": "blind/0058_A.png",
+    "image_B": "blind/0058_B.png",
+    "blind_vote": "TIE",
+    "unblinded_result": "tie",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  },
+  {
+    "pair": "val_8807|steps30|seed42",
+    "prompt": "A man standing on a tennis court holding a racquet.",
+    "image_A": "blind/0059_A.png",
+    "image_B": "blind/0059_B.png",
+    "blind_vote": "B",
+    "unblinded_result": "base_better",
+    "reviewer": "Codex visual review",
+    "review_status": "ok"
+  }
+]

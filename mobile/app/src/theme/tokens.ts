@@ -1,0 +1,38 @@
+// Shared design tokens mirroring the web palette exactly
+export const C = {
+  bg: '#080B0A',
+  surface: '#111713',
+  surfaceDark: '#0D120E',
+  inputBg: '#0F1A11',
+  hover: '#182019',
+  hoverAlt: '#1A2A1C',
+  border: '#2A3A2C',
+  borderLight: '#1A2A1C',
+  borderElevated: '#3A4A3C',
+  accent: '#B7FF35',
+  accentSecondary: '#8DDB39',
+  accentPressed: '#6FBB20',
+  accentTranslucent: 'rgba(183,255,53,0.15)',
+  accentBorder: 'rgba(183,255,53,0.25)',
+  textPrimary: '#F4F7F0',
+  textSecondary: '#A5B1A7',
+  textMuted: '#6B7B6D',
+  error: '#FF4444',
+  errorText: '#FFB3B3',
+  errorBg: 'rgba(255,68,68,0.12)',
+  warning: '#FFB800',
+};
+
+export const R = {
+  full: 9999,
+  xl2: 20,
+  xl: 18,
+  lg: 16,
+  md: 14,
+  sm: 12,
+  xs: 10,
+  xxs: 8,
+  tiny: 6,
+  nano: 4,
+  micro: 3,
+};

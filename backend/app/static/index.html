@@ -7,885 +7,928 @@
   <link rel="stylesheet" href="/static/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Header Bar -->
-  <header class="top-header">
-    <div class="header-left">
-      <div class="app-logo">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-        </svg>
-      </div>
-      <div class="app-title-group">
-        <h1 class="app-title">Imagine AI</h1>
-        <span class="app-subtitle">P3 · Resource-Efficient Text-to-Image Generation for Mobile Devices · RTX 5050</span>
-      </div>
-    </div>
-    <div class="header-right">
-      <div class="status-pill" id="system-status-pill">
-        <span class="status-dot"></span>
-        <span id="status-text">Model ready GPU · fp16</span>
-      </div>
-    </div>
-  </header>
+  <div class="app-container">
 
-  <!-- Navigation Tabs -->
-  <nav class="nav-tabs-bar">
-    <div class="nav-tabs-container">
-      <button class="nav-tab" data-tab="generate">
-        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6l2.1 2.1M5.6 18.4l2.1-2.1m8.6-8.6l2.1-2.1"/></svg>
-        <span>Generate</span>
-      </button>
-      <button class="nav-tab" data-tab="batch">
-        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        <span>Batch</span>
-      </button>
-      <button class="nav-tab" data-tab="stress">
-        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31M14 9.3V1.99M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0"/></svg>
-        <span>Stress lab</span>
-      </button>
-      <button class="nav-tab" data-tab="pipeline">
-        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-        <span>Pipeline</span>
-      </button>
-      <div class="tab-divider"></div>
-      <button class="nav-tab active" data-tab="comparison">
-        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        <span>Model comparison</span>
-      </button>
-      <button class="nav-tab" data-tab="robustness">
-        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        <span>Robustness &amp; consistency</span>
-      </button>
-      <button class="nav-tab" data-tab="failures">
-        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-        <span>Failure analysis</span>
-      </button>
-      <div class="tab-divider"></div>
-      <button class="nav-tab" data-tab="catalogue">
-        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <span>Catalogue</span>
-      </button>
-      <button class="nav-tab" data-tab="about">
-        <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        <span>About</span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- Main View Container -->
-  <main class="main-content">
-    
-    <!-- ==================== TAB 5: MODEL COMPARISON (DEFAULT / REFERENCE UI) ==================== -->
-    <section id="tab-comparison" class="tab-panel active">
-      <!-- Top 4 Summary Cards -->
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-label">Best alignment (CLIP)</div>
-          <div class="metric-value">0.333</div>
-          <div class="metric-subtext">Hybrid C1 / V4 (fp16, 2 steps)</div>
+    <!-- ==================== LEFT SIDEBAR ==================== -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 22h20L12 2z"></path>
+            <path d="M12 12l5 10H7l5-10z"></path>
+          </svg>
         </div>
-        <div class="metric-card">
-          <div class="metric-label">Inference speedup</div>
-          <div class="metric-value">3.01×</div>
-          <div class="metric-subtext">288 ms vs 866 ms Baseline (3.01x faster)</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Baseline latency</div>
-          <div class="metric-value">866 ms</div>
-          <div class="metric-subtext">SD-Turbo fp32, 4 steps (unoptimized)</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Peak VRAM reduction</div>
-          <div class="metric-value">-43.4%</div>
-          <div class="metric-subtext">3,678 MB vs 6,500 MB Baseline</div>
+        <div class="brand-info">
+          <span class="brand-name">Imagine AI</span>
+          <span class="brand-subtext">P3 · RTX 5050</span>
         </div>
       </div>
 
-      <!-- Main Comparison Card -->
-      <div class="dashboard-panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Classical vs deep learning vs hybrid</h2>
-            <p class="panel-description">Empirical measurements on the unseen test set (NVIDIA RTX 5050 Laptop GPU, PyTorch 2.11 cu128); model size, memory, and latency per image.</p>
-          </div>
-          <div class="chart-legend">
-            <span class="legend-item"><span class="legend-dot classical-color"></span> Classical CV</span>
-            <span class="legend-item"><span class="legend-dot deep-color"></span> Deep learning baseline</span>
-            <span class="legend-item"><span class="legend-dot hybrid-color"></span> Hybrid optimized</span>
-          </div>
-        </div>
+      <!-- Navigation Menu Items -->
+      <nav class="sidebar-nav">
+        <button class="nav-tab active" data-tab="generate">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6l2.1 2.1M5.6 18.4l2.1-2.1m8.6-8.6l2.1-2.1"/></svg>
+          <span>Generate</span>
+        </button>
+        <button class="nav-tab" data-tab="batch">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Batch</span>
+        </button>
+        <button class="nav-tab" data-tab="stress">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31M14 9.3V1.99M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0"/></svg>
+          <span>Stress Lab</span>
+        </button>
+        <button class="nav-tab" data-tab="pipeline">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          <span>Pipeline</span>
+        </button>
+        <button class="nav-tab" data-tab="comparison">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Model Comparison</span>
+        </button>
+        <button class="nav-tab" data-tab="robustness">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span>Robustness</span>
+        </button>
+        <button class="nav-tab" data-tab="failures">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <span>Failure Analysis</span>
+        </button>
+        <button class="nav-tab" data-tab="catalogue">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Catalogue</span>
+        </button>
+        <button class="nav-tab" data-tab="about">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span>About</span>
+        </button>
+      </nav>
 
-        <!-- Grouped Bar Chart -->
-        <div class="chart-container">
-          <div class="chart-svg-wrapper" id="grouped-bar-chart">
-            <!-- Grouped bars rendered via JS SVG for razor-sharp rendering -->
+      <!-- Sidebar Bottom: RTX 5050 Card -->
+      <div class="sidebar-footer">
+        <div class="gpu-status-card">
+          <div class="gpu-card-text">
+            <div class="gpu-pill-status">
+              <span class="gpu-status-dot"></span>
+              <span>RTX 5050</span>
+            </div>
+            <span class="gpu-sub">Model Ready</span>
           </div>
-        </div>
-
-        <!-- Horizontal Breakdown Bars (Size & Latency) -->
-        <div class="horizontal-metrics-grid">
-          <div class="horizontal-col">
-            <div class="sub-section-title">Model size / footprint</div>
-            <div class="bar-row">
-              <div class="bar-row-label">Classical filters</div>
-              <div class="bar-track">
-                <div class="bar-fill classical-fill" style="width: 2%;"></div>
-              </div>
-              <div class="bar-row-val">0.1 MB</div>
-            </div>
-            <div class="bar-row">
-              <div class="bar-row-label">Distilled UNet</div>
-              <div class="bar-track">
-                <div class="bar-fill deep-fill" style="width: 80%;"></div>
-              </div>
-              <div class="bar-row-val">3,440.0 MB</div>
-            </div>
-            <div class="bar-row">
-              <div class="bar-row-label">Hybrid full pipeline</div>
-              <div class="bar-track">
-                <div class="bar-fill hybrid-fill" style="width: 100%;"></div>
-              </div>
-              <div class="bar-row-val">4,267.0 MB</div>
-            </div>
+          <div class="gpu-chip-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="4" y="4" width="16" height="16" rx="2"/>
+              <rect x="9" y="9" width="6" height="6"/>
+              <line x1="9" y1="1" x2="9" y2="4"/>
+              <line x1="15" y1="1" x2="15" y2="4"/>
+              <line x1="9" y1="20" x2="9" y2="23"/>
+              <line x1="15" y1="20" x2="15" y2="23"/>
+              <line x1="20" y1="9" x2="23" y2="9"/>
+              <line x1="20" y1="14" x2="23" y2="14"/>
+              <line x1="1" y1="9" x2="4" y2="9"/>
+              <line x1="1" y1="14" x2="4" y2="14"/>
+            </svg>
           </div>
-
-          <div class="horizontal-col">
-            <div class="sub-section-title">Latency per image (NVIDIA RTX 5050 Laptop GPU)</div>
-            <div class="bar-row">
-              <div class="bar-row-label">Classical CV post-process</div>
-              <div class="bar-track">
-                <div class="bar-fill classical-fill" style="width: 3%;"></div>
-              </div>
-              <div class="bar-row-val">17.9 ms</div>
-            </div>
-            <div class="bar-row">
-              <div class="bar-row-label">Deep learning baseline (fp32)</div>
-              <div class="bar-track">
-                <div class="bar-fill deep-fill" style="width: 100%;"></div>
-              </div>
-              <div class="bar-row-val">866 ms</div>
-            </div>
-            <div class="bar-row">
-              <div class="bar-row-label">Hybrid optimized (fp16, 2 steps)</div>
-              <div class="bar-track">
-                <div class="bar-fill hybrid-fill" style="width: 33%;"></div>
-              </div>
-              <div class="bar-row-val highlight-val">288 ms (3.01×)</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Bottom Detailed Table -->
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Approach</th>
-                <th>CLIP score</th>
-                <th>Denoise steps</th>
-                <th>Precision</th>
-                <th>Peak VRAM</th>
-                <th>Model size</th>
-                <th>Latency (ms)</th>
-                <th>Speedup</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><span class="badge badge-classical">Classical</span> Bilateral + Unsharp mask + CLAHE</td>
-                <td>0.326</td>
-                <td>N/A</td>
-                <td>CPU / NumPy</td>
-                <td>&lt; 5 MB</td>
-                <td>0.1 MB</td>
-                <td>17.9 ms</td>
-                <td>-</td>
-              </tr>
-              <tr>
-                <td><span class="badge badge-deep">Deep Learning</span> Baseline B0 / V0 (SD-Turbo)</td>
-                <td>0.327</td>
-                <td>4 steps</td>
-                <td>fp32</td>
-                <td>6,500 MB</td>
-                <td>4,267 MB</td>
-                <td>866 ms</td>
-                <td>1.00× (Baseline)</td>
-              </tr>
-              <tr>
-                <td><span class="badge badge-deep">Deep Learning</span> Reduced Precision V1 (E1)</td>
-                <td>0.330</td>
-                <td>4 steps</td>
-                <td>fp16</td>
-                <td>3,678 MB</td>
-                <td>4,267 MB</td>
-                <td>414 ms</td>
-                <td>2.09×</td>
-              </tr>
-              <tr>
-                <td><span class="badge badge-deep">Deep Learning</span> Reduced Steps V2 (E2)</td>
-                <td>0.332</td>
-                <td>2 steps</td>
-                <td>fp32</td>
-                <td>6,500 MB</td>
-                <td>4,267 MB</td>
-                <td>575 ms</td>
-                <td>1.51×</td>
-              </tr>
-              <tr>
-                <td><span class="badge badge-deep">Deep Learning</span> Ultra-Fast V3 (E3)</td>
-                <td>0.336</td>
-                <td>1 step</td>
-                <td>fp32</td>
-                <td>6,500 MB</td>
-                <td>4,267 MB</td>
-                <td>433 ms</td>
-                <td>2.00×</td>
-              </tr>
-              <tr class="highlight-row">
-                <td><span class="badge badge-hybrid">Hybrid Optimized</span> Combined C1 / V4 (fp16 + 2 steps + CV)</td>
-                <td><strong>0.333</strong></td>
-                <td><strong>2 steps</strong></td>
-                <td><strong>fp16</strong></td>
-                <td><strong>3,678 MB</strong></td>
-                <td><strong>4,267 MB</strong></td>
-                <td><strong>288 ms</strong></td>
-                <td><strong class="highlight-val">3.01× Speedup</strong></td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </div>
+    </aside>
 
-      <!-- Dedicated Experiment: SD 1.5 Baseline -> Adapted (LoRA) -> Final Optimized -->
-      <div class="dashboard-panel" style="margin-top: 24px;">
-        <div class="panel-header">
-          <div>
-            <div class="badge badge-hybrid" style="margin-bottom: 6px;">Problem Statement 3 Core Requirement</div>
-            <h2 class="panel-title">SD 1.5 Empirical Progression: Baseline vs Adapted vs Optimized</h2>
-            <p class="panel-description">Evaluating the exact scientific progression: <strong>SD 1.5 Baseline (FP32, 30 steps)</strong> → <strong>SD 1.5 Adapted (LoRA, 30 steps)</strong> → <strong>SD 1.5 Final Optimized (LoRA + FP16 + 8 steps)</strong> alongside <strong>SD-Turbo ADD Distillation</strong> on the NVIDIA GeForce RTX 5050 Laptop GPU.</p>
+    <!-- ==================== MAIN WRAPPER ==================== -->
+    <div class="main-wrapper">
+      
+      <!-- Top Dynamic Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <span class="header-category" id="header-category">TEXT-TO-IMAGE GENERATION</span>
+          <h1 class="header-title" id="header-title">Generative Inference</h1>
+          <p class="header-desc" id="header-desc">Create high-quality, on-device images from natural language prompts</p>
+        </div>
+        <div class="header-right">
+          <div class="status-pill" id="system-status-pill">
+            <span class="status-dot"></span>
+            <span id="status-text">Model ready GPU · fp16</span>
+          </div>
+          <div class="profile-avatar" title="Signed in as Student Engineer">
+            <span>K</span>
           </div>
         </div>
+      </header>
 
-        <!-- 4-Card Summary for SD 1.5 Progression -->
-        <div class="metrics-grid" style="margin-bottom: 20px;">
-          <div class="metric-card">
-            <div class="metric-label">Baseline (SD 1.5 fp32)</div>
-            <div class="metric-value">12.43 s</div>
-            <div class="metric-subtext">30 steps · 5.65 GB VRAM · CLIP: 0.368</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Adapted (SD 1.5 + LoRA)</div>
-            <div class="metric-value">11.86 s</div>
-            <div class="metric-subtext">30 steps · 5.91 GB VRAM · CLIP: 0.335</div>
-          </div>
-          <div class="metric-card" style="border-color: #3fb950; background: rgba(63, 185, 80, 0.05);">
-            <div class="metric-label" style="color: #7ee787;">Final Optimized (LoRA + fp16 + 8s)</div>
-            <div class="metric-value highlight-val">1.65 s</div>
-            <div class="metric-subtext" style="color: #7ee787;"><strong>7.55× Speedup</strong> · 3.41 GB VRAM (-39.6%) · CLIP: 0.324</div>
-          </div>
-          <div class="metric-card" style="border-color: #58a6ff; background: rgba(56, 139, 253, 0.05);">
-            <div class="metric-label" style="color: #79c0ff;">Distilled Benchmark (SD-Turbo)</div>
-            <div class="metric-value" style="color: #58a6ff;">0.34 s</div>
-            <div class="metric-subtext"><strong>36.0× Speedup</strong> · 2 steps · 3.68 GB VRAM · CLIP: 0.342</div>
-          </div>
-        </div>
+      <!-- Main Tab Content Area -->
+      <main class="main-content">
 
-        <!-- Chart Graphic -->
-        <div style="margin-bottom: 24px; text-align: center; background: #0d1117; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 16px;">
-          <img src="/static/sd15_comparison.png" alt="Empirical Comparison Charts: Latency, VRAM, CLIP Score, Steps" style="max-width: 100%; height: auto; border-radius: var(--radius-sm); display: block; margin: 0 auto;">
-        </div>
+        <!-- ==================== TAB 1: GENERATE (DEFAULT ACTIVE) ==================== -->
+        <section id="tab-generate" class="tab-panel active">
+          <div class="generate-layout">
+            
+            <!-- Controls Column -->
+            <div class="generate-controls">
+              <div class="panel-card">
+                <h2 class="sub-title">Generative Inference Prompt</h2>
+                
+                <div class="prompt-input-wrapper">
+                  <svg class="prompt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                    <path d="M2 2l7.586 7.586"></path>
+                    <circle cx="11" cy="11" r="2"></circle>
+                  </svg>
+                  <textarea id="prompt-input" rows="3" maxlength="500" placeholder="Describe the image you want to generate in natural language...">A cozy wooden cabin beside a mountain lake at sunset</textarea>
+                  <div class="prompt-meta">
+                    <span id="char-counter">50 / 500</span>
+                    <button type="button" class="btn-text" id="clear-prompt-btn">Clear</button>
+                  </div>
+                </div>
 
-        <!-- Detailed Empirical Comparison Table -->
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Model Configuration</th>
-                <th>Sampling Steps</th>
-                <th>Precision</th>
-                <th>Inference Latency</th>
-                <th>Peak GPU VRAM</th>
-                <th>CLIP Score</th>
-                <th>Speedup vs Baseline</th>
-                <th>VRAM Saving</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Baseline:</strong> Stable Diffusion v1.5 (Unchanged)</td>
-                <td>30 steps</td>
-                <td>FP32</td>
-                <td class="mono-text">12,429.6 ms (12.43 s)</td>
-                <td class="mono-text">5,645.0 MB (5.65 GB)</td>
-                <td class="mono-text">0.368</td>
-                <td>1.00× (Reference)</td>
-                <td>0%</td>
-              </tr>
-              <tr>
-                <td><strong>Adapted:</strong> SD 1.5 + Domain LoRA (LCM-LoRA)</td>
-                <td>30 steps</td>
-                <td>FP32</td>
-                <td class="mono-text">11,858.0 ms (11.86 s)</td>
-                <td class="mono-text">5,906.1 MB (5.91 GB)</td>
-                <td class="mono-text">0.335</td>
-                <td>1.05×</td>
-                <td>-4.6% (LoRA overhead)</td>
-              </tr>
-              <tr class="highlight-row">
-                <td><strong>Final Optimized:</strong> SD 1.5 + LoRA + FP16 + LCMScheduler + CV</td>
-                <td><strong>8 steps</strong></td>
-                <td><strong>FP16</strong></td>
-                <td class="mono-text"><strong class="highlight-val">1,647.1 ms (1.65 s)</strong></td>
-                <td class="mono-text"><strong class="highlight-val">3,407.9 MB (3.41 GB)</strong></td>
-                <td class="mono-text"><strong>0.324</strong></td>
-                <td><strong class="highlight-val">7.55× Speedup</strong></td>
-                <td><strong class="highlight-val">-39.6% Reduction</strong></td>
-              </tr>
-              <tr style="background: rgba(56, 139, 253, 0.06);">
-                <td><strong>Distilled Benchmark:</strong> SD-Turbo (ADD 2-Step Architecture)</td>
-                <td><strong>2 steps</strong></td>
-                <td><strong>FP16</strong></td>
-                <td class="mono-text" style="color: #58a6ff;"><strong>344.9 ms (0.34 s)</strong></td>
-                <td class="mono-text" style="color: #58a6ff;"><strong>3,677.6 MB (3.68 GB)</strong></td>
-                <td class="mono-text" style="color: #58a6ff;"><strong>0.342</strong></td>
-                <td><strong style="color: #58a6ff;">36.0× Speedup</strong></td>
-                <td style="color: #58a6ff;"><strong>-34.9% Reduction</strong></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+                <!-- Sample Prompts -->
+                <div class="prompt-suggestions">
+                  <span class="suggestion-label">Sample prompts:</span>
+                  <button class="pill-btn sample-prompt" data-prompt="A cozy wooden cabin beside a mountain lake at sunset">Cabin at Sunset</button>
+                  <button class="pill-btn sample-prompt" data-prompt="An astronaut riding a horse on Mars, cinematic lighting, ultra high res">Astronaut on Mars</button>
+                  <button class="pill-btn sample-prompt" data-prompt="A vintage red sports car driving through a misty autumn forest road">Red Sports Car</button>
+                  <button class="pill-btn sample-prompt" data-prompt="A futuristic cyberpunk street with glowing neon signs and rain reflections">Cyberpunk Street</button>
+                </div>
 
-    <!-- ==================== TAB 1: GENERATE ==================== -->
-    <section id="tab-generate" class="tab-panel">
-      <div class="generate-layout">
-        <!-- Controls Column -->
-        <div class="generate-controls">
-          <div class="panel-card">
-            <h2 class="sub-title">Generative Inference Prompt</h2>
-            <div class="prompt-input-wrapper">
-              <textarea id="prompt-input" rows="4" maxlength="500" placeholder="Describe the image you want to generate in natural language (e.g., A cozy wooden cabin beside a mountain lake at sunset)...">A cozy wooden cabin beside a mountain lake at sunset</textarea>
-              <div class="prompt-meta">
-                <span id="char-counter">50 / 500</span>
-                <button type="button" class="btn-text" id="clear-prompt-btn">Clear</button>
+                <!-- Model Architecture Selector (2x2 Grid) -->
+                <div class="control-group">
+                  <label class="control-label">Model Architecture</label>
+                  <div class="preset-selector">
+                    <div class="preset-card model-card" data-model="sd_turbo">
+                      <div class="preset-header">
+                        <span class="preset-name">SD-Turbo (Distilled)</span>
+                        <span class="badge badge-ultra">ULTRA-FAST</span>
+                      </div>
+                      <span class="preset-desc">1-2 steps · ~345 ms · fp16</span>
+                    </div>
+
+                    <div class="preset-card model-card" data-model="sd15_optimized">
+                      <div class="preset-header">
+                        <span class="preset-name">SD 1.5 + LoRA</span>
+                        <span class="badge badge-optimized">OPTIMIZED</span>
+                      </div>
+                      <span class="preset-desc">8 steps · ~1.6 s · fp16</span>
+                    </div>
+
+                    <div class="preset-card model-card active" data-model="sd15_adapted">
+                      <div class="preset-header">
+                        <span class="preset-name">SD 1.5 Adapted LoRA</span>
+                        <span class="badge badge-approved">APPROVED</span>
+                      </div>
+                      <span class="preset-desc">30 steps · fp16 · reviewed weight 0.25</span>
+                    </div>
+
+                    <div class="preset-card model-card" data-model="sd15_baseline">
+                      <div class="preset-header">
+                        <span class="preset-name">SD 1.5 Baseline</span>
+                      </div>
+                      <span class="preset-desc">30 steps · ~12.4 s · fp32</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Quality Presets -->
+                <div class="control-group">
+                  <label class="control-label">Quality Preset</label>
+                  <div class="quality-selector">
+                    <div class="quality-card" data-preset="quick">
+                      <div class="preset-name">⚡ Quick</div>
+                      <div class="preset-desc">1 step · ~180 ms</div>
+                    </div>
+                    <div class="quality-card active" data-preset="balanced">
+                      <div class="preset-badge">RECOMMENDED</div>
+                      <div class="preset-name">⚖️ Balanced</div>
+                      <div class="preset-desc">2 steps · ~288 ms</div>
+                    </div>
+                    <div class="quality-card" data-preset="best">
+                      <div class="preset-name">👑 Best</div>
+                      <div class="preset-desc">4 steps · ~550 ms</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Advanced Settings (Collapsible) -->
+                <details class="advanced-settings">
+                  <summary>⚙️ Advanced Inference Parameters</summary>
+                  <div class="advanced-grid">
+                    <div class="form-item">
+                      <label for="resolution-select">Resolution</label>
+                      <select id="resolution-select">
+                        <option value="512" selected>512 × 512 (Standard)</option>
+                        <option value="256">256 × 256 (Mobile Low-Bandwidth)</option>
+                        <option value="640">640 × 640 (Expanded)</option>
+                        <option value="768">768 × 768 (High-Res)</option>
+                      </select>
+                    </div>
+                    <div class="form-item">
+                      <label for="seed-input">Random Seed (-1 for random)</label>
+                      <input type="number" id="seed-input" value="42" min="-1" max="9999999">
+                    </div>
+                    <div class="form-item full-width">
+                      <label class="checkbox-label">
+                        <input type="checkbox" id="cv-postprocess-toggle" checked>
+                        <span>Classical CV Post-Processing (Bilateral Edge Preservation + Halo Guard + CLAHE)</span>
+                      </label>
+                    </div>
+                  </div>
+                </details>
+
+                <!-- Linguistic Analysis Box -->
+                <div class="analysis-box" id="analysis-box">
+                  <div class="analysis-header">
+                    <span class="analysis-title">✦ Linguistic Consistency &amp; Attribute Parser</span>
+                    <span class="analysis-status" id="parser-status">Analyzed</span>
+                  </div>
+                  <div class="analysis-body" id="analysis-content">
+                    <div class="tag-row">
+                      <span class="tag-label">Objects:</span>
+                      <span id="analysis-objects" class="tag-list"><span class="tag">cabin (1)</span> <span class="tag">lake (1)</span></span>
+                    </div>
+                    <div class="tag-row">
+                      <span class="tag-label">Attributes:</span>
+                      <span id="analysis-attrs" class="tag-list"><span class="tag">wooden</span> <span class="tag">cozy</span></span>
+                    </div>
+                    <div class="tag-row">
+                      <span class="tag-label">Environment:</span>
+                      <span id="analysis-env" class="tag-list"><span class="tag">sunset</span> <span class="tag">mountain</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Generate Action Button -->
+                <button id="generate-btn" class="btn-primary">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  <span>Generate Image</span>
+                </button>
               </div>
             </div>
 
-            <!-- Quick sample prompts -->
-            <div class="prompt-suggestions">
-              <span class="suggestion-label">Sample prompts:</span>
-              <button class="pill-btn sample-prompt" data-prompt="A cozy wooden cabin beside a mountain lake at sunset">Cabin at Sunset</button>
-              <button class="pill-btn sample-prompt" data-prompt="An astronaut riding a horse on Mars, cinematic lighting, ultra high res">Astronaut on Mars</button>
-              <button class="pill-btn sample-prompt" data-prompt="A vintage red sports car driving through a misty autumn forest road">Red Sports Car</button>
-              <button class="pill-btn sample-prompt" data-prompt="A futuristic cyberpunk street with glowing neon signs and rain reflections">Cyberpunk Street</button>
-            </div>
+            <!-- Output Column -->
+            <div class="generate-output">
+              <div class="panel-card output-card">
+                <div class="output-header">
+                  <h2 class="sub-title">Generated Output</h2>
+                  <div class="output-actions">
+                    <button id="download-btn" class="btn-icon" title="Download Image">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </button>
+                    <button class="btn-icon" title="Expand Fullscreen" onclick="window.open(document.getElementById('generated-image').src, '_blank')">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                    </button>
+                    <button class="btn-icon" title="Share Link">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    </button>
+                  </div>
+                </div>
 
-            <!-- Model Architecture Selector -->
-            <div class="control-group">
-              <label class="control-label">Model Architecture</label>
-              <div class="preset-selector" style="grid-template-columns: 1fr 1fr; margin-bottom: 12px;">
-                <button type="button" class="preset-card model-card active" data-model="sd_turbo">
-                  <div class="preset-badge">Ultra-Fast</div>
-                  <div class="preset-name">SD-Turbo (Distilled)</div>
-                  <div class="preset-desc">1-2 steps · ~345 ms · fp16</div>
-                </button>
-                <button type="button" class="preset-card model-card" data-model="sd15_optimized">
-                  <div class="preset-badge" style="background: #3fb950;">Optimized</div>
-                  <div class="preset-name">SD 1.5 + LoRA</div>
-                  <div class="preset-desc">8 steps · ~1.6 s · fp16</div>
-                </button>
-                <button type="button" class="preset-card model-card" data-model="sd15_adapted">
-                  <div class="preset-name">SD 1.5 Adapted</div>
-                  <div class="preset-desc">30 steps · ~11.8 s · fp32</div>
-                </button>
-                <button type="button" class="preset-card model-card" data-model="sd15_baseline">
-                  <div class="preset-name">SD 1.5 Baseline</div>
-                  <div class="preset-desc">30 steps · ~12.4 s · fp32</div>
-                </button>
+                <!-- Image Viewer -->
+                <div class="image-viewer-container" id="image-viewer">
+                  <div class="placeholder-state hidden" id="image-placeholder">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                      <circle cx="8.5" cy="8.5" r="1.5"/>
+                      <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    <p>Click "Generate Image" to run inference on the RTX 5050 GPU</p>
+                    <span class="sub-tip">Average latency: ~288 ms (Balanced)</span>
+                  </div>
+                  <div class="loading-state hidden" id="image-loader">
+                    <div class="spinner"></div>
+                    <p>Running Distilled Latent Diffusion on RTX 5050...</p>
+                    <span class="timer" id="live-timer">0.00 s</span>
+                  </div>
+                  <!-- Initial showcase visual matching reference screenshot -->
+                  <img id="generated-image" class="result-image" src="/static/demo_cabin.png" alt="Generated visual result">
+                </div>
+
+                <!-- Telemetry Metrics Strip (Matching reference pill bar) -->
+                <div class="telemetry-strip" id="telemetry-panel">
+                  <div class="telemetry-mini-pill">
+                    <span class="pill-icon">⏱️</span>
+                    <span class="pill-label">Latency</span>
+                    <span id="tel-latency" class="pill-val">288.4 ms</span>
+                  </div>
+                  <div class="telemetry-mini-pill">
+                    <span class="pill-icon">💾</span>
+                    <span class="pill-label">VRAM</span>
+                    <span id="tel-vram" class="pill-val">3,678 MB</span>
+                  </div>
+                  <div class="telemetry-mini-pill">
+                    <span class="pill-icon">🎯</span>
+                    <span class="pill-label">Precision</span>
+                    <span id="tel-precision" class="pill-val">fp16</span>
+                  </div>
+                  <div class="telemetry-mini-pill">
+                    <span class="pill-icon">🔢</span>
+                    <span class="pill-label">Steps</span>
+                    <span id="tel-steps" class="pill-val">2</span>
+                  </div>
+                </div>
+
+                <!-- Telemetry Technical Details -->
+                <div class="telemetry-details">
+                  <div class="tel-row"><span>Base Model:</span> <span class="mono-text">stabilityai/sd-turbo @ b261bac</span></div>
+                  <div class="tel-row"><span>Scheduler:</span> <span class="mono-text">EulerDiscrete (trailing)</span></div>
+                  <div class="tel-row"><span>Classical CV:</span> <span class="mono-text">Bilateral (σ_c=0.1, σ_s=3) + Halo Guard</span></div>
+                  <div class="tel-row"><span>Adaptive Resource:</span> <span class="mono-text" id="tel-decision">Optimal configuration (no budget fallback needed)</span></div>
+                </div>
+
               </div>
             </div>
 
-            <!-- Quality Presets -->
-            <div class="control-group">
-              <label class="control-label">Quality Preset</label>
-              <div class="preset-selector">
-                <button type="button" class="preset-card" data-preset="quick">
-                  <div class="preset-name">Quick</div>
-                  <div class="preset-desc">1 step · ~180 ms</div>
-                </button>
-                <button type="button" class="preset-card active" data-preset="balanced">
-                  <div class="preset-badge">Recommended</div>
-                  <div class="preset-name">Balanced</div>
-                  <div class="preset-desc">2 steps · ~288 ms</div>
-                </button>
-                <button type="button" class="preset-card" data-preset="best">
-                  <div class="preset-name">Best</div>
-                  <div class="preset-desc">4 steps · ~550 ms</div>
-                </button>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 2: BATCH EVALUATION ==================== -->
+        <section id="tab-batch" class="tab-panel">
+          <div class="dashboard-panel">
+            <div class="batch-header-action">
+              <div>
+                <h2 class="sub-title">Batch Hold-out Prompt Evaluation</h2>
+                <p class="panel-description">Evaluation across the 20 frozen hold-out prompts from <code>prompt_suite_v1</code> assessing prompt consistency, latency, and CLIP score.</p>
+              </div>
+              <button id="run-batch-btn" class="btn-primary" style="width: auto; padding: 10px 20px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Run Hold-out Suite</span>
+              </button>
+            </div>
+
+            <!-- Top 4 Summary Cards matching screenshot -->
+            <div class="metrics-summary-grid">
+              <div class="metric-summary-box">
+                <div class="metric-icon-box purple">📁</div>
+                <div class="metric-data">
+                  <span class="metric-data-val">20</span>
+                  <span class="metric-data-label">Total Prompts</span>
+                </div>
+              </div>
+              <div class="metric-summary-box">
+                <div class="metric-icon-box green">✔️</div>
+                <div class="metric-data">
+                  <span class="metric-data-val">20 / 20</span>
+                  <span class="metric-data-label">Evaluated</span>
+                </div>
+              </div>
+              <div class="metric-summary-box">
+                <div class="metric-icon-box amber">⚡</div>
+                <div class="metric-data">
+                  <span class="metric-data-val">288.7 ms</span>
+                  <span class="metric-data-label">Avg. Latency</span>
+                </div>
+              </div>
+              <div class="metric-summary-box">
+                <div class="metric-icon-box indigo">📊</div>
+                <div class="metric-data">
+                  <span class="metric-data-val">0.334</span>
+                  <span class="metric-data-label">Avg. CLIP Score</span>
+                </div>
               </div>
             </div>
 
-            <!-- Advanced Collapsible Settings -->
-            <details class="advanced-settings">
-              <summary>Advanced Inference Parameters</summary>
-              <div class="advanced-grid">
-                <div class="form-item">
-                  <label for="resolution-select">Resolution</label>
-                  <select id="resolution-select">
-                    <option value="512" selected>512 × 512 (Standard)</option>
-                    <option value="256">256 × 256 (Mobile Low-Bandwidth)</option>
-                    <option value="640">640 × 640 (Expanded)</option>
-                    <option value="768">768 × 768 (High-Res)</option>
+            <!-- Clean Modern Batch Table -->
+            <div class="table-container">
+              <table class="data-table" id="batch-table">
+                <thead>
+                  <tr>
+                    <th>Prompt ID</th>
+                    <th>Category</th>
+                    <th>Prompt Text</th>
+                    <th>Target Steps</th>
+                    <th>Latency (ms)</th>
+                    <th>CLIP Score</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="batch-tbody">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 3: STRESS LAB ==================== -->
+        <section id="tab-stress" class="tab-panel">
+          <div class="dashboard-panel">
+            <h2 class="sub-title">Resource Budget &amp; Adaptive Stress Lab</h2>
+            <p class="panel-description" style="margin-bottom: 20px;">Demonstrating Problem Statement 3 requirement: Adaptive generation strategy based on dynamic computational budgets and memory constraints.</p>
+
+            <div class="stress-grid">
+              <!-- Left Column: Controls & Prompt -->
+              <div class="stress-controls">
+                
+                <!-- Prompt Input Box -->
+                <div class="panel-card" style="margin-bottom: 16px;">
+                  <h3 class="sub-title" style="font-size: 0.95rem; margin-bottom: 8px;">Stress Generation Prompt</h3>
+                  <div class="prompt-input-wrapper">
+                    <svg class="prompt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                      <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                      <path d="M2 2l7.586 7.586"></path>
+                      <circle cx="11" cy="11" r="2"></circle>
+                    </svg>
+                    <textarea id="stress-prompt-input" rows="2" maxlength="500" placeholder="Describe the image to stress test under hardware budgets...">A cybernetic cheetah sprinting through a futuristic desert, cinematic</textarea>
+                    <div class="prompt-meta">
+                      <span id="stress-char-counter">66 / 500</span>
+                      <button type="button" class="btn-text" id="stress-clear-prompt-btn">Clear</button>
+                    </div>
+                  </div>
+
+                  <!-- Sample Prompts -->
+                  <div class="prompt-suggestions" style="margin-top: 8px;">
+                    <span class="suggestion-label">Quick samples:</span>
+                    <button type="button" class="pill-btn stress-sample-prompt" data-prompt="A cybernetic cheetah sprinting through a futuristic desert, cinematic">Cyber Cheetah</button>
+                    <button type="button" class="pill-btn stress-sample-prompt" data-prompt="A cozy wooden cabin beside a mountain lake at sunset">Cabin at Sunset</button>
+                    <button type="button" class="pill-btn stress-sample-prompt" data-prompt="An astronaut riding a horse on Mars, cinematic lighting">Astronaut on Mars</button>
+                    <button type="button" class="pill-btn stress-sample-prompt" data-prompt="A vintage red sports car driving through a misty autumn forest road">Red Sports Car</button>
+                  </div>
+                </div>
+
+                <!-- Model Architecture Selector -->
+                <div class="control-group" style="margin-bottom: 16px;">
+                  <label class="control-label">Model Architecture</label>
+                  <div class="preset-selector" style="grid-template-columns: 1fr 1fr;">
+                    <div class="preset-card stress-model-card active" data-model="sd_turbo">
+                      <div class="preset-header">
+                        <span class="preset-name">SD-Turbo</span>
+                        <span class="badge badge-ultra">ULTRA-FAST</span>
+                      </div>
+                      <span class="preset-desc">1-2 steps · ~345 ms · fp16</span>
+                    </div>
+
+                    <div class="preset-card stress-model-card" data-model="sd15_optimized">
+                      <div class="preset-header">
+                        <span class="preset-name">SD 1.5 + LoRA</span>
+                        <span class="badge badge-optimized">OPTIMIZED</span>
+                      </div>
+                      <span class="preset-desc">8 steps · ~1.6 s · fp16</span>
+                    </div>
+
+                    <div class="preset-card stress-model-card" data-model="sd15_adapted">
+                      <div class="preset-header">
+                        <span class="preset-name">SD 1.5 Adapted</span>
+                        <span class="badge badge-approved">APPROVED</span>
+                      </div>
+                      <span class="preset-desc">30 steps · fp16 · LoRA 0.25</span>
+                    </div>
+
+                    <div class="preset-card stress-model-card" data-model="sd15_baseline">
+                      <div class="preset-header">
+                        <span class="preset-name">SD 1.5 Baseline</span>
+                      </div>
+                      <span class="preset-desc">30 steps · ~12.4 s · fp32</span>
+                    </div>
+                  </div>
+                  <!-- Hidden backing select to maintain JS compatibility -->
+                  <select id="stress-model-select" style="display:none;">
+                    <option value="sd_turbo" selected>SD-Turbo (Distilled)</option>
+                    <option value="sd15_optimized">SD 1.5 + LoRA</option>
+                    <option value="sd15_adapted">SD 1.5 Adapted LoRA</option>
+                    <option value="sd15_baseline">SD 1.5 Baseline</option>
                   </select>
                 </div>
-                <div class="form-item">
-                  <label for="seed-input">Random Seed (-1 for random)</label>
-                  <input type="number" id="seed-input" value="42" min="-1" max="9999999">
+
+                <!-- Hardware Budget Sliders -->
+                <div class="slider-box">
+                  <div class="slider-header">
+                    <span>⏱️ Latency Budget (ms)</span>
+                    <span id="budget-latency-val" class="slider-val">500 ms</span>
+                  </div>
+                  <input type="range" id="budget-latency-slider" min="50" max="5000" step="50" value="500">
+                  <div class="slider-ticks"><span>50ms (Extreme)</span><span>1650ms (LCM-LoRA)</span><span>5000ms (Generous)</span></div>
                 </div>
-                <div class="form-item full-width">
-                  <label class="checkbox-label">
-                    <input type="checkbox" id="cv-postprocess-toggle" checked>
-                    <span>Classical CV Post-Processing (Bilateral Edge Preservation + Halo Guard + CLAHE)</span>
-                  </label>
+
+                <div class="slider-box">
+                  <div class="slider-header">
+                    <span>💾 Available VRAM (MB)</span>
+                    <span id="budget-vram-val" class="slider-val">4060 MB</span>
+                  </div>
+                  <input type="range" id="budget-vram-slider" min="1500" max="8151" step="256" value="4060">
+                  <div class="slider-ticks"><span>1.5 GB</span><span>4.0 GB</span><span>8.1 GB (RTX 5050)</span></div>
+                </div>
+
+                <!-- Advanced Settings (Collapsible) -->
+                <div class="panel-card" style="margin-bottom: 16px; padding: 12px 16px;">
+                  <div id="stress-advanced-toggle" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                    <span style="font-size:0.85rem; font-weight:600; color:var(--text-secondary);">⚙️ Advanced Generation Settings</span>
+                    <span id="stress-advanced-chevron" style="font-size:0.75rem; color:var(--accent-purple);">Expand ▼</span>
+                  </div>
+                  <div id="stress-advanced-body" style="display:none; margin-top:12px;">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                      <div>
+                        <label style="font-size:0.75rem; color:var(--text-dim); display:block; margin-bottom:4px;">Inference Seed</label>
+                        <input type="number" id="stress-seed-input" placeholder="Random seed" style="width:100%; padding:6px 10px; background:#0a0e1c; border:1px solid var(--border-card); border-radius:6px; color:#fff; font-size:0.8rem; font-family:var(--font-mono);">
+                      </div>
+                      <div>
+                        <label style="font-size:0.75rem; color:var(--text-dim); display:block; margin-bottom:4px;">Fallback Engine</label>
+                        <div style="padding:6px 10px; background:#0a0e1c; border:1px solid var(--border-card); border-radius:6px; color:var(--accent-green); font-size:0.8rem; font-weight:600;">Auto-Adaptive Controller</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Adaptive Controller Strategy Preview -->
+                <div class="adaptive-strategy-card" style="margin-bottom: 16px;">
+                  <div class="strategy-gpu-visual">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2">
+                      <rect x="4" y="4" width="16" height="16" rx="2"/>
+                      <rect x="9" y="9" width="6" height="6"/>
+                      <line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/>
+                      <line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/>
+                      <line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/>
+                      <line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>
+                    </svg>
+                  </div>
+                  <div class="strategy-spec">
+                    <div class="sub-title" style="margin-bottom: 6px; font-size: 0.95rem;">Adaptive Controller Strategy</div>
+                    <div class="spec-item"><span class="spec-label">Selected Resolution:</span> <span id="strat-res" class="spec-val">512 × 512</span></div>
+                    <div class="spec-item"><span class="spec-label">Denoising Steps:</span> <span id="strat-steps" class="spec-val">2 steps</span></div>
+                    <div class="spec-item"><span class="spec-label">Precision Target:</span> <span id="strat-prec" class="spec-val">fp16</span></div>
+                    <div class="spec-item"><span class="spec-label">Predicted Latency:</span> <span id="strat-pred-lat" class="spec-val">288 ms</span></div>
+                    <div class="spec-item"><span class="spec-label">Predicted Peak VRAM:</span> <span id="strat-pred-vram" class="spec-val">3,678 MB</span></div>
+                    <div class="spec-item"><span class="spec-label">VRAM Safety Margin:</span> <span id="strat-safety" class="spec-val text-success">+382 MB headroom</span></div>
+                  </div>
+                </div>
+
+                <!-- CTA Button -->
+                <button id="stress-generate-btn" class="btn-primary" style="width:100%; height:46px; background: linear-gradient(135deg, #10b981, #6366f1); font-size:0.95rem; font-weight:700;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  <span>⚡ Run Live Adaptive Stress Test</span>
+                </button>
+              </div>
+
+              <!-- Right Column: Visualization, Ladder & Live Generated Output -->
+              <div class="stress-display">
+                <!-- Headroom Visualization -->
+                <div class="envelope-viz" style="margin-bottom: 16px;">
+                  <div class="sub-title" style="font-size: 0.95rem;">Budget Envelope &amp; Headroom Visualization</div>
+                  <div class="envelope-bar-group">
+                    <div class="envelope-label">Latency Budget Utilization</div>
+                    <div class="envelope-track">
+                      <div id="latency-budget-fill" class="envelope-fill" style="width: 58%;"></div>
+                    </div>
+                    <div class="envelope-stat" id="latency-budget-stat">288 ms / 500 ms (58% utilized)</div>
+                  </div>
+
+                  <div class="envelope-bar-group">
+                    <div class="envelope-label">VRAM Allocation vs Capacity</div>
+                    <div class="envelope-track">
+                      <div id="vram-budget-fill" class="envelope-fill" style="width: 91%;"></div>
+                    </div>
+                    <div class="envelope-stat" id="vram-budget-stat">3678 MB / 4060 MB (91% utilized)</div>
+                  </div>
+                </div>
+
+                <!-- Fallback Ladder -->
+                <div class="decision-ladder" style="margin-bottom: 16px;">
+                  <div class="sub-title" style="font-size: 0.95rem;">Adaptive Fallback Ladder</div>
+                  <ul class="ladder-list" id="ladder-list">
+                    <li class="ladder-step active">1. Standard Combined (512px, fp16, 2 steps) → ~288 ms</li>
+                    <li class="ladder-step">2. Step Throttling (512px, fp16, 1 step) → ~180 ms, 3.68 GB</li>
+                    <li class="ladder-step">3. Spatial Rescaling (256px, fp16, 2 steps) → ~120 ms, 2.31 GB</li>
+                    <li class="ladder-step">4. Classical Downsampling (128px + Bicubic) → ~36 ms</li>
+                  </ul>
+                </div>
+
+                <!-- Generated Image Output Container -->
+                <div class="panel-card" style="padding: 16px;">
+                  <div class="output-header" style="margin-bottom: 12px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <h3 class="sub-title" style="font-size: 0.95rem; margin:0;">Live Adaptive Output</h3>
+                      <span id="stress-status-tag" class="badge badge-hybrid">Ready</span>
+                    </div>
+                    <div class="output-actions">
+                      <button id="stress-download-btn" class="btn-icon" title="Download Image" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                      </button>
+                      <button class="btn-icon" title="Expand Fullscreen" onclick="const img=document.getElementById('stress-result-img'); if(img && img.src && !img.classList.contains('hidden')) window.open(img.src, '_blank')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Image Viewer -->
+                  <div class="image-viewer-container" id="stress-image-viewer" style="min-height: 280px; max-height: 380px;">
+                    <div class="placeholder-state" id="stress-placeholder">
+                      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                      </svg>
+                      <p>Run Live Adaptive Stress Test to evaluate adaptive fallback on RTX 5050</p>
+                      <span class="sub-tip">Automatically adjusts resolution, steps, and post-processing to fit budget</span>
+                    </div>
+                    <div class="loading-state hidden" id="stress-loader">
+                      <div class="spinner"></div>
+                      <p>Running Adaptive Distilled Diffusion on RTX 5050...</p>
+                      <span class="timer" id="stress-timer">0.00 s</span>
+                    </div>
+                    <img id="stress-result-img" class="result-image hidden" src="" alt="Stress test generated result" style="max-height: 360px; object-fit: contain;">
+                  </div>
+
+                  <!-- Telemetry Metrics Strip -->
+                  <div class="telemetry-strip" id="stress-telemetry-panel" style="margin-top: 14px;">
+                    <div class="telemetry-mini-pill">
+                      <span class="pill-icon">⏱️</span>
+                      <span class="pill-label">Latency</span>
+                      <span id="stress-exec-latency" class="pill-val">-- ms</span>
+                    </div>
+                    <div class="telemetry-mini-pill">
+                      <span class="pill-icon">💾</span>
+                      <span class="pill-label">VRAM</span>
+                      <span id="stress-exec-vram" class="pill-val">-- MB</span>
+                    </div>
+                    <div class="telemetry-mini-pill">
+                      <span class="pill-icon">⚖️</span>
+                      <span class="pill-label">Budget</span>
+                      <span id="stress-exec-budget-status" class="pill-val">--</span>
+                    </div>
+                  </div>
+
+                  <!-- Execution Details & Explanation -->
+                  <div class="telemetry-details hidden" id="stress-execution-details" style="margin-top: 12px;">
+                    <div class="tel-row"><span>Controller Decision:</span> <span class="mono-text" id="stress-exec-decision" style="color:var(--text-primary); font-weight:600;">--</span></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 4: PIPELINE ARCHITECTURE ==================== -->
+        <section id="tab-pipeline" class="tab-panel">
+          <div class="dashboard-panel">
+            <h2 class="sub-title">End-to-End System Pipeline</h2>
+            <p class="panel-description" style="margin-bottom: 22px;">Interactive architectural diagram mapping Problem Statement 3 requirements: Text encoding, distilled latent diffusion, VAE decompression, and classical CV post-processing.</p>
+
+            <div class="pipeline-flow">
+              <div class="pipeline-node" data-node="text">
+                <div class="node-badge">Stage 1</div>
+                <div class="node-title">Prompt Analysis &amp; Text Encoder</div>
+                <div class="node-desc">CLIP ViT-B/32 · 77 tokens · 768-dim</div>
+                <div class="node-metric">~8.2 ms</div>
+              </div>
+              <div class="pipeline-arrow">➔</div>
+              <div class="pipeline-node active" data-node="unet">
+                <div class="node-badge">Stage 2</div>
+                <div class="node-title">Distilled Latent Denoising UNet</div>
+                <div class="node-desc">SD-Turbo 1-2 steps · fp16 Tensor Cores</div>
+                <div class="node-metric">~210.5 ms</div>
+              </div>
+              <div class="pipeline-arrow">➔</div>
+              <div class="pipeline-node" data-node="vae">
+                <div class="node-badge">Stage 3</div>
+                <div class="node-title">Latent-to-RGB VAE Decoder</div>
+                <div class="node-desc">8× upsample · 64×64×4 → 512×512×3</div>
+                <div class="node-metric">~51.8 ms</div>
+              </div>
+              <div class="pipeline-arrow">➔</div>
+              <div class="pipeline-node" data-node="cv">
+                <div class="node-badge">Stage 4</div>
+                <div class="node-title">Classical CV Post-Processing</div>
+                <div class="node-desc">Bilateral + Halo guard + CLAHE</div>
+                <div class="node-metric">~17.9 ms</div>
+              </div>
+              <div class="pipeline-arrow">➔</div>
+              <div class="pipeline-node" data-node="delivery">
+                <div class="node-badge">Stage 5</div>
+                <div class="node-title">Hybrid Edge-Mobile Delivery</div>
+                <div class="node-desc">REST API v1.0.0 · Android Jetpack Compose</div>
+                <div class="node-metric">Total: ~288 ms</div>
+              </div>
+            </div>
+
+            <!-- Pipeline Inspector Detail Box -->
+            <div class="pipeline-inspector" id="node-inspector">
+              <div class="inspector-header">
+                <span id="inspector-title" class="sub-title">Stage 2: Distilled Latent Denoising UNet</span>
+                <span class="badge badge-hybrid">⚡ Hardware Accelerated</span>
+              </div>
+              <div class="inspector-body" id="inspector-body">
+                <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.6;">
+                  Runs Adversarial Diffusion Distillation (ADD) directly inside the PyTorch 2.11 environment. By operating on compact 64×64×4 latent tensors in half-precision (<code>torch.float16</code>), memory bandwidth is halved and Tensor Core MAC operations are saturated.
+                </p>
+                <div class="inspector-meta-grid">
+                  <div class="inspector-chip"><strong>&lt;&gt; Input Tensor:</strong> <code>torch.Tensor(1, 4, 64, 64)</code></div>
+                  <div class="inspector-chip"><strong>&lt;&gt; Output Tensor:</strong> <code>torch.Tensor(1, 4, 64, 64)</code></div>
+                  <div class="inspector-chip"><strong>📊 Peak Allocation:</strong> <code>3,678 MB VRAM</code></div>
+                  <div class="inspector-chip"><strong>&lt;&gt; Code Symbol:</strong> <code>backend.app.services.engine.SDTurboEngine</code></div>
                 </div>
               </div>
-            </details>
+            </div>
+          </div>
+        </section>
 
-            <!-- Linguistic Prompt Analysis Box (Live) -->
-            <div class="analysis-box" id="analysis-box">
-              <div class="analysis-header">
-                <span class="analysis-title">Linguistic Consistency &amp; Attribute Parser</span>
-                <span class="analysis-status" id="parser-status">Analyzed</span>
-              </div>
-              <div class="analysis-body" id="analysis-content">
-                <div class="tag-row">
-                  <span class="tag-label">Objects:</span>
-                  <span id="analysis-objects" class="tag-list"><span class="tag">cabin (1)</span> <span class="tag">lake (1)</span></span>
-                </div>
-                <div class="tag-row">
-                  <span class="tag-label">Attributes:</span>
-                  <span id="analysis-attrs" class="tag-list"><span class="tag">wooden</span> <span class="tag">cozy</span></span>
-                </div>
-                <div class="tag-row">
-                  <span class="tag-label">Environment / Lighting:</span>
-                  <span id="analysis-env" class="tag-list"><span class="tag">sunset</span> <span class="tag">mountain</span></span>
+        <!-- ==================== TAB 5: MODEL COMPARISON ==================== -->
+        <section id="tab-comparison" class="tab-panel">
+          <div class="dashboard-panel">
+            <h2 class="sub-title">Model Architecture Comparison</h2>
+            <p class="panel-description" style="margin-bottom: 20px;">Empirical measurements across Classical, Deep Learning, and Hybrid architectures on the RTX 5050 Laptop GPU.</p>
+
+            <div class="metrics-summary-grid">
+              <div class="metric-summary-box">
+                <div class="metric-icon-box indigo">🎯</div>
+                <div class="metric-data">
+                  <span class="metric-data-val">0.333</span>
+                  <span class="metric-data-label">Best alignment (CLIP)</span>
                 </div>
               </div>
-            </div>
-
-            <!-- Generate CTA -->
-            <div class="action-row">
-              <button id="generate-btn" class="btn-primary">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                <span>Generate Image</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Output Column -->
-        <div class="generate-output">
-          <div class="panel-card output-card">
-            <div class="output-header">
-              <h2 class="sub-title">Generated Output</h2>
-              <div class="output-actions">
-                <button id="download-btn" class="btn-secondary" disabled>Download PNG</button>
-              </div>
-            </div>
-
-            <div class="image-viewer-container" id="image-viewer">
-              <div class="placeholder-state" id="image-placeholder">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                  <circle cx="8.5" cy="8.5" r="1.5"/>
-                  <polyline points="21 15 16 10 5 21"/>
-                </svg>
-                <p>Click "Generate Image" to run inference on the RTX 5050 GPU</p>
-                <span class="sub-tip">Average latency: ~288 ms (Balanced)</span>
-              </div>
-              <div class="loading-state hidden" id="image-loader">
-                <div class="spinner"></div>
-                <p>Running Distilled Latent Diffusion...</p>
-                <span class="timer" id="live-timer">0.00 s</span>
-              </div>
-              <img id="generated-image" class="result-image hidden" alt="Generated visual result">
-            </div>
-
-            <!-- "How this was generated" Telemetry Badge -->
-            <div class="telemetry-badge" id="telemetry-panel">
-              <div class="telemetry-summary">
-                <div class="telemetry-pill"><span class="pill-title">Latency:</span> <span id="tel-latency" class="pill-bold">288.4 ms</span></div>
-                <div class="telemetry-pill"><span class="pill-title">VRAM:</span> <span id="tel-vram" class="pill-bold">3,678 MB</span></div>
-                <div class="telemetry-pill"><span class="pill-title">Precision:</span> <span id="tel-precision" class="pill-bold">fp16</span></div>
-                <div class="telemetry-pill"><span class="pill-title">Steps:</span> <span id="tel-steps" class="pill-bold">2</span></div>
-              </div>
-              <div class="telemetry-details">
-                <div class="tel-row"><span>Base Model:</span> <span class="mono-text">stabilityai/sd-turbo @ b261bac</span></div>
-                <div class="tel-row"><span>Scheduler:</span> <span class="mono-text">EulerDiscrete (trailing)</span></div>
-                <div class="tel-row"><span>Classical CV:</span> <span class="mono-text">Bilateral (σ_c=0.1, σ_s=3) + Unsharp Mask</span></div>
-                <div class="tel-row"><span>Adaptive Resource:</span> <span class="mono-text" id="tel-decision">Optimal configuration (no budget fallback needed)</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== TAB 2: BATCH EVALUATION ==================== -->
-    <section id="tab-batch" class="tab-panel">
-      <div class="dashboard-panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Batch hold-out prompt evaluation</h2>
-            <p class="panel-description">Evaluation across the 20 frozen hold-out prompts from <code>prompt_suite_v1</code> assessing prompt consistency, latency, and CLIP score.</p>
-          </div>
-          <button id="run-batch-btn" class="btn-secondary">Run Hold-out Suite</button>
-        </div>
-        <div class="table-container">
-          <table class="data-table" id="batch-table">
-            <thead>
-              <tr>
-                <th>Prompt ID</th>
-                <th>Category</th>
-                <th>Prompt Text</th>
-                <th>Target Steps</th>
-                <th>Latency (ms)</th>
-                <th>CLIP Score</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="batch-tbody">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== TAB 3: STRESS LAB ==================== -->
-    <section id="tab-stress" class="tab-panel">
-      <div class="dashboard-panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Resource Budget &amp; Adaptive Stress Lab</h2>
-            <p class="panel-description">Demonstrating Problem Statement 3 requirement: Adaptive generation strategy based on dynamic computational budgets and memory constraints.</p>
-          </div>
-        </div>
-
-        <div class="stress-grid">
-          <div class="stress-controls">
-            <div class="slider-box">
-              <div class="slider-header">
-                <span>Latency Budget (ms)</span>
-                <span id="budget-latency-val" class="slider-val">500 ms</span>
-              </div>
-              <input type="range" id="budget-latency-slider" min="50" max="5000" step="50" value="500">
-              <div class="slider-ticks"><span>50ms (Extreme)</span><span>1650ms (LCM-LoRA)</span><span>5000ms (Generous)</span></div>
-            </div>
-
-            <div class="slider-box">
-              <div class="slider-header">
-                <span>Available VRAM (MB)</span>
-                <span id="budget-vram-val" class="slider-val">4096 MB</span>
-              </div>
-              <input type="range" id="budget-vram-slider" min="1500" max="8151" step="256" value="4096">
-              <div class="slider-ticks"><span>1.5 GB</span><span>4.0 GB</span><span>8.1 GB (RTX 5050)</span></div>
-            </div>
-
-            <div class="adaptive-strategy-card">
-              <div class="sub-title">Adaptive Controller Strategy</div>
-              <div class="strategy-spec">
-                <div class="spec-item"><span class="spec-label">Selected Resolution:</span> <span id="strat-res" class="spec-val">512 × 512</span></div>
-                <div class="spec-item"><span class="spec-label">Denoising Steps:</span> <span id="strat-steps" class="spec-val">2 steps</span></div>
-                <div class="spec-item"><span class="spec-label">Precision Target:</span> <span id="strat-prec" class="spec-val">fp16</span></div>
-                <div class="spec-item"><span class="spec-label">Predicted Latency:</span> <span id="strat-pred-lat" class="spec-val">288 ms</span></div>
-                <div class="spec-item"><span class="spec-label">Predicted Peak VRAM:</span> <span id="strat-pred-vram" class="spec-val">3,678 MB</span></div>
-                <div class="spec-item"><span class="spec-label">OOM Safety Margin:</span> <span id="strat-safety" class="spec-val text-success">+418 MB headroom</span></div>
-              </div>
-            </div>
-
-            <!-- Live Stress Test Trigger -->
-            <div class="stress-prompt-card" style="margin-top: 16px; background: #0d1117; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 16px;">
-              <div style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
-                <label for="stress-model-select" style="font-size: 0.85rem; font-weight: 600; color: #fff; white-space: nowrap;">Target Model:</label>
-                <select id="stress-model-select" style="flex: 1; background: #161b22; border: 1px solid var(--border-muted); border-radius: 4px; padding: 6px 10px; color: #fff; font-size: 0.82rem;">
-                  <option value="sd_turbo" selected>⚡ SD-Turbo (ADD 2-step Distillation Engine)</option>
-                  <option value="sd15_optimized">🚀 SD 1.5 Final Optimized (LCM-LoRA + FP16 + 8 steps)</option>
-                  <option value="sd15_adapted">🧪 SD 1.5 Adapted (LoRA + FP32 + 30 steps)</option>
-                  <option value="sd15_baseline">🏛 SD 1.5 Baseline (Original + FP32 + 30 steps)</option>
-                </select>
-              </div>
-              <label for="stress-prompt-input" style="font-size: 0.85rem; font-weight: 600; color: #fff; display: block; margin-bottom: 6px;">Prompt for Stress Generation</label>
-              <textarea id="stress-prompt-input" rows="2" style="width: 100%; background: #161b22; border: 1px solid var(--border-muted); border-radius: 4px; padding: 10px; color: #fff; font-size: 0.88rem; resize: vertical; margin-bottom: 12px;">A cybernetic cheetah sprinting through a futuristic desert, cinematic</textarea>
-              <button id="stress-generate-btn" class="btn-primary" style="background: linear-gradient(135deg, #1f6feb, #238636);">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                <span>⚡ Run Live Adaptive Stress Test</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="stress-display">
-            <div class="sub-title">Budget Envelope &amp; Headroom Visualization</div>
-            <div class="envelope-viz" id="envelope-viz">
-              <div class="envelope-bar-group">
-                <div class="envelope-label">Latency Budget Utilization</div>
-                <div class="envelope-track">
-                  <div id="latency-budget-fill" class="envelope-fill" style="width: 96%;"></div>
+              <div class="metric-summary-box">
+                <div class="metric-icon-box green">🚀</div>
+                <div class="metric-data">
+                  <span class="metric-data-val">3.01×</span>
+                  <span class="metric-data-label">Inference speedup</span>
                 </div>
-                <div class="envelope-stat" id="latency-budget-stat">288 ms / 300 ms (96.0% utilized)</div>
               </div>
-
-              <div class="envelope-bar-group">
-                <div class="envelope-label">VRAM Allocation vs Capacity</div>
-                <div class="envelope-track">
-                  <div id="vram-budget-fill" class="envelope-fill" style="width: 89%;"></div>
+              <div class="metric-summary-box">
+                <div class="metric-icon-box amber">⏱️</div>
+                <div class="metric-data">
+                  <span class="metric-data-val">866 ms</span>
+                  <span class="metric-data-label">Baseline latency</span>
                 </div>
-                <div class="envelope-stat" id="vram-budget-stat">3,678 MB / 4,096 MB (89.8% utilized)</div>
               </div>
-            </div>
-
-            <div class="decision-ladder">
-              <div class="sub-title">Adaptive Fallback Ladder</div>
-              <ul class="ladder-list" id="ladder-list">
-                <li class="ladder-step active">1. Standard Combined (512px, fp16, 2 steps) → ~288 ms, 3.68 GB VRAM</li>
-                <li class="ladder-step">2. Step Throttling (512px, fp16, 1 step) → ~180 ms, 3.68 GB VRAM</li>
-                <li class="ladder-step">3. Spatial Rescaling (256px, fp16, 2 steps) → ~120 ms, 2.10 GB VRAM</li>
-                <li class="ladder-step">4. Classical Downsampling (128px + Bicubic Upscale) → ~65 ms, 1.45 GB VRAM</li>
-              </ul>
-            </div>
-
-            <!-- Real-Time Execution Console & Generated Image -->
-            <div class="stress-result-console" style="margin-top: 20px; background: #0d1117; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 18px;">
-              <div class="sub-title" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-                <span>Live Stress Execution Result</span>
-                <span id="stress-status-tag" class="badge badge-hybrid">Ready</span>
-              </div>
-              
-              <div id="stress-image-container" style="min-height: 260px; background: #161b22; border: 1px dashed var(--border-muted); border-radius: 6px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; margin-bottom: 14px;">
-                <div id="stress-placeholder" style="text-align: center; color: var(--text-dim); padding: 20px;">
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 8px;">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                  </svg>
-                  <p style="font-size: 0.85rem;">Click "Run Live Adaptive Stress Test" to test generation against your chosen budget</p>
+              <div class="metric-summary-box">
+                <div class="metric-icon-box purple">💾</div>
+                <div class="metric-data">
+                  <span class="metric-data-val">-43.4%</span>
+                  <span class="metric-data-label">Peak VRAM reduction</span>
                 </div>
-                <div id="stress-loader" class="hidden" style="text-align: center; color: var(--text-muted);">
-                  <div class="spinner"></div>
-                  <p>Evaluating adaptive budget on RTX 5050...</p>
-                  <span id="stress-timer" class="timer">0.00 s</span>
+              </div>
+            </div>
+
+            <!-- Grouped Bar Chart -->
+            <div style="background: #0d1222; border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px;">
+              <div id="grouped-bar-chart"></div>
+            </div>
+
+            <!-- Detailed Table -->
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Approach</th>
+                    <th>CLIP score</th>
+                    <th>Denoise steps</th>
+                    <th>Precision</th>
+                    <th>Peak VRAM</th>
+                    <th>Latency (ms)</th>
+                    <th>Speedup</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="badge badge-classical">Classical</span> Bilateral + Unsharp mask</td>
+                    <td>0.326</td><td>N/A</td><td>NumPy</td><td>&lt; 5 MB</td><td>17.9 ms</td><td>-</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-deep">Deep Learning</span> Baseline B0 (SD-Turbo)</td>
+                    <td>0.327</td><td>4 steps</td><td>fp32</td><td>6,500 MB</td><td>866 ms</td><td>1.00×</td>
+                  </tr>
+                  <tr style="background: rgba(16, 185, 129, 0.08);">
+                    <td><strong style="color: #34d399;">Hybrid Optimized</strong> Combined C1 / V4 (fp16 + 2 steps + CV)</td>
+                    <td><strong>0.333</strong></td><td><strong>2 steps</strong></td><td><strong>fp16</strong></td><td><strong>3,678 MB</strong></td><td><strong>288 ms</strong></td><td><strong style="color: #34d399;">3.01× Speedup</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 6: ROBUSTNESS ==================== -->
+        <section id="tab-robustness" class="tab-panel">
+          <div class="dashboard-panel">
+            <h2 class="sub-title">Prompt Consistency &amp; Linguistic Robustness</h2>
+            <p class="panel-description" style="margin-bottom: 20px;">Semantic consistency across diverse prompt structural complexities and attribute bindings.</p>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+              <div class="panel-card">
+                <div class="sub-title" style="font-size: 0.95rem;">1. Single Object Prompts</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #38bdf8; font-family: var(--font-mono); margin-bottom: 6px;">0.338 <span style="font-size: 0.8rem; color: var(--text-dim);">mean CLIP</span></div>
+                <p style="font-size: 0.82rem; color: var(--text-muted);">Exhibits 100% subject consistency across seeds. Distilled 1-step and 2-step denoisers form coherent subjects without structural tearing.</p>
+              </div>
+              <div class="panel-card">
+                <div class="sub-title" style="font-size: 0.95rem;">2. Multi-Object Prompts</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #34d399; font-family: var(--font-mono); margin-bottom: 6px;">0.329 <span style="font-size: 0.8rem; color: var(--text-dim);">mean CLIP</span></div>
+                <p style="font-size: 0.82rem; color: var(--text-muted);">Handles paired subjects cleanly in 2 steps. Single-step mode occasionally exhibits count variation.</p>
+              </div>
+              <div class="panel-card">
+                <div class="sub-title" style="font-size: 0.95rem;">3. Spatial Relationships</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #c084fc; font-family: var(--font-mono); margin-bottom: 6px;">0.325 <span style="font-size: 0.8rem; color: var(--text-dim);">mean CLIP</span></div>
+                <p style="font-size: 0.82rem; color: var(--text-muted);">Prepositions like "beside", "holding", and "under" are parsed by the linguistic analyzer to guide step allocation.</p>
+              </div>
+              <div class="panel-card">
+                <div class="sub-title" style="font-size: 0.95rem;">4. Color &amp; Style Binding</div>
+                <div style="font-size: 1.5rem; font-weight: 800; color: #fbbf24; font-family: var(--font-mono); margin-bottom: 6px;">0.332 <span style="font-size: 0.8rem; color: var(--text-dim);">mean CLIP</span></div>
+                <p style="font-size: 0.82rem; color: var(--text-muted);">Maintains attribute attachment (e.g. "red car", "yellow raincoat") while Classical CV suppresses bleeding.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 7: FAILURE ANALYSIS ==================== -->
+        <section id="tab-failures" class="tab-panel">
+          <div class="dashboard-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div>
+                <h2 class="sub-title">Documented Failure-Case Analysis</h2>
+                <p class="panel-description">Honest academic disclosure of observed failure modes, detection mechanics, and applied mitigations per course evaluation guidelines (§8.6).</p>
+              </div>
+              <div class="filter-pills">
+                <button class="pill-btn active" data-filter="all">All (9)</button>
+                <button class="pill-btn" data-filter="resolved">⭐ Resolved (4)</button>
+                <button class="pill-btn" data-filter="mitigated">★ Mitigated (3)</button>
+                <button class="pill-btn" data-filter="inherent">⚠️ Inherent (2)</button>
+              </div>
+            </div>
+
+            <!-- Two-Column Failure Layout matching screenshot -->
+            <div class="failure-layout">
+              <!-- Left Column: Case Items List -->
+              <div class="failure-list" id="failure-container">
+                <!-- Dynamically populated or rendered -->
+              </div>
+
+              <!-- Right Column: Visual Before/After & Case Summary -->
+              <div class="comparison-container">
+                <div class="visual-pair">
+                  <div class="visual-box">
+                    <img src="/static/sd15_comparison.png" alt="Before Artifact" id="failure-img-before">
+                    <div class="visual-label" style="color: #f87171;">Before (Artifact)</div>
+                  </div>
+                  <div style="font-size: 1.3rem; color: #a78bfa;">➔</div>
+                  <div class="visual-box">
+                    <img src="/static/demo_cabin.png" alt="After Mitigated" id="failure-img-after">
+                    <div class="visual-label" style="color: #34d399;">After (Mitigated)</div>
+                  </div>
                 </div>
-                <img id="stress-result-img" class="result-image hidden" alt="Adaptive stress test output" style="max-height: 280px; width: auto; object-fit: contain; border-radius: 4px;">
-              </div>
 
-              <div id="stress-execution-details" class="hidden" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.82rem; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 4px;">
-                <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-dim);">Execution Time:</span> <span id="stress-exec-latency" class="mono-text highlight-val">-- ms</span></div>
-                <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-dim);">Budget Result:</span> <span id="stress-exec-budget-status" class="mono-text">--</span></div>
-                <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-dim);">VRAM Allocation:</span> <span id="stress-exec-vram" class="mono-text">-- MB</span></div>
-                <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-dim);">Controller Decision:</span> <span id="stress-exec-decision" class="mono-text" style="color: #79c0ff;">--</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== TAB 4: PIPELINE ARCHITECTURE ==================== -->
-    <section id="tab-pipeline" class="tab-panel">
-      <div class="dashboard-panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">End-to-End System Pipeline</h2>
-            <p class="panel-description">Interactive architectural diagram mapping Problem Statement 3 requirements: Text encoding, distilled latent diffusion, VAE decompression, and classical CV post-processing.</p>
-          </div>
-        </div>
-
-        <div class="pipeline-flow">
-          <div class="pipeline-node" data-node="text">
-            <div class="node-badge">Stage 1</div>
-            <div class="node-title">Prompt Analysis &amp; Text Encoder</div>
-            <div class="node-desc">CLIP ViT-B/32 · 77 tokens · 768-dim</div>
-            <div class="node-metric">Latency: ~8.2 ms</div>
-          </div>
-          <div class="pipeline-arrow">➔</div>
-          <div class="pipeline-node" data-node="unet">
-            <div class="node-badge">Stage 2</div>
-            <div class="node-title">Distilled Latent Denoising UNet</div>
-            <div class="node-desc">SD-Turbo 1-2 steps · fp16 Tensor Cores</div>
-            <div class="node-metric">Latency: ~210.5 ms</div>
-          </div>
-          <div class="pipeline-arrow">➔</div>
-          <div class="pipeline-node" data-node="vae">
-            <div class="node-badge">Stage 3</div>
-            <div class="node-title">Latent-to-RGB VAE Decoder</div>
-            <div class="node-desc">8× spatial upsample · 64×64×4 → 512×512×3</div>
-            <div class="node-metric">Latency: ~51.8 ms</div>
-          </div>
-          <div class="pipeline-arrow">➔</div>
-          <div class="pipeline-node" data-node="cv">
-            <div class="node-badge">Stage 4</div>
-            <div class="node-title">Classical CV Post-Processing</div>
-            <div class="node-desc">Bilateral filter + Halo guard + CLAHE</div>
-            <div class="node-metric">Latency: ~17.9 ms</div>
-          </div>
-          <div class="pipeline-arrow">➔</div>
-          <div class="pipeline-node" data-node="delivery">
-            <div class="node-badge">Stage 5</div>
-            <div class="node-title">Hybrid Edge-Mobile Delivery</div>
-            <div class="node-desc">REST API v1.0.0 · Android Jetpack Compose</div>
-            <div class="node-metric">Total: ~288 ms e2e</div>
-          </div>
-        </div>
-
-        <div class="pipeline-inspector" id="node-inspector">
-          <div class="inspector-header">
-            <span id="inspector-title" class="sub-title">Stage 2: Distilled Latent Denoising UNet</span>
-            <span class="badge badge-hybrid">Hardware Accelerated</span>
-          </div>
-          <div class="inspector-body" id="inspector-body">
-            <p>Runs Adversarial Diffusion Distillation (ADD) directly inside the PyTorch 2.11 environment. By operating on compact 64×64×4 latent tensors in half-precision (<code>torch.float16</code>), memory bandwidth is halved and Tensor Core MAC operations are saturated on the RTX 5050 GPU.</p>
-            <div class="inspector-meta-grid">
-              <div><strong>Input Tensor:</strong> <code>torch.Tensor(1, 4, 64, 64)</code></div>
-              <div><strong>Output Tensor:</strong> <code>torch.Tensor(1, 4, 64, 64)</code></div>
-              <div><strong>Peak Allocation:</strong> <code>3,678 MB VRAM</code></div>
-              <div><strong>Code Symbol:</strong> <code>backend.app.services.engine.SDTurboEngine</code></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== TAB 6: ROBUSTNESS & CONSISTENCY ==================== -->
-    <section id="tab-robustness" class="tab-panel">
-      <div class="dashboard-panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Prompt Consistency &amp; Linguistic Robustness</h2>
-            <p class="panel-description">Semantic consistency across diverse prompt structural complexities (from single objects to multi-attribute spatial interactions).</p>
-          </div>
-        </div>
-
-        <div class="robustness-grid">
-          <div class="robustness-card">
-            <div class="sub-title">1. Single Object Prompts</div>
-            <div class="robustness-stat"><span class="stat-num">0.338</span> <span class="stat-unit">mean CLIP</span></div>
-            <p class="card-p">Exhibits 100% subject consistency across seeds. Distilled 1-step and 2-step denoisers form coherent subjects without structural tearing.</p>
-          </div>
-          <div class="robustness-card">
-            <div class="sub-title">2. Multi-Object Prompts</div>
-            <div class="robustness-stat"><span class="stat-num">0.329</span> <span class="stat-unit">mean CLIP</span></div>
-            <p class="card-p">Handles paired subjects cleanly in 2 steps. Single-step mode occasionally exhibits count variation (e.g. 3 penguins instead of 2).</p>
-          </div>
-          <div class="robustness-card">
-            <div class="sub-title">3. Spatial Relationships</div>
-            <div class="robustness-stat"><span class="stat-num">0.325</span> <span class="stat-unit">mean CLIP</span></div>
-            <p class="card-p">Prepositions like "beside", "holding", and "under" are parsed by the linguistic analyzer to guide step allocation.</p>
-          </div>
-          <div class="robustness-card">
-            <div class="sub-title">4. Color &amp; Style Binding</div>
-            <div class="robustness-stat"><span class="stat-num">0.332</span> <span class="stat-unit">mean CLIP</span></div>
-            <p class="card-p">Maintains attribute attachment (e.g., "red car", "yellow raincoat") while Classical CV suppresses inadvertent color bleeding.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== TAB 7: FAILURE ANALYSIS ==================== -->
-    <section id="tab-failures" class="tab-panel">
-      <div class="dashboard-panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Documented Failure-Case Analysis</h2>
-            <p class="panel-description">Honest academic disclosure of observed failure modes, detection mechanics, and applied mitigations per course evaluation guidelines (§8.6).</p>
-          </div>
-          <div class="filter-pills">
-            <button class="pill-btn active" data-filter="all">All (9)</button>
-            <button class="pill-btn" data-filter="resolved">Resolved (4)</button>
-            <button class="pill-btn" data-filter="mitigated">Mitigated (3)</button>
-            <button class="pill-btn" data-filter="inherent">Inherent (2)</button>
-          </div>
-        </div>
-
-        <div class="failure-accordion" id="failure-container">
-          <!-- Accordion items loaded dynamically from failure_analysis.md -->
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== TAB 8: CATALOGUE / GALLERY ==================== -->
-    <section id="tab-catalogue" class="tab-panel">
-      <div class="dashboard-panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Empirical Generation Catalogue</h2>
-            <p class="panel-description">Pre-computed holdout prompt benchmark generations from the NVIDIA RTX 5050 GPU.</p>
-          </div>
-        </div>
-        <div class="catalogue-grid" id="catalogue-grid">
-          <!-- Populated dynamically with real images -->
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== TAB 9: ABOUT ==================== -->
-    <section id="tab-about" class="tab-panel">
-      <div class="dashboard-panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">About Imagine AI &amp; Team Details</h2>
-            <p class="panel-description">Problem Statement 3 · Computer Vision &amp; Generative AI Capstone Project.</p>
-          </div>
-        </div>
-
-        <div class="about-grid">
-          <div class="about-col">
-            <h3 class="sub-title">Team &amp; Problem Statement</h3>
-            <ul class="about-list">
-              <li><strong>Problem Statement:</strong> ProbID - P3: Resource-Efficient Text-to-Image Generation for Mobile Devices</li>
-              <li><strong>Student USNs:</strong> <code>1MS22CS001, 1MS22CS002</code></li>
-              <li><strong>Repository Architecture:</strong> Hybrid Client-Server (FastAPI GPU backend + Jetpack Compose Android client + Modern Web Dashboard)</li>
-              <li><strong>Frozen API Contract:</strong> REST v1.0.0 (endpoints <code>/api/v1/generate</code>, <code>/api/v1/capabilities</code>, <code>/api/v1/model</code>, <code>/api/v1/prompt/analysis</code>)</li>
-            </ul>
-
-            <h3 class="sub-title" style="margin-top: 24px;">Hardware &amp; Software Environment</h3>
-            <ul class="about-list">
-              <li><strong>GPU:</strong> NVIDIA GeForce RTX 5050 Laptop GPU (8,151 MB VRAM, CUDA 13.2 driver)</li>
-              <li><strong>Deep Learning Stack:</strong> PyTorch 2.11.0+cu128, HuggingFace Diffusers 0.42.1, Transformers 5.22.2</li>
-              <li><strong>Base Model:</strong> <code>stabilityai/sd-turbo @ b261bac6fd2cf515557d5d0707481eafa0485ec2</code></li>
-              <li><strong>CLIP Scorer:</strong> <code>openai/clip-vit-base-patch32 @ 3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268</code></li>
-              <li><strong>Classical CV Engine:</strong> OpenCV, SciPy, Pillow (Bilateral filter, Laplacian halo guard, CLAHE)</li>
-            </ul>
-          </div>
-
-          <div class="about-col">
-            <h3 class="sub-title">Viva / Demo Presentation Highlights</h3>
-            <div class="viva-card">
-              <div class="viva-point">
-                <strong>1. 3.01× Empirical Speedup:</strong>
-                <span>Reducing denoising steps from 4 to 2 and running native fp16 cut median end-to-end latency from 866 ms to 288 ms with zero loss in CLIP alignment (0.333 vs 0.301).</span>
-              </div>
-              <div class="viva-point">
-                <strong>2. VRAM Conservation (-43.4%):</strong>
-                <span>Peak GPU memory dropped from 6,500 MB to 3,678 MB, staying safely within the 8 GB capacity of consumer laptop GPUs.</span>
-              </div>
-              <div class="viva-point">
-                <strong>3. Why Hybrid Mobile Deployment?</strong>
-                <span>Local mobile diffusion crashes mobile OS limits (>3.5 GB RAM). A hybrid architecture allows mobile phones to stream generation in &lt;300 ms over LAN/Wi-Fi.</span>
-              </div>
-              <div class="viva-point">
-                <strong>4. Open Gap Disclosure (DL-02):</strong>
-                <span>Adapter fine-tuning on distilled weights degrades output fidelity; base SD-Turbo weights were preserved as an engineering trade-off.</span>
+                <div class="case-summary-box" id="case-summary-box">
+                  <div class="sub-title" style="font-size: 0.95rem; margin-bottom: 8px;">📋 Case Summary</div>
+                  <div><strong>Type:</strong> <span id="summary-type">Texture / Sharpening</span></div>
+                  <div><strong>Impact:</strong> <span id="summary-impact">Halo artifacts around high-contrast edges</span></div>
+                  <div><strong>Mitigation:</strong> <span id="summary-mitigation">CLAHE + bilateral filter</span></div>
+                  <div><strong>Status:</strong> <span id="summary-status" class="badge badge-hybrid">Mitigated</span></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-  </main>
+        <!-- ==================== TAB 8: CATALOGUE ==================== -->
+        <section id="tab-catalogue" class="tab-panel">
+          <div class="dashboard-panel">
+            <h2 class="sub-title">Empirical Generation Catalogue</h2>
+            <p class="panel-description" style="margin-bottom: 20px;">Pre-computed holdout prompt benchmark generations from the NVIDIA RTX 5050 GPU.</p>
+            <div class="catalogue-grid" id="catalogue-grid">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </section>
 
-  <script src="/static/app.js"></script>
+        <!-- ==================== TAB 9: ABOUT ==================== -->
+        <section id="tab-about" class="tab-panel">
+          <div class="dashboard-panel">
+            <h2 class="sub-title">About Imagine AI &amp; Team Details</h2>
+            <p class="panel-description" style="margin-bottom: 22px;">Problem Statement 3 · Computer Vision &amp; Generative AI Capstone Project.</p>
+
+            <div class="about-grid">
+              <div class="about-col">
+                <h3 class="sub-title">Team &amp; Problem Statement</h3>
+                <ul class="about-list">
+                  <li><strong>Problem Statement:</strong> ProbID - P3: Resource-Efficient Text-to-Image Generation for Mobile Devices</li>
+                  <li><strong>Student USNs:</strong> <code>1MS22CS001, 1MS22CS002</code></li>
+                  <li><strong>Repository Architecture:</strong> Hybrid Client-Server (FastAPI GPU backend + Modern Web Dashboard + Android Client)</li>
+                  <li><strong>Frozen API Contract:</strong> REST v1.0.0 (<code>/api/v1/generate</code>, <code>/api/v1/capabilities</code>, <code>/api/v1/model</code>)</li>
+                </ul>
+              </div>
+
+              <div class="about-col">
+                <h3 class="sub-title">Viva / Demo Highlights</h3>
+                <div class="viva-card">
+                  <div class="viva-point">
+                    <strong>1. 3.01× Empirical Speedup:</strong>
+                    <span>Reducing denoising steps from 4 to 2 and running native fp16 cut median end-to-end latency from 866 ms to 288 ms.</span>
+                  </div>
+                  <div class="viva-point">
+                    <strong>2. VRAM Conservation (-43.4%):</strong>
+                    <span>Peak GPU memory dropped from 6,500 MB to 3,678 MB, staying safely within 8 GB laptop GPUs.</span>
+                  </div>
+                  <div class="viva-point">
+                    <strong>3. Hybrid Architecture Justification:</strong>
+                    <span>Local mobile diffusion crashes mobile OS limits (>3.5 GB RAM). A hybrid architecture allows mobile phones to stream generation in &lt;300 ms over LAN/Wi-Fi.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="/static/app.js?v=p3-redesign-v3"></script>
 </body>
 </html>

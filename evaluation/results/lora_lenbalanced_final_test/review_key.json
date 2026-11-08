@@ -1,0 +1,695 @@
+[
+  {
+    "pair": "COCO_test_109454|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00034.png",
+    "B_source": "adapted/00034.png"
+  },
+  {
+    "pair": "COCO_test_123415|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00029.png",
+    "B_source": "adapted/00029.png"
+  },
+  {
+    "pair": "COCO_test_128679|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00025.png",
+    "B_source": "base/00025.png"
+  },
+  {
+    "pair": "COCO_test_129663|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00039.png",
+    "B_source": "adapted/00039.png"
+  },
+  {
+    "pair": "COCO_test_129706|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00022.png",
+    "B_source": "base/00022.png"
+  },
+  {
+    "pair": "COCO_test_141517|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00023.png",
+    "B_source": "adapted/00023.png"
+  },
+  {
+    "pair": "COCO_test_150538|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00032.png",
+    "B_source": "adapted/00032.png"
+  },
+  {
+    "pair": "COCO_test_159112|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00046.png",
+    "B_source": "base/00046.png"
+  },
+  {
+    "pair": "COCO_test_179720|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00002.png",
+    "B_source": "adapted/00002.png"
+  },
+  {
+    "pair": "COCO_test_185850|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00008.png",
+    "B_source": "adapted/00008.png"
+  },
+  {
+    "pair": "COCO_test_190595|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00052.png",
+    "B_source": "adapted/00052.png"
+  },
+  {
+    "pair": "COCO_test_192306|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00018.png",
+    "B_source": "adapted/00018.png"
+  },
+  {
+    "pair": "COCO_test_194756|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00057.png",
+    "B_source": "adapted/00057.png"
+  },
+  {
+    "pair": "COCO_test_200250|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00013.png",
+    "B_source": "base/00013.png"
+  },
+  {
+    "pair": "COCO_test_211487|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00059.png",
+    "B_source": "adapted/00059.png"
+  },
+  {
+    "pair": "COCO_test_220858|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00058.png",
+    "B_source": "adapted/00058.png"
+  },
+  {
+    "pair": "COCO_test_22213|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00042.png",
+    "B_source": "base/00042.png"
+  },
+  {
+    "pair": "COCO_test_226883|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00019.png",
+    "B_source": "base/00019.png"
+  },
+  {
+    "pair": "COCO_test_229889|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00048.png",
+    "B_source": "base/00048.png"
+  },
+  {
+    "pair": "COCO_test_263258|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00004.png",
+    "B_source": "adapted/00004.png"
+  },
+  {
+    "pair": "COCO_test_272323|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00028.png",
+    "B_source": "base/00028.png"
+  },
+  {
+    "pair": "COCO_test_279030|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00007.png",
+    "B_source": "adapted/00007.png"
+  },
+  {
+    "pair": "COCO_test_283910|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00017.png",
+    "B_source": "base/00017.png"
+  },
+  {
+    "pair": "COCO_test_28506|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00050.png",
+    "B_source": "adapted/00050.png"
+  },
+  {
+    "pair": "COCO_test_289128|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00045.png",
+    "B_source": "adapted/00045.png"
+  },
+  {
+    "pair": "COCO_test_300034|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00015.png",
+    "B_source": "adapted/00015.png"
+  },
+  {
+    "pair": "COCO_test_300233|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00005.png",
+    "B_source": "adapted/00005.png"
+  },
+  {
+    "pair": "COCO_test_307790|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00020.png",
+    "B_source": "base/00020.png"
+  },
+  {
+    "pair": "COCO_test_32400|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00031.png",
+    "B_source": "adapted/00031.png"
+  },
+  {
+    "pair": "COCO_test_333286|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00036.png",
+    "B_source": "base/00036.png"
+  },
+  {
+    "pair": "COCO_test_336493|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00016.png",
+    "B_source": "base/00016.png"
+  },
+  {
+    "pair": "COCO_test_341393|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00037.png",
+    "B_source": "adapted/00037.png"
+  },
+  {
+    "pair": "COCO_test_34811|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00011.png",
+    "B_source": "base/00011.png"
+  },
+  {
+    "pair": "COCO_test_361123|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00054.png",
+    "B_source": "adapted/00054.png"
+  },
+  {
+    "pair": "COCO_test_377984|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00006.png",
+    "B_source": "adapted/00006.png"
+  },
+  {
+    "pair": "COCO_test_384213|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00041.png",
+    "B_source": "adapted/00041.png"
+  },
+  {
+    "pair": "COCO_test_388481|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00021.png",
+    "B_source": "base/00021.png"
+  },
+  {
+    "pair": "COCO_test_408327|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00053.png",
+    "B_source": "adapted/00053.png"
+  },
+  {
+    "pair": "COCO_test_424432|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00049.png",
+    "B_source": "adapted/00049.png"
+  },
+  {
+    "pair": "COCO_test_434900|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00035.png",
+    "B_source": "base/00035.png"
+  },
+  {
+    "pair": "COCO_test_443969|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00009.png",
+    "B_source": "adapted/00009.png"
+  },
+  {
+    "pair": "COCO_test_469618|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00055.png",
+    "B_source": "adapted/00055.png"
+  },
+  {
+    "pair": "COCO_test_474751|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00014.png",
+    "B_source": "base/00014.png"
+  },
+  {
+    "pair": "COCO_test_484080|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00010.png",
+    "B_source": "base/00010.png"
+  },
+  {
+    "pair": "COCO_test_525616|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00027.png",
+    "B_source": "adapted/00027.png"
+  },
+  {
+    "pair": "COCO_test_527906|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00038.png",
+    "B_source": "base/00038.png"
+  },
+  {
+    "pair": "COCO_test_529578|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00056.png",
+    "B_source": "base/00056.png"
+  },
+  {
+    "pair": "COCO_test_554595|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00047.png",
+    "B_source": "base/00047.png"
+  },
+  {
+    "pair": "COCO_test_562121|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00026.png",
+    "B_source": "base/00026.png"
+  },
+  {
+    "pair": "COCO_test_570573|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00043.png",
+    "B_source": "adapted/00043.png"
+  },
+  {
+    "pair": "COCO_test_576714|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00000.png",
+    "B_source": "base/00000.png"
+  },
+  {
+    "pair": "COCO_test_579548|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00040.png",
+    "B_source": "adapted/00040.png"
+  },
+  {
+    "pair": "COCO_test_68408|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00044.png",
+    "B_source": "adapted/00044.png"
+  },
+  {
+    "pair": "COCO_test_69795|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00001.png",
+    "B_source": "base/00001.png"
+  },
+  {
+    "pair": "COCO_test_70020|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00024.png",
+    "B_source": "adapted/00024.png"
+  },
+  {
+    "pair": "COCO_test_73702|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00030.png",
+    "B_source": "adapted/00030.png"
+  },
+  {
+    "pair": "COCO_test_78035|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00012.png",
+    "B_source": "adapted/00012.png"
+  },
+  {
+    "pair": "COCO_test_89603|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00003.png",
+    "B_source": "base/00003.png"
+  },
+  {
+    "pair": "COCO_test_90280|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00051.png",
+    "B_source": "base/00051.png"
+  },
+  {
+    "pair": "COCO_test_97156|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00033.png",
+    "B_source": "base/00033.png"
+  },
+  {
+    "pair": "Flickr30K_test_11423|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00062.png",
+    "B_source": "base/00062.png"
+  },
+  {
+    "pair": "Flickr30K_test_12356|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00088.png",
+    "B_source": "adapted/00088.png"
+  },
+  {
+    "pair": "Flickr30K_test_12417|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00080.png",
+    "B_source": "base/00080.png"
+  },
+  {
+    "pair": "Flickr30K_test_13417|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00075.png",
+    "B_source": "base/00075.png"
+  },
+  {
+    "pair": "Flickr30K_test_1358|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00093.png",
+    "B_source": "base/00093.png"
+  },
+  {
+    "pair": "Flickr30K_test_14558|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00087.png",
+    "B_source": "adapted/00087.png"
+  },
+  {
+    "pair": "Flickr30K_test_14796|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00069.png",
+    "B_source": "base/00069.png"
+  },
+  {
+    "pair": "Flickr30K_test_16395|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00086.png",
+    "B_source": "base/00086.png"
+  },
+  {
+    "pair": "Flickr30K_test_16416|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00096.png",
+    "B_source": "adapted/00096.png"
+  },
+  {
+    "pair": "Flickr30K_test_16715|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00078.png",
+    "B_source": "base/00078.png"
+  },
+  {
+    "pair": "Flickr30K_test_17208|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00076.png",
+    "B_source": "adapted/00076.png"
+  },
+  {
+    "pair": "Flickr30K_test_17731|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00091.png",
+    "B_source": "base/00091.png"
+  },
+  {
+    "pair": "Flickr30K_test_17733|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00095.png",
+    "B_source": "base/00095.png"
+  },
+  {
+    "pair": "Flickr30K_test_18979|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00070.png",
+    "B_source": "base/00070.png"
+  },
+  {
+    "pair": "Flickr30K_test_19071|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00061.png",
+    "B_source": "base/00061.png"
+  },
+  {
+    "pair": "Flickr30K_test_219|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00083.png",
+    "B_source": "adapted/00083.png"
+  },
+  {
+    "pair": "Flickr30K_test_22317|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00092.png",
+    "B_source": "adapted/00092.png"
+  },
+  {
+    "pair": "Flickr30K_test_23144|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00099.png",
+    "B_source": "base/00099.png"
+  },
+  {
+    "pair": "Flickr30K_test_23252|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00094.png",
+    "B_source": "adapted/00094.png"
+  },
+  {
+    "pair": "Flickr30K_test_24043|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00074.png",
+    "B_source": "adapted/00074.png"
+  },
+  {
+    "pair": "Flickr30K_test_24425|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00097.png",
+    "B_source": "adapted/00097.png"
+  },
+  {
+    "pair": "Flickr30K_test_24457|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00071.png",
+    "B_source": "adapted/00071.png"
+  },
+  {
+    "pair": "Flickr30K_test_24829|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00082.png",
+    "B_source": "adapted/00082.png"
+  },
+  {
+    "pair": "Flickr30K_test_26084|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00098.png",
+    "B_source": "base/00098.png"
+  },
+  {
+    "pair": "Flickr30K_test_26256|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00081.png",
+    "B_source": "adapted/00081.png"
+  },
+  {
+    "pair": "Flickr30K_test_26536|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00072.png",
+    "B_source": "adapted/00072.png"
+  },
+  {
+    "pair": "Flickr30K_test_27830|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00065.png",
+    "B_source": "adapted/00065.png"
+  },
+  {
+    "pair": "Flickr30K_test_28240|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00063.png",
+    "B_source": "base/00063.png"
+  },
+  {
+    "pair": "Flickr30K_test_29177|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00068.png",
+    "B_source": "adapted/00068.png"
+  },
+  {
+    "pair": "Flickr30K_test_29250|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00090.png",
+    "B_source": "adapted/00090.png"
+  },
+  {
+    "pair": "Flickr30K_test_3087|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00073.png",
+    "B_source": "base/00073.png"
+  },
+  {
+    "pair": "Flickr30K_test_3437|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00060.png",
+    "B_source": "base/00060.png"
+  },
+  {
+    "pair": "Flickr30K_test_472|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00079.png",
+    "B_source": "base/00079.png"
+  },
+  {
+    "pair": "Flickr30K_test_4942|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00064.png",
+    "B_source": "base/00064.png"
+  },
+  {
+    "pair": "Flickr30K_test_5056|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00067.png",
+    "B_source": "adapted/00067.png"
+  },
+  {
+    "pair": "Flickr30K_test_5881|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00077.png",
+    "B_source": "adapted/00077.png"
+  },
+  {
+    "pair": "Flickr30K_test_6242|steps30|seed42",
+    "A": "base",
+    "B": "adapted",
+    "A_source": "base/00084.png",
+    "B_source": "adapted/00084.png"
+  },
+  {
+    "pair": "Flickr30K_test_9088|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00066.png",
+    "B_source": "base/00066.png"
+  },
+  {
+    "pair": "Flickr30K_test_9572|steps30|seed42",
+    "A": "adapted",
+    "B": "base",
+    "A_source": "adapted/00089.png",
+    "B_source": "base/00089.png"
+  }
+]

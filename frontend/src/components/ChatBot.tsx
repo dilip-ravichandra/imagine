@@ -8,6 +8,7 @@ import {
   Tooltip,
 } from '@chakra-ui/react';
 import { FiMessageSquare, FiX, FiSend, FiMic } from 'react-icons/fi';
+import { sendChat } from '../lib/api';
 
 interface ChatBotProps {
   isOpen?: boolean;
@@ -24,28 +25,32 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen: initialOpen = false }) => {
     },
   ]);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!message.trim()) return;
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const userText = message.trim();
     setMessages((prev) => [...prev, { role: 'user', text: userText, time }]);
     setMessage('');
-
-    // Simulate Groq assistant response
-    setTimeout(() => {
-      let reply = `That's a great question! For "${userText.slice(0, 40)}...", I recommend trying the Create Studio with SD-Turbo or Storybook Studio to generate sequential scenes. You can also use voice input or upload an image for selective inpainting!`;
-      if (userText.toLowerCase().includes('prompt') || userText.toLowerCase().includes('help')) {
-        reply = `Here is an enhanced prompt recommendation: "${userText}, cinematic lighting, volumetric atmospheric fog, octane 8k render, hyper-detailed, masterpiece." Try pasting this into Create Studio!`;
-      }
+    try {
+      const result = await sendChat([{ role: 'user', content: userText }]);
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          text: reply,
+          text: result.message,
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
-    }, 700);
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          text: error instanceof Error ? error.message : 'The assistant request failed.',
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
+    }
   };
 
   return (

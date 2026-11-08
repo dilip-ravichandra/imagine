@@ -16,17 +16,19 @@ import time
 from pathlib import Path
 
 from .data import DataError
-from .adapter import BASE_MODEL, LORA_WEIGHT_NAME, sha256_file, validate_adapter  # noqa: F401 (re-exported)
+from .adapter import LORA_WEIGHT_NAME, SD15_BASE_MODEL, sha256_file, validate_adapter
 
 REPO = Path(__file__).resolve().parents[2]
 DEFAULT_EVAL = REPO / "evaluation" / "prompts" / "dataset_prompts.json"
 WARMUP_PROMPT = "A ceramic cup on a wooden table."
 
 
-def plan_runs(manifest: dict, eval_rows: list, steps_list, seeds, limit: int = 0) -> list:
+def plan_runs(manifest: dict, eval_rows: list, steps_list, seeds, limit: int = 0, eval_only: bool = False) -> list:
     """Held-out prompts x steps x seeds. TEST rows are impossible to include by construction."""
-    prompts = [dict(prompt_id=f"val_{r['image_id']}", prompt=r["caption"], source="validation")
-               for r in manifest["validation"]]
+    prompts = [] if eval_only else [
+        dict(prompt_id=f"val_{r['image_id']}", prompt=r["caption"], source="validation")
+        for r in manifest["validation"]
+    ]
     prompts += [dict(prompt_id=r["id"], prompt=r["prompt"], source="dev")
                 for r in eval_rows if r.get("split") == "dev"]
     if limit:
@@ -95,10 +97,10 @@ def summarize_review(sheet_rows: list, key: list) -> dict:
 
 def run(a) -> int:  # pragma: no cover - needs GPU, torch, weights
     try:
-        meta = validate_adapter(a.adapter, a.revision)
+        meta = validate_adapter(a.adapter, a.revision, SD15_BASE_MODEL)
         manifest = json.loads((Path(a.data) / "manifest.json").read_text(encoding="utf-8"))
         eval_rows = json.loads(Path(a.eval_prompts or DEFAULT_EVAL).read_text(encoding="utf-8"))
-        plan = plan_runs(manifest, eval_rows, a.steps, a.seeds, a.limit)
+        plan = plan_runs(manifest, eval_rows, a.steps, a.seeds, a.limit, a.eval_only)
     except (DataError, OSError, KeyError, json.JSONDecodeError) as e:
         print("ERROR:", e, file=sys.stderr)
         return 2
@@ -114,15 +116,16 @@ def run(a) -> int:  # pragma: no cover - needs GPU, torch, weights
     out.mkdir(parents=True)
     (out / "base").mkdir()
     (out / "adapted").mkdir()
-    pipe = AutoPipelineForText2Image.from_pretrained(BASE_MODEL, revision=meta["base_revision"],
+    pipe = AutoPipelineForText2Image.from_pretrained(SD15_BASE_MODEL, revision=meta["base_revision"],
                                                      torch_dtype=torch.float16, variant="fp16").to("cuda")
     pipe.set_progress_bar_config(disable=True)
     records = []
     for variant in ("base", "adapted"):
         if variant == "adapted":
             pipe.load_lora_weights(str(a.adapter), weight_name=LORA_WEIGHT_NAME)
+            pipe.set_adapters("default_0", adapter_weights=a.adapter_weight)
         with torch.inference_mode():  # warm-up, not recorded
-            pipe(WARMUP_PROMPT, num_inference_steps=1, guidance_scale=0.0, width=512, height=512,
+            pipe(WARMUP_PROMPT, num_inference_steps=1, guidance_scale=7.5, width=512, height=512,
                  generator=torch.Generator("cpu").manual_seed(0))
         for i, r in enumerate(plan):
             torch.cuda.synchronize()
@@ -131,7 +134,7 @@ def run(a) -> int:  # pragma: no cover - needs GPU, torch, weights
             status, image_name = "ok", f"{variant}/{i:05d}.png"
             try:
                 with torch.inference_mode():
-                    res = pipe(r["prompt"], num_inference_steps=r["steps"], guidance_scale=0.0, width=512, height=512,
+                    res = pipe(r["prompt"], num_inference_steps=r["steps"], guidance_scale=7.5, width=512, height=512,
                                generator=torch.Generator("cpu").manual_seed(r["seed"]))  # same seed semantics as engine.py
                 torch.cuda.synchronize()
                 if getattr(res, "nsfw_content_detected", None) and any(res.nsfw_content_detected):
@@ -154,7 +157,7 @@ def run(a) -> int:  # pragma: no cover - needs GPU, torch, weights
     # Binds this comparison to ONE adapter + base revision, so ai_engine.training.approve can refuse a mismatched review.
     (out / "compare_meta.json").write_text(json.dumps(dict(
         adapter_sha256=meta["adapter_sha256"], base_revision=meta["base_revision"], steps=a.steps, seeds=a.seeds,
-        planned_runs=len(plan), pairs_in_sheet=len(sheet)), indent=2), encoding="utf-8")
+        adapter_weight=a.adapter_weight, planned_runs=len(plan), pairs_in_sheet=len(sheet)), indent=2), encoding="utf-8")
     (out / "README.txt").write_text(
         "Open only blind/ and review_sheet.csv (not base/, adapted/, comparison.json or review_key.json) until done.\n"
         "A/B order is randomised. Then run\n"
@@ -170,11 +173,14 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--data", required=True)
     p.add_argument("--adapter", required=True)
     p.add_argument("--out", required=True)
-    p.add_argument("--revision", help="require the adapter to match this sd-turbo commit")
-    p.add_argument("--steps", type=int, nargs="+", default=[1, 4], choices=[1, 2, 3, 4])
+    p.add_argument("--revision", help="require the adapter to match this SD 1.5 commit")
+    p.add_argument("--steps", type=int, nargs="+", default=[30], choices=range(1, 51))
     p.add_argument("--seeds", type=int, nargs="+", default=[42, 43])
+    p.add_argument("--adapter-weight", type=float, default=1.0,
+                   help="LoRA influence scale for development comparisons (default: 1.0)")
     p.add_argument("--limit", type=int, default=0, help="first N prompts only (smoke)")
     p.add_argument("--eval-prompts")
+    p.add_argument("--eval-only", action="store_true", help="compare only prompts from --eval-prompts")
     return p
 
 

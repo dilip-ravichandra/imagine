@@ -34,6 +34,7 @@ import {
 import { Link } from 'react-router-dom';
 import WorkspaceLayout from '../components/WorkspaceLayout';
 import InteractiveCanvasMask from '../components/InteractiveCanvasMask';
+import { generateWithModel } from '../lib/api';
 
 interface StoryScene {
   id: number;
@@ -122,6 +123,8 @@ const StoryBookStudio: React.FC = () => {
   const [activeSceneIndex, setActiveSceneIndex] = useState(0);
 
   const [isGeneratingStory, setIsGeneratingStory] = useState(false);
+  const [storyModel, setStoryModel] = useState<'sd_turbo' | 'sd15_optimized'>('sd_turbo');
+  const [storyError, setStoryError] = useState<string | null>(null);
 
   // Selective Scene Recreator Modal
   const [isRecreating, setIsRecreating] = useState(false);
@@ -142,53 +145,68 @@ const StoryBookStudio: React.FC = () => {
   const activeScene = scenes[activeSceneIndex] || scenes[0];
 
   // Handle Full Story Generation
-  const handleGenerateStory = () => {
+  const handleGenerateStory = async () => {
     if (!storyIdea.trim()) return;
     setIsGeneratingStory(true);
-
-    setTimeout(() => {
-      const generated: StoryScene[] = [
+    setStoryError(null);
+    try {
+      const scenePrompts = [
+        `${storyIdea} - Opening scene, ${artStyle}, establish the world and main character`,
+        `${storyIdea} - Rising action, ${artStyle}, show the first challenge`,
+        `${storyIdea} - Climax, ${artStyle}, emotional turning point and decisive action`,
+        `${storyIdea} - Ending, ${artStyle}, warm hopeful resolution`,
+      ];
+      const sceneText = [
         {
-          id: 1,
           title: 'Scene 1: The Beginning',
-          imagePrompt: `${storyIdea} - Opening scene, ${artStyle}, high detail`,
-          imageUrl: `https://picsum.photos/seed/storygen1${Date.now()}/600/400`,
           narration: `Once upon a time in a vibrant world, the story begins: ${storyIdea.slice(0, 90)}...`,
           dialogue: 'Hero: "Our journey starts today!"',
           character: 'Main Character',
         },
         {
-          id: 2,
           title: 'Scene 2: The Adventure Unfolds',
-          imagePrompt: `${storyIdea} - Mid journey conflict or mystery, ${artStyle}`,
-          imageUrl: `https://picsum.photos/seed/storygen2${Date.now()}/600/400`,
           narration: 'As obstacles appeared along the path, unexpected companions joined hands to solve the mystery.',
           dialogue: 'Companion: "Look ahead, there is light beyond the misty horizon!"',
           character: 'Companion',
         },
         {
-          id: 3,
           title: 'Scene 3: The Climax',
-          imagePrompt: `${storyIdea} - Climax moment with emotional connection, ${artStyle}`,
-          imageUrl: `https://picsum.photos/seed/storygen3${Date.now()}/600/400`,
           narration: 'Facing the greatest challenge of all, kindness and courage turned darkness into radiant joy.',
           dialogue: 'All: "Together we can accomplish anything!"',
           character: 'Heroes Together',
         },
         {
-          id: 4,
           title: 'Scene 4: The Happy Ending',
-          imagePrompt: `${storyIdea} - Warm celebration sunset scene, ${artStyle}`,
-          imageUrl: `https://picsum.photos/seed/storygen4${Date.now()}/600/400`,
           narration: 'And from that memorable day forward, joy echoed across the kingdom. The end.',
           dialogue: 'Narrator: "A journey remembered for generations."',
           character: 'Happy Ensemble',
         },
       ];
+      const generated: StoryScene[] = [];
+      for (let index = 0; index < scenePrompts.length; index += 1) {
+        const result = await generateWithModel({
+          prompt: scenePrompts[index],
+          modelChoice: storyModel,
+          resolution: 512,
+          steps: storyModel === 'sd15_optimized' ? 8 : 2,
+        });
+        generated.push({
+          id: index + 1,
+          title: sceneText[index].title,
+          imagePrompt: scenePrompts[index],
+          imageUrl: result.image_url,
+          narration: sceneText[index].narration,
+          dialogue: sceneText[index].dialogue,
+          character: sceneText[index].character,
+        });
+      }
       setScenes(generated);
       setActiveSceneIndex(0);
+    } catch (error) {
+      setStoryError(error instanceof Error ? error.message : 'Unable to generate the storyboard.');
+    } finally {
       setIsGeneratingStory(false);
-    }, 1800);
+    }
   };
 
   // Open Selective Recreate
@@ -198,16 +216,21 @@ const StoryBookStudio: React.FC = () => {
   };
 
   // Apply Selective Recreation to the active scene
-  const handleApplySceneRecreation = () => {
+  const handleApplySceneRecreation = async () => {
     setIsRegeneratingPanel(true);
-
-    setTimeout(() => {
+    try {
+      const result = await generateWithModel({
+        prompt: `${activeScene.imagePrompt}, ${recreatePromptChange}`,
+        modelChoice: storyModel,
+        resolution: 512,
+        steps: storyModel === 'sd15_optimized' ? 8 : 2,
+      });
       setScenes((prev) =>
         prev.map((s, idx) =>
           idx === activeSceneIndex
             ? {
                 ...s,
-                imageUrl: `https://picsum.photos/seed/recreated${Date.now()}/600/400`,
+                imageUrl: result.image_url,
                 imagePrompt: `${s.imagePrompt} [Recreated: ${recreatePromptChange}]`,
               }
             : s
@@ -215,7 +238,11 @@ const StoryBookStudio: React.FC = () => {
       );
       setIsRegeneratingPanel(false);
       setIsRecreating(false);
-    }, 1400);
+    } catch (error) {
+      setStoryError(error instanceof Error ? error.message : 'Unable to recreate this scene.');
+    } finally {
+      setIsRegeneratingPanel(false);
+    }
   };
 
   // Voice Dictation handler
@@ -278,6 +305,11 @@ const StoryBookStudio: React.FC = () => {
                 <Text color="#A5B1A7" fontSize="xs">
                   Crafting Scene {activeSceneIndex + 1} of {scenes.length} · All story pages saved to Gallery
                 </Text>
+                {storyError && (
+                  <Text color="#FF8A80" fontSize="xs" mt={1}>
+                    {storyError}
+                  </Text>
+                )}
               </Box>
             </Flex>
 
@@ -314,6 +346,20 @@ const StoryBookStudio: React.FC = () => {
                     {a}
                   </option>
                 ))}
+              </Select>
+
+              <Select
+                size="sm"
+                value={storyModel}
+                onChange={(e) => setStoryModel(e.target.value as 'sd_turbo' | 'sd15_optimized')}
+                bg="#0F1A11"
+                color="#F4F7F0"
+                border="1px solid #2A3A2C"
+                borderRadius="8px"
+                w={{ base: 'full', sm: '170px' }}
+              >
+                <option value="sd_turbo" style={{ background: '#111713' }}>SD-Turbo Storyboard</option>
+                <option value="sd15_optimized" style={{ background: '#111713' }}>SD 1.5 Optimized</option>
               </Select>
 
               <Button

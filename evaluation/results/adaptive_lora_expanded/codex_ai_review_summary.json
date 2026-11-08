@@ -1,0 +1,10 @@
+{
+  "reviewer": "Codex visual AI review",
+  "pairs": 40,
+  "adapted_better": 9,
+  "base_better": 16,
+  "tie": 15,
+  "adapted_not_worse_fraction": 0.6,
+  "new_failures": 0,
+  "method": "Visual side-by-side review of all randomized blind pairs; prompt adherence, anatomy/object count, composition, and visible artifacts. Subjective advisory result; not human approval."
+}
