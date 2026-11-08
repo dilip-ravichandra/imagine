@@ -509,24 +509,60 @@
                 </div>
 
                 <!-- Advanced Settings (Collapsible) -->
-                <div class="panel-card" style="margin-bottom: 16px; padding: 12px 16px;">
-                  <div id="stress-advanced-toggle" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
-                    <span style="font-size:0.85rem; font-weight:600; color:var(--text-secondary);">⚙️ Advanced Generation Settings</span>
-                    <span id="stress-advanced-chevron" style="font-size:0.75rem; color:var(--accent-purple);">Expand ▼</span>
-                  </div>
-                  <div id="stress-advanced-body" style="display:none; margin-top:12px;">
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-                      <div>
-                        <label style="font-size:0.75rem; color:var(--text-dim); display:block; margin-bottom:4px;">Inference Seed</label>
-                        <input type="number" id="stress-seed-input" placeholder="Random seed" style="width:100%; padding:6px 10px; background:#0a0e1c; border:1px solid var(--border-card); border-radius:6px; color:#fff; font-size:0.8rem; font-family:var(--font-mono);">
-                      </div>
-                      <div>
-                        <label style="font-size:0.75rem; color:var(--text-dim); display:block; margin-bottom:4px;">Fallback Engine</label>
-                        <div style="padding:6px 10px; background:#0a0e1c; border:1px solid var(--border-card); border-radius:6px; color:var(--accent-green); font-size:0.8rem; font-weight:600;">Auto-Adaptive Controller</div>
-                      </div>
+                <details class="advanced-settings" id="stress-advanced-details">
+                  <summary>⚙️ Advanced Adaptive Parameters</summary>
+                  <div class="advanced-grid">
+                    <div class="form-item">
+                      <label for="stress-resolution-select">Target Resolution</label>
+                      <select id="stress-resolution-select">
+                        <option value="auto" selected>Auto-Adaptive (Dynamic)</option>
+                        <option value="512">512 × 512 (Standard)</option>
+                        <option value="256">256 × 256 (Spatial Rescaling)</option>
+                        <option value="128">128 × 128 (Bicubic Upscale Fallback)</option>
+                      </select>
+                    </div>
+
+                    <div class="form-item">
+                      <label for="stress-steps-select">Denoising Steps</label>
+                      <select id="stress-steps-select">
+                        <option value="auto" selected>Auto-Adaptive (Dynamic)</option>
+                        <option value="1">1 step (Sub-180ms Throttling)</option>
+                        <option value="2">2 steps (Balanced ADD)</option>
+                        <option value="4">4 steps (Quality Expansion)</option>
+                        <option value="8">8 steps (LoRA Optimized)</option>
+                        <option value="30">30 steps (Full Standard)</option>
+                      </select>
+                    </div>
+
+                    <div class="form-item">
+                      <label for="stress-precision-select">Precision Target</label>
+                      <select id="stress-precision-select">
+                        <option value="auto" selected>Auto-Adaptive (Dynamic)</option>
+                        <option value="fp16">fp16 (Half Precision Tensor Cores)</option>
+                        <option value="fp32">fp32 (Full Precision IEEE 754)</option>
+                      </select>
+                    </div>
+
+                    <div class="form-item">
+                      <label for="stress-seed-input">Random Seed (-1 for random)</label>
+                      <input type="number" id="stress-seed-input" value="-1" min="-1" max="9999999" placeholder="-1">
+                    </div>
+
+                    <div class="form-item full-width">
+                      <label class="checkbox-label">
+                        <input type="checkbox" id="stress-cv-toggle" checked>
+                        <span>Classical CV Post-Processing (Bilateral Edge Preservation + Halo Guard + CLAHE)</span>
+                      </label>
+                    </div>
+
+                    <div class="form-item full-width">
+                      <label class="checkbox-label">
+                        <input type="checkbox" id="stress-oom-guard" checked>
+                        <span>Adaptive OOM Headroom Guard (Prevents VRAM allocation exceeding GPU capacity)</span>
+                      </label>
                     </div>
                   </div>
-                </div>
+                </details>
 
                 <!-- Adaptive Controller Strategy Preview -->
                 <div class="adaptive-strategy-card" style="margin-bottom: 16px;">

@@ -925,6 +925,68 @@ private fun StressLabPanel(state: UiState, viewModel: ImagineAiViewModel, contex
             }
         }
 
+        // 3.5 Advanced Adaptive Settings Card
+        var showAdvancedSettings by remember { mutableStateOf(false) }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(BgCard)
+                .border(1.dp, BorderCard, RoundedCornerShape(12.dp))
+                .padding(14.dp)
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showAdvancedSettings = !showAdvancedSettings },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("⚙️", fontSize = 14.sp)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Advanced Adaptive Parameters", fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    }
+                    Text(
+                        if (showAdvancedSettings) "Collapse ▲" else "Expand ▼",
+                        fontSize = 11.5.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = AccentPurple
+                    )
+                }
+
+                AnimatedVisibility(visible = showAdvancedSettings) {
+                    Column(
+                        modifier = Modifier.padding(top = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Divider(color = Color(0x1AFFFFFF), thickness = 1.dp)
+
+                        StrategyRow("Target Resolution:", "Auto-Adaptive ($predictedRes)")
+                        StrategyRow("Denoising Steps:", "Auto-Adaptive ($predictedSteps)")
+                        StrategyRow("Precision Target:", if (state.selectedModel == "sd15_baseline") "fp32 (IEEE 754)" else "fp16 (Tensor Cores)")
+                        StrategyRow("Classical CV Pipeline:", "Bilateral + Halo Guard + CLAHE")
+                        StrategyRow("Adaptive OOM Guard:", "Active (+Headroom Allocation)")
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color(0xFF0A0E1C))
+                                .border(1.dp, BorderCard, RoundedCornerShape(8.dp))
+                                .padding(10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Inference Seed", fontSize = 12.sp, color = TextMuted)
+                            Text("-1 (Randomized)", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary, fontFamily = FontFamily.Monospace)
+                        }
+                    }
+                }
+            }
+        }
+
         // 4. Budget Envelope & Headroom Visualization Card
         Box(
             modifier = Modifier

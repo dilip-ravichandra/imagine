@@ -468,10 +468,11 @@ function initStressLab() {
   const sampleBtns = document.querySelectorAll('.stress-sample-prompt');
   const modelCards = document.querySelectorAll('.stress-model-card');
   const modelSelect = document.getElementById('stress-model-select');
-  const advToggle = document.getElementById('stress-advanced-toggle');
-  const advBody = document.getElementById('stress-advanced-body');
-  const advChevron = document.getElementById('stress-advanced-chevron');
+  const resSelect = document.getElementById('stress-resolution-select');
+  const stepsSelect = document.getElementById('stress-steps-select');
+  const precSelect = document.getElementById('stress-precision-select');
   const seedInput = document.getElementById('stress-seed-input');
+  const cvToggle = document.getElementById('stress-cv-toggle');
 
   const placeholder = document.getElementById('stress-placeholder');
   const loader = document.getElementById('stress-loader');
@@ -521,14 +522,9 @@ function initStressLab() {
     });
   });
 
-  // Advanced settings toggle
-  if (advToggle && advBody) {
-    advToggle.addEventListener('click', () => {
-      const isHidden = advBody.style.display === 'none' || !advBody.style.display;
-      advBody.style.display = isHidden ? 'block' : 'none';
-      if (advChevron) advChevron.textContent = isHidden ? 'Collapse ▲' : 'Expand ▼';
-    });
-  }
+  if (resSelect) resSelect.addEventListener('change', update);
+  if (stepsSelect) stepsSelect.addEventListener('change', update);
+  if (precSelect) precSelect.addEventListener('change', update);
 
   function update() {
     if (!latSlider || !vramSlider) return;
@@ -614,6 +610,31 @@ function initStressLab() {
       predLat = 12430;
       predVram = 5645;
       activeLadderIdx = 0;
+    }
+
+    // Reflect dynamically in Advanced Settings options if on Auto
+    if (resSelect) {
+      const autoRes = resSelect.querySelector('option[value="auto"]');
+      if (autoRes) autoRes.textContent = `Auto-Adaptive (${chosenRes} × ${chosenRes})`;
+      if (resSelect.value !== 'auto') {
+        chosenRes = parseInt(resSelect.value, 10);
+      }
+    }
+
+    if (stepsSelect) {
+      const autoSteps = stepsSelect.querySelector('option[value="auto"]');
+      if (autoSteps) autoSteps.textContent = `Auto-Adaptive (${chosenSteps} steps)`;
+      if (stepsSelect.value !== 'auto') {
+        chosenSteps = parseInt(stepsSelect.value, 10);
+      }
+    }
+
+    if (precSelect) {
+      const autoPrec = precSelect.querySelector('option[value="auto"]');
+      if (autoPrec) autoPrec.textContent = `Auto-Adaptive (${chosenPrec})`;
+      if (precSelect.value !== 'auto') {
+        chosenPrec = precSelect.value;
+      }
     }
 
     if (ladderItems[activeLadderIdx]) {
@@ -703,6 +724,12 @@ function initStressLab() {
           model_choice: modelChoice
         };
         if (seedVal !== null) reqPayload.seed = seedVal;
+        if (resSelect && resSelect.value !== 'auto') {
+          reqPayload.resolution = parseInt(resSelect.value, 10);
+        }
+        if (stepsSelect && stepsSelect.value !== 'auto') {
+          reqPayload.steps = parseInt(stepsSelect.value, 10);
+        }
 
         const res = await fetch('/api/v1/adaptive/stress-generate', {
           method: 'POST',

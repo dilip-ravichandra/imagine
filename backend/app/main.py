@@ -388,6 +388,8 @@ def create_app(engine: Optional[DiffusionEngine] = None, settings: Optional[Sett
         vram_budget_mb: int = Field(default=4096, ge=1024, le=16384)
         model_choice: Optional[str] = Field(default="sd_turbo")
         seed: Optional[int] = None
+        resolution: Optional[int] = None
+        steps: Optional[int] = None
 
     @app.post("/api/v1/adaptive/stress-generate")
     def stress_generate(req: StressGenerateRequest, request: Request):
@@ -461,6 +463,13 @@ def create_app(engine: Optional[DiffusionEngine] = None, settings: Optional[Sett
                 ladder_step = 1
                 ladder_name = "Full Quality Mode"
                 expl = f"Adequate budget ({req.latency_budget_ms} ms, {req.vram_budget_mb} MB VRAM): Full quality pipeline configuration selected."
+
+        if req.resolution and req.resolution in [128, 256, 384, 512, 640, 768]:
+            chosen_res = req.resolution
+            if chosen_res == 128:
+                upscale_bicubic = True
+        if req.steps and 1 <= req.steps <= 50:
+            chosen_steps = req.steps
 
         rid = uuid.uuid4().hex
         res = generate_with_model(req.prompt, model_choice, req.seed, chosen_res, chosen_steps,
