@@ -3,8 +3,10 @@
 2. Inpainting (Mask-guided selective recreation)
 3. Image-to-Image (Reference image conditioning)
 """
+import functools
 import logging
 import os
+import threading
 import time
 from typing import Optional, Tuple
 from PIL import Image, ImageOps
@@ -12,6 +14,16 @@ from PIL import Image, ImageOps
 log = logging.getLogger("imagineai.multimodel")
 
 _PIPELINES = {}
+_GPU_LOCK = threading.RLock()  # one image job at a time on the GPU: concurrent users queue here instead of colliding
+
+
+def _serialized(fn):
+    @functools.wraps(fn)
+    def wrapper(*a, **kw):
+        with _GPU_LOCK:
+            return fn(*a, **kw)
+    return wrapper
+
 _INPAINT_PIPELINES = {}
 _IMG2IMG_PIPELINES = {}
 _CURRENT_MODEL_ON_GPU = None
@@ -249,6 +261,7 @@ def _align_to_multiple(dim: int, multiple: int = 8) -> int:
     return max(multiple, (dim // multiple) * multiple)
 
 
+@_serialized
 def generate_with_model(
     prompt: str,
     model_choice: str = "sd_turbo",
@@ -314,6 +327,7 @@ def generate_with_model(
     }
 
 
+@_serialized
 def inpaint_with_model(
     prompt: str,
     image: Image.Image,
@@ -401,6 +415,7 @@ def inpaint_with_model(
     }
 
 
+@_serialized
 def img2img_with_model(
     prompt: str,
     image: Image.Image,

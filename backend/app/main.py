@@ -175,7 +175,6 @@ def create_app(engine: Optional[DiffusionEngine] = None, settings: Optional[Sett
     react_index_file = react_dist_dir / "index.html"
     android_apk_file = repo_root / "android" / "app" / "build" / "outputs" / "apk" / "debug" / "app-debug.apk"
     hosted_variants = os.getenv("IMAGINEAI_HOSTED_VARIANTS", "0").strip().lower() in {"1", "true", "yes", "on"}
-    hosted_auth = hosted_variants and bool(settings.api_key)
     if static_dir.exists():
         app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
     if (react_dist_dir / "assets").is_dir():
@@ -196,12 +195,6 @@ def create_app(engine: Optional[DiffusionEngine] = None, settings: Optional[Sett
         if not react_index_file.is_file():
             return JSONResponse(status_code=503, content={"detail": "The Imagine AI web build is not packaged."})
         html = react_index_file.read_text(encoding="utf-8")
-        if hosted_auth:
-            html = html.replace(
-                "</head>",
-                '<script src="/static/hosted-auth.js"></script></head>',
-                1,
-            )
         return HTMLResponse(html)
 
     @app.get("/", include_in_schema=False)
