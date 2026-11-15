@@ -1,92 +1,63 @@
-# Modal Deployment Guide for ImagineAI
-# =====================================
+# Imagine AI cloud deployment
 
-## Step 1 — Install Modal SDK
-```bash
-pip install modal
-modal token new
-```
-This opens a browser window to authenticate with your Modal account.
+The Modal deployment serves the launched React site, the research dashboard,
+the Android APK, and the shared inference API from one URL. Generation runs on
+Modal's A10G GPU; the laptop GPU is not used.
 
----
+## Cost guardrail
 
-## Step 2 — (Optional) Create a secrets group in Modal dashboard
-If you want API key protection on your deployed endpoint:
-1. Go to https://modal.com/secrets
-2. Click "New secret group"
-3. Name it: `imagineai-secrets`
-4. Add key: `API_KEY` = any random string you choose
+Before deploying, open **Modal → Usage & Billing** and set the workspace
+**spend limit** to `$0`. This is the hard cap on net charges after credits. A
+workspace usage budget is a different limit and does not guarantee `$0`
+out-of-pocket. The current Modal CLI/SDK has no spend-limit setter, so verify
+the value in the dashboard before running any Modal deployment or model
+download command.
 
----
+The Starter plan currently includes compute credits, and the hard spend limit
+stops workloads when they would create out-of-pocket Modal charges. Provider
+API keys (Groq/Gemini) are separate accounts and must have their own billing
+limits if those APIs are enabled.
 
-## Step 3 — Pre-download model weights (run once)
-This downloads SD-Turbo + SD 1.5 + LCM-LoRA weights (~10 GB) into a
-persistent Modal volume so they survive between deployments and cold starts.
+## Deploy
 
-```bash
-modal run modal_deploy.py
-```
+Use the existing authenticated Modal profile and Python environment:
 
----
-
-## Step 4 — Deploy the web endpoint
-```bash
-modal deploy modal_deploy.py
+```powershell
+.\.venv\Scripts\python.exe -m modal deploy modal_deploy.py
 ```
 
-Modal will print something like:
-```
-✓ Created web endpoint: https://dilip-ravichandra--imagineai-p3-fastapi-app.modal.run
-```
+Before deploying, accept the Stable Diffusion 1.5 model terms on Hugging Face
+and put a read token in `.env` as `HF_TOKEN=...`. The pinned SD 1.5 repository
+is gated, and the token is needed to download all model files. The deployment
+script places that token and configured Groq/Gemini keys in an encrypted Modal
+secret. It packages only the backend, research UI, built React assets,
+approved LoRA, required catalogue images, and current Android APK. It does not
+upload `.env`, training data, or review keys. It creates `.modal-api-key`
+locally; keep that file private (it is ignored by Git).
 
-**That URL is your live public dashboard and API.**
+After setting the Modal spend limit and `HF_TOKEN`, download the model files
+into the persistent volume, then deploy:
 
----
-
-## Step 5 — Test the deployment
-```bash
-# Health check
-curl https://<your-app>.modal.run/api/v1/health
-
-# Web Dashboard
-open https://<your-app>.modal.run/
-
-# API Docs
-open https://<your-app>.modal.run/docs
+```powershell
+.\.venv\Scripts\python.exe -m modal run modal_deploy.py::download_models
+.\.venv\Scripts\python.exe -m modal deploy modal_deploy.py
 ```
 
----
+Modal returns the public base URL. The three surfaces are:
 
-## Step 6 — Update Android app to use the Modal URL
-In android/app/src/main/java/.../api/ApiClient.kt, change:
-```kotlin
-private const val BASE_URL = "http://192.168.1.4:8000/"
-```
-to:
-```kotlin
-private const val BASE_URL = "https://<your-app>.modal.run/"
-```
+- React website: `/`
+- Research dashboard: `/research`
+- Android APK download: `/download/android.apk`
 
----
+The API is at `/api/v1/*`, with `/health` public. The hosted web pages ask for
+the API key on the first API request. In Android, open Server Configuration,
+enter the same base URL (with trailing slash) and API key, then save. The APK
+is the currently built debug APK.
 
-## GPU specs on Modal (A10G)
-| Spec | Modal A10G | Your RTX 5050 |
-|------|-----------|---------------|
-| VRAM | 24 GB | 8 GB |
-| CUDA | 12.4 | 12.8 |
-| FP16 Tensor | Yes | Yes |
-| SD-Turbo latency | ~180 ms | ~345 ms |
+## Verify after deployment
 
-The A10G has 3× more VRAM, so all 4 models can stay resident simultaneously.
-
----
-
-## Cost estimate (Modal pricing)
-| Usage | Cost |
-|-------|------|
-| 30 GPU-hr free/month | \$0 |
-| A10G on-demand | ~\$1.10/hr |
-| Idle (keep_warm=0) | \$0 (auto scale-to-zero) |
-| Idle (keep_warm=1) | ~\$26.40/month |
-
-**Recommendation:** Set `keep_warm=0` after the hackathon to avoid charges.
+Open `/health`, `/`, `/research`, and `/download/android.apk`. Confirm the
+React site and dashboard load, then use the model selector to generate with
+SD-Turbo, SD 1.5, SD 1.5 LCM, and the approved SD 1.5 LoRA (weight `0.25`).
+Generation requests stay on the cloud GPU and the service scales to zero after
+60 seconds without requests.

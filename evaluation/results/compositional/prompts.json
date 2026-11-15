@@ -1,0 +1,902 @@
+[
+ {
+  "cat": "single",
+  "prompt": "a photo of a bench",
+  "objs": [
+   "bench"
+  ],
+  "i": 0
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a chair",
+  "objs": [
+   "chair"
+  ],
+  "i": 1
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a horse",
+  "objs": [
+   "horse"
+  ],
+  "i": 2
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a cat",
+  "objs": [
+   "cat"
+  ],
+  "i": 3
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a car",
+  "objs": [
+   "car"
+  ],
+  "i": 4
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a book",
+  "objs": [
+   "book"
+  ],
+  "i": 5
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a bicycle",
+  "objs": [
+   "bicycle"
+  ],
+  "i": 6
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a bird",
+  "objs": [
+   "bird"
+  ],
+  "i": 7
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a backpack",
+  "objs": [
+   "backpack"
+  ],
+  "i": 8
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a cat",
+  "objs": [
+   "cat"
+  ],
+  "i": 9
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a vase",
+  "objs": [
+   "vase"
+  ],
+  "i": 10
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a cup",
+  "objs": [
+   "cup"
+  ],
+  "i": 11
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a cat",
+  "objs": [
+   "cat"
+  ],
+  "i": 12
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a car",
+  "objs": [
+   "car"
+  ],
+  "i": 13
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of an apple",
+  "objs": [
+   "apple"
+  ],
+  "i": 14
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of an apple",
+  "objs": [
+   "apple"
+  ],
+  "i": 15
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a car",
+  "objs": [
+   "car"
+  ],
+  "i": 16
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a laptop",
+  "objs": [
+   "laptop"
+  ],
+  "i": 17
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a car",
+  "objs": [
+   "car"
+  ],
+  "i": 18
+ },
+ {
+  "cat": "single",
+  "prompt": "a photo of a book",
+  "objs": [
+   "book"
+  ],
+  "i": 19
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of an apple and a cat",
+  "objs": [
+   "apple",
+   "cat"
+  ],
+  "i": 20
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a backpack and a bicycle",
+  "objs": [
+   "backpack",
+   "bicycle"
+  ],
+  "i": 21
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a laptop and a backpack",
+  "objs": [
+   "laptop",
+   "backpack"
+  ],
+  "i": 22
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a cat and a backpack",
+  "objs": [
+   "cat",
+   "backpack"
+  ],
+  "i": 23
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a backpack and a horse",
+  "objs": [
+   "backpack",
+   "horse"
+  ],
+  "i": 24
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a cat and a laptop",
+  "objs": [
+   "cat",
+   "laptop"
+  ],
+  "i": 25
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a cat and a book",
+  "objs": [
+   "cat",
+   "book"
+  ],
+  "i": 26
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a chair and an umbrella",
+  "objs": [
+   "chair",
+   "umbrella"
+  ],
+  "i": 27
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of an apple and a chair",
+  "objs": [
+   "apple",
+   "chair"
+  ],
+  "i": 28
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a book and a bicycle",
+  "objs": [
+   "book",
+   "bicycle"
+  ],
+  "i": 29
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a backpack and an umbrella",
+  "objs": [
+   "backpack",
+   "umbrella"
+  ],
+  "i": 30
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a book and a bottle",
+  "objs": [
+   "book",
+   "bottle"
+  ],
+  "i": 31
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a bicycle and a backpack",
+  "objs": [
+   "bicycle",
+   "backpack"
+  ],
+  "i": 32
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a backpack and a cup",
+  "objs": [
+   "backpack",
+   "cup"
+  ],
+  "i": 33
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a bird and a bicycle",
+  "objs": [
+   "bird",
+   "bicycle"
+  ],
+  "i": 34
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a book and a car",
+  "objs": [
+   "book",
+   "car"
+  ],
+  "i": 35
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a backpack and a cat",
+  "objs": [
+   "backpack",
+   "cat"
+  ],
+  "i": 36
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a television and a cup",
+  "objs": [
+   "television",
+   "cup"
+  ],
+  "i": 37
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of a pizza and a book",
+  "objs": [
+   "pizza",
+   "book"
+  ],
+  "i": 38
+ },
+ {
+  "cat": "two_objects",
+  "prompt": "a photo of an apple and a bench",
+  "objs": [
+   "apple",
+   "bench"
+  ],
+  "i": 39
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 4 bananas",
+  "objs": [
+   "banana"
+  ],
+  "n": 4,
+  "i": 40
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 3 bananas",
+  "objs": [
+   "banana"
+  ],
+  "n": 3,
+  "i": 41
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 2 umbrellas",
+  "objs": [
+   "umbrella"
+  ],
+  "n": 2,
+  "i": 42
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 4 bottles",
+  "objs": [
+   "bottle"
+  ],
+  "n": 4,
+  "i": 43
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 2 laptops",
+  "objs": [
+   "laptop"
+  ],
+  "n": 2,
+  "i": 44
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 3 backpacks",
+  "objs": [
+   "backpack"
+  ],
+  "n": 3,
+  "i": 45
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 3 vases",
+  "objs": [
+   "vase"
+  ],
+  "n": 3,
+  "i": 46
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 4 benches",
+  "objs": [
+   "bench"
+  ],
+  "n": 4,
+  "i": 47
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 3 bananas",
+  "objs": [
+   "banana"
+  ],
+  "n": 3,
+  "i": 48
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 2 televisions",
+  "objs": [
+   "television"
+  ],
+  "n": 2,
+  "i": 49
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 4 bicycles",
+  "objs": [
+   "bicycle"
+  ],
+  "n": 4,
+  "i": 50
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 2 apples",
+  "objs": [
+   "apple"
+  ],
+  "n": 2,
+  "i": 51
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 2 benches",
+  "objs": [
+   "bench"
+  ],
+  "n": 2,
+  "i": 52
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 3 pizzas",
+  "objs": [
+   "pizza"
+  ],
+  "n": 3,
+  "i": 53
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 4 cats",
+  "objs": [
+   "cat"
+  ],
+  "n": 4,
+  "i": 54
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 4 cars",
+  "objs": [
+   "car"
+  ],
+  "n": 4,
+  "i": 55
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 3 backpacks",
+  "objs": [
+   "backpack"
+  ],
+  "n": 3,
+  "i": 56
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 4 benches",
+  "objs": [
+   "bench"
+  ],
+  "n": 4,
+  "i": 57
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 4 birds",
+  "objs": [
+   "bird"
+  ],
+  "n": 4,
+  "i": 58
+ },
+ {
+  "cat": "counting",
+  "prompt": "a photo of 4 pizzas",
+  "objs": [
+   "pizza"
+  ],
+  "n": 4,
+  "i": 59
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a blue banana",
+  "objs": [
+   "banana"
+  ],
+  "color": "blue",
+  "i": 60
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a black car",
+  "objs": [
+   "car"
+  ],
+  "color": "black",
+  "i": 61
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a blue pizza",
+  "objs": [
+   "pizza"
+  ],
+  "color": "blue",
+  "i": 62
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a black cat",
+  "objs": [
+   "cat"
+  ],
+  "color": "black",
+  "i": 63
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a purple backpack",
+  "objs": [
+   "backpack"
+  ],
+  "color": "purple",
+  "i": 64
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of an orange umbrella",
+  "objs": [
+   "umbrella"
+  ],
+  "color": "orange",
+  "i": 65
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a red bird",
+  "objs": [
+   "bird"
+  ],
+  "color": "red",
+  "i": 66
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a white banana",
+  "objs": [
+   "banana"
+  ],
+  "color": "white",
+  "i": 67
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a blue bottle",
+  "objs": [
+   "bottle"
+  ],
+  "color": "blue",
+  "i": 68
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a red pizza",
+  "objs": [
+   "pizza"
+  ],
+  "color": "red",
+  "i": 69
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a black cup",
+  "objs": [
+   "cup"
+  ],
+  "color": "black",
+  "i": 70
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a yellow chair",
+  "objs": [
+   "chair"
+  ],
+  "color": "yellow",
+  "i": 71
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of an orange horse",
+  "objs": [
+   "horse"
+  ],
+  "color": "orange",
+  "i": 72
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a blue pizza",
+  "objs": [
+   "pizza"
+  ],
+  "color": "blue",
+  "i": 73
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a purple bottle",
+  "objs": [
+   "bottle"
+  ],
+  "color": "purple",
+  "i": 74
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a black horse",
+  "objs": [
+   "horse"
+  ],
+  "color": "black",
+  "i": 75
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of an orange chair",
+  "objs": [
+   "chair"
+  ],
+  "color": "orange",
+  "i": 76
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a black book",
+  "objs": [
+   "book"
+  ],
+  "color": "black",
+  "i": 77
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a white apple",
+  "objs": [
+   "apple"
+  ],
+  "color": "white",
+  "i": 78
+ },
+ {
+  "cat": "colour",
+  "prompt": "a photo of a yellow horse",
+  "objs": [
+   "horse"
+  ],
+  "color": "yellow",
+  "i": 79
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a chair right of a car",
+  "objs": [
+   "chair",
+   "car"
+  ],
+  "rel": "right of",
+  "i": 80
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a chair right of a laptop",
+  "objs": [
+   "chair",
+   "laptop"
+  ],
+  "rel": "right of",
+  "i": 81
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a dog right of a pizza",
+  "objs": [
+   "dog",
+   "pizza"
+  ],
+  "rel": "right of",
+  "i": 82
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a clock left of an umbrella",
+  "objs": [
+   "clock",
+   "umbrella"
+  ],
+  "rel": "left of",
+  "i": 83
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a chair above an apple",
+  "objs": [
+   "chair",
+   "apple"
+  ],
+  "rel": "above",
+  "i": 84
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a television above a backpack",
+  "objs": [
+   "television",
+   "backpack"
+  ],
+  "rel": "above",
+  "i": 85
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a chair left of a vase",
+  "objs": [
+   "chair",
+   "vase"
+  ],
+  "rel": "left of",
+  "i": 86
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a banana below a book",
+  "objs": [
+   "banana",
+   "book"
+  ],
+  "rel": "below",
+  "i": 87
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a horse below a television",
+  "objs": [
+   "horse",
+   "television"
+  ],
+  "rel": "below",
+  "i": 88
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a bicycle below a pizza",
+  "objs": [
+   "bicycle",
+   "pizza"
+  ],
+  "rel": "below",
+  "i": 89
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a cat left of a cup",
+  "objs": [
+   "cat",
+   "cup"
+  ],
+  "rel": "left of",
+  "i": 90
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a cup right of a banana",
+  "objs": [
+   "cup",
+   "banana"
+  ],
+  "rel": "right of",
+  "i": 91
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a bicycle left of a bench",
+  "objs": [
+   "bicycle",
+   "bench"
+  ],
+  "rel": "left of",
+  "i": 92
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a bicycle right of a dog",
+  "objs": [
+   "bicycle",
+   "dog"
+  ],
+  "rel": "right of",
+  "i": 93
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a book above a bicycle",
+  "objs": [
+   "book",
+   "bicycle"
+  ],
+  "rel": "above",
+  "i": 94
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a television left of a dog",
+  "objs": [
+   "television",
+   "dog"
+  ],
+  "rel": "left of",
+  "i": 95
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a cup right of a horse",
+  "objs": [
+   "cup",
+   "horse"
+  ],
+  "rel": "right of",
+  "i": 96
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a clock above a bird",
+  "objs": [
+   "clock",
+   "bird"
+  ],
+  "rel": "above",
+  "i": 97
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a pizza left of a bicycle",
+  "objs": [
+   "pizza",
+   "bicycle"
+  ],
+  "rel": "left of",
+  "i": 98
+ },
+ {
+  "cat": "position",
+  "prompt": "a photo of a pizza below a banana",
+  "objs": [
+   "pizza",
+   "banana"
+  ],
+  "rel": "below",
+  "i": 99
+ }
+]

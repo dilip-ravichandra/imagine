@@ -14,6 +14,7 @@ import {
 import { Link } from 'react-router-dom';
 import ChatBot from '../components/ChatBot';
 
+import { SHOWCASE } from '../lib/showcase';
 const NAV_LINKS = ['Home', 'Features', 'Explore', 'Pricing'];
 
 const FEATURES = [
@@ -40,12 +41,12 @@ const FEATURES = [
 ];
 
 const SHOWCASE_IMAGES = [
-  { src: 'https://picsum.photos/seed/land1/600/400', label: 'Cinematic Landscape' },
-  { src: 'https://picsum.photos/seed/land2/600/400', label: 'Neon Cityscape' },
-  { src: 'https://picsum.photos/seed/land3/600/400', label: 'Fantasy Dragon' },
-  { src: 'https://picsum.photos/seed/land4/600/400', label: 'Underwater World' },
-  { src: 'https://picsum.photos/seed/land5/600/400', label: 'Space Odyssey' },
-  { src: 'https://picsum.photos/seed/land6/600/400', label: 'Abstract Art' },
+  { src: SHOWCASE.cabin.src, label: 'Mountain lake cabin', prompt: SHOWCASE.cabin.prompt },
+  { src: SHOWCASE.neon.src, label: 'Neon city street', prompt: SHOWCASE.neon.prompt },
+  { src: SHOWCASE.dragon.src, label: 'Fantasy dragon', prompt: SHOWCASE.dragon.prompt },
+  { src: SHOWCASE.reef.src, label: 'Coral reef', prompt: SHOWCASE.reef.prompt },
+  { src: SHOWCASE.space.src, label: 'Space nebula', prompt: SHOWCASE.space.prompt },
+  { src: SHOWCASE.abstract.src, label: 'Abstract fluid art', prompt: SHOWCASE.abstract.prompt },
 ];
 
 const Navbar: React.FC = () => (
@@ -61,16 +62,16 @@ const Navbar: React.FC = () => (
     px={{ base: 4, md: 10 }}
     py={3}
     sx={{
-      bg: 'rgba(8,11,10,0.85)',
+      bg: 'rgba(251,248,244,0.85)',
       backdropFilter: 'blur(20px)',
-      borderBottom: '1px solid #2A3A2C',
+      borderBottom: '1px solid #E3DACF',
     }}
   >
     <Link to="/" style={{ textDecoration: 'none' }}>
       <Heading
         size="md"
         sx={{
-          bgGradient: 'linear(to-r, #B7FF35, #8DDB39)',
+          bgGradient: 'linear(to-r, #5B5BF0, #4747DB)',
           bgClip: 'text',
           fontWeight: 800,
           letterSpacing: '-0.5px',
@@ -91,9 +92,9 @@ const Navbar: React.FC = () => (
             fontSize="sm"
             fontWeight={500}
             sx={{
-              color: '#A5B1A7',
+              color: '#5B6277',
               transition: 'color 0.2s',
-              _hover: { color: '#F4F7F0' },
+              _hover: { color: '#1E2233' },
             }}
           >
             {l}
@@ -108,8 +109,8 @@ const Navbar: React.FC = () => (
           variant="ghost"
           size="sm"
           sx={{
-            color: '#A5B1A7',
-            _hover: { bg: '#1A2A1C', color: '#F4F7F0' },
+            color: '#5B6277',
+            _hover: { bg: '#EFE8DF', color: '#1E2233' },
           }}
         >
           Sign In
@@ -119,10 +120,10 @@ const Navbar: React.FC = () => (
         <Button
           size="sm"
           sx={{
-            bg: '#B7FF35',
-            color: '#080B0A',
+            bg: '#5B5BF0',
+            color: '#FFFFFF',
             fontWeight: 700,
-            _hover: { bg: '#8DDB39', transform: 'translateY(-1px)' },
+            _hover: { bg: '#4747DB', transform: 'translateY(-1px)' },
             transition: 'all 0.2s',
           }}
         >
@@ -150,7 +151,7 @@ const HeroSection: React.FC = () => (
       h="600px"
       borderRadius="50%"
       sx={{
-        bg: 'radial-gradient(circle, rgba(183,255,53,0.12) 0%, transparent 70%)',
+        bg: 'radial-gradient(circle, rgba(91,91,240,0.12) 0%, transparent 70%)',
         pointerEvents: 'none',
       }}
     />
@@ -176,9 +177,9 @@ const HeroSection: React.FC = () => (
           letterSpacing="0.05em"
           textTransform="uppercase"
           sx={{
-            bg: 'rgba(183,255,53,0.1)',
-            color: '#B7FF35',
-            border: '1px solid rgba(183,255,53,0.25)',
+            bg: 'rgba(91,91,240,0.1)',
+            color: '#5B5BF0',
+            border: '1px solid rgba(91,91,240,0.25)',
           }}
         >
           ✦ Powered by SD-Turbo & Next-Gen AI
@@ -188,13 +189,13 @@ const HeroSection: React.FC = () => (
           size={{ base: 'xl', md: '2xl' }}
           lineHeight={1.12}
           mb={5}
-          sx={{ color: '#F4F7F0', fontWeight: 800, letterSpacing: '-1.5px' }}
+          sx={{ color: '#1E2233', fontWeight: 800, letterSpacing: '-1.5px' }}
         >
           Turn Your Ideas Into{' '}
           <Box
             as="span"
             sx={{
-              bgGradient: 'linear(to-r, #B7FF35, #8DDB39)',
+              bgGradient: 'linear(to-r, #5B5BF0, #4747DB)',
               bgClip: 'text',
             }}
           >
@@ -206,7 +207,7 @@ const HeroSection: React.FC = () => (
         <Text
           fontSize={{ base: 'md', md: 'lg' }}
           mb={8}
-          sx={{ color: '#A5B1A7', lineHeight: 1.7 }}
+          sx={{ color: '#5B6277', lineHeight: 1.7 }}
         >
           Create images, learn concepts, edit scenes and explore infinite possibilities — all inside a cohesive, lightning-fast creative studio.
         </Text>
@@ -217,14 +218,14 @@ const HeroSection: React.FC = () => (
               size="lg"
               px={8}
               sx={{
-                bg: '#B7FF35',
-                color: '#080B0A',
+                bg: '#5B5BF0',
+                color: '#FFFFFF',
                 fontWeight: 700,
                 fontSize: 'md',
                 _hover: {
-                  bg: '#8DDB39',
+                  bg: '#4747DB',
                   transform: 'translateY(-2px)',
-                  boxShadow: '0 8px 30px rgba(183,255,53,0.3)',
+                  boxShadow: '0 8px 30px rgba(91,91,240,0.14)',
                 },
                 transition: 'all 0.25s',
               }}
@@ -238,13 +239,13 @@ const HeroSection: React.FC = () => (
               variant="outline"
               px={8}
               sx={{
-                color: '#B7FF35',
-                borderColor: '#2A3A2C',
+                color: '#5B5BF0',
+                borderColor: '#E3DACF',
                 fontWeight: 600,
                 fontSize: 'md',
                 _hover: {
-                  bg: 'rgba(183,255,53,0.08)',
-                  borderColor: '#B7FF35',
+                  bg: 'rgba(91,91,240,0.08)',
+                  borderColor: '#5B5BF0',
                   transform: 'translateY(-2px)',
                 },
                 transition: 'all 0.25s',
@@ -267,15 +268,15 @@ const HeroSection: React.FC = () => (
               key={item.label}
               align="center"
               gap={2}
-              bg="#111713"
-              border="1px solid #2A3A2C"
+              bg="#FFFFFF"
+              border="1px solid #E3DACF"
               px={3.5}
               py={2}
               borderRadius="10px"
               fontSize="xs"
               fontWeight={600}
-              color="#F4F7F0"
-              _hover={{ borderColor: '#B7FF35', bg: '#182019' }}
+              color="#1E2233"
+              _hover={{ borderColor: '#5B5BF0', bg: '#F5F0EA' }}
               transition="all 0.2s ease"
               cursor="pointer"
             >
@@ -294,19 +295,19 @@ const HeroSection: React.FC = () => (
         position="relative"
         borderRadius="20px"
         overflow="hidden"
-        border="1px solid #2A3A2C"
-        bg="#111713"
-        boxShadow="0 24px 64px rgba(0,0,0,0.7), 0 0 40px rgba(183,255,53,0.15)"
+        border="1px solid #E3DACF"
+        bg="#FFFFFF"
+        boxShadow="0 24px 64px rgba(30,34,51,0.12), 0 0 40px rgba(91,91,240,0.15)"
         transition="all 0.35s ease"
         _hover={{
           transform: 'translateY(-4px)',
-          borderColor: '#B7FF35',
-          boxShadow: '0 30px 80px rgba(0,0,0,0.8), 0 0 60px rgba(183,255,53,0.25)',
+          borderColor: '#5B5BF0',
+          boxShadow: '0 30px 80px rgba(30,34,51,0.16), 0 0 60px rgba(91,91,240,0.14)',
         }}
       >
         <Image
-          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"
-          alt="Astronaut / Sci-Fi Visual"
+          src={SHOWCASE.hero.src}
+          alt={`Image made with ImagineAI: ${SHOWCASE.hero.prompt}`}
           w="100%"
           h="400px"
           objectFit="cover"
@@ -317,27 +318,27 @@ const HeroSection: React.FC = () => (
           left={0}
           right={0}
           p={5}
-          bgGradient="linear(to-t, #080B0A 30%, transparent)"
+          bgGradient="linear(to-t, #FBF8F4 30%, transparent)"
         >
           <Flex justify="space-between" align="center">
             <Box>
-              <Text fontSize="xs" color="#B7FF35" fontWeight={700} textTransform="uppercase">
+              <Text fontSize="xs" color="#5B5BF0" fontWeight={700} textTransform="uppercase">
                 Prompt of the Day
               </Text>
-              <Text fontSize="sm" color="#F4F7F0" fontWeight={600} mt={0.5}>
-                "Futuristic cybernetic explorer on an alien planet"
+              <Text fontSize="sm" color="#1E2233" fontWeight={600} mt={0.5}>
+                "{SHOWCASE.hero.prompt}"
               </Text>
             </Box>
             <Box
-              bg="rgba(183,255,53,0.15)"
-              color="#B7FF35"
+              bg="rgba(91,91,240,0.15)"
+              color="#5B5BF0"
               fontSize="xs"
               px={2.5}
               py={1}
               borderRadius="6px"
               fontWeight="bold"
             >
-              SD-Turbo 8K
+              Made here · SD 1.5
             </Box>
           </Flex>
         </Box>
@@ -352,7 +353,7 @@ const FeatureCards: React.FC = () => (
       size="lg"
       textAlign="center"
       mb={3}
-      sx={{ color: '#F4F7F0', fontWeight: 700 }}
+      sx={{ color: '#1E2233', fontWeight: 700 }}
     >
       Everything You Need to Create
     </Heading>
@@ -360,7 +361,7 @@ const FeatureCards: React.FC = () => (
       textAlign="center"
       mb={10}
       fontSize="md"
-      sx={{ color: '#A5B1A7' }}
+      sx={{ color: '#5B6277' }}
     >
       One platform, infinite creative possibilities
     </Text>
@@ -372,14 +373,14 @@ const FeatureCards: React.FC = () => (
           p={6}
           borderRadius="12px"
           sx={{
-            bg: '#111713',
-            border: '1px solid #2A3A2C',
+            bg: '#FFFFFF',
+            border: '1px solid #E3DACF',
             transition: 'all 0.3s ease',
             cursor: 'pointer',
             _hover: {
               transform: 'translateY(-6px)',
-              boxShadow: '0 12px 40px rgba(183,255,53,0.08)',
-              borderColor: 'rgba(183,255,53,0.3)',
+              boxShadow: '0 12px 40px rgba(91,91,240,0.08)',
+              borderColor: 'rgba(91,91,240,0.3)',
             },
           }}
         >
@@ -390,11 +391,11 @@ const FeatureCards: React.FC = () => (
             fontSize="md"
             fontWeight={700}
             mb={2}
-            sx={{ color: '#F4F7F0' }}
+            sx={{ color: '#1E2233' }}
           >
             {f.title}
           </Text>
-          <Text fontSize="sm" sx={{ color: '#A5B1A7', lineHeight: 1.6 }}>
+          <Text fontSize="sm" sx={{ color: '#5B6277', lineHeight: 1.6 }}>
             {f.desc}
           </Text>
         </Box>
@@ -409,7 +410,7 @@ const ShowcaseGallery: React.FC = () => (
       size="lg"
       textAlign="center"
       mb={3}
-      sx={{ color: '#F4F7F0', fontWeight: 700 }}
+      sx={{ color: '#1E2233', fontWeight: 700 }}
     >
       Community Showcase
     </Heading>
@@ -417,7 +418,7 @@ const ShowcaseGallery: React.FC = () => (
       textAlign="center"
       mb={10}
       fontSize="md"
-      sx={{ color: '#A5B1A7' }}
+      sx={{ color: '#5B6277' }}
     >
       See what creators are building with ImagineAI
     </Text>
@@ -430,12 +431,12 @@ const ShowcaseGallery: React.FC = () => (
           borderRadius="12px"
           overflow="hidden"
           sx={{
-            border: '1px solid #2A3A2C',
+            border: '1px solid #E3DACF',
             transition: 'all 0.35s ease',
             cursor: 'pointer',
             _hover: {
               transform: 'scale(1.02)',
-              boxShadow: '0 16px 50px rgba(0,0,0,0.5)',
+              boxShadow: '0 16px 50px rgba(30,34,51,0.12)',
               '& .overlay': { opacity: 1 },
               '& img': { transform: 'scale(1.08)' },
             },
@@ -461,10 +462,10 @@ const ShowcaseGallery: React.FC = () => (
               opacity: 0,
               transition: 'opacity 0.3s ease',
               bgGradient:
-                'linear(to-t, rgba(8,11,10,0.9), transparent)',
+                'linear(to-t, rgba(251,248,244,0.9), transparent)',
             }}
           >
-            <Text fontWeight={600} fontSize="sm" sx={{ color: '#F4F7F0' }}>
+            <Text fontWeight={600} fontSize="sm" sx={{ color: '#1E2233' }}>
               {img.label}
             </Text>
           </Flex>
@@ -481,10 +482,10 @@ const Footer: React.FC = () => (
     justify="space-between"
     px={{ base: 4, md: 12 }}
     py={6}
-    sx={{ borderTop: '1px solid #2A3A2C' }}
+    sx={{ borderTop: '1px solid #E3DACF' }}
     gap={4}
   >
-    <Text fontSize="sm" sx={{ color: '#A5B1A7' }}>
+    <Text fontSize="sm" sx={{ color: '#5B6277' }}>
       © 2024 ImagineAI. All rights reserved.
     </Text>
     <HStack spacing={6}>
@@ -495,8 +496,8 @@ const Footer: React.FC = () => (
           href="#"
           fontSize="sm"
           sx={{
-            color: '#A5B1A7',
-            _hover: { color: '#B7FF35' },
+            color: '#5B6277',
+            _hover: { color: '#5B5BF0' },
             transition: 'color 0.2s',
           }}
         >
@@ -509,7 +510,7 @@ const Footer: React.FC = () => (
 
 const LandingPage: React.FC = () => {
   return (
-    <Box minH="100vh" sx={{ bg: '#080B0A' }}>
+    <Box minH="100vh" sx={{ bg: '#FBF8F4' }}>
       <Navbar />
       <HeroSection />
       <FeatureCards />

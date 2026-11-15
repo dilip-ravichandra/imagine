@@ -26,7 +26,7 @@ def good_tally(n=40, adapted=30, base=6):
 
 
 def approve(d: Path, per=None, failures=0, reviewer="R. Viewer", confirmed=True):
-    per = per or {1: good_tally(), 4: good_tally()}
+    per = per or {30: good_tally()}
     return A.write_approval(d, per_steps=per, failures=failures, reviewer=reviewer, sheet_sha256="s" * 64,
                             artifacts_confirmed=confirmed)
 
@@ -44,7 +44,7 @@ def make_compare_dir(tmp: Path, adapter: Path, *, pairs_per_steps=40, adapted_wi
     out = tmp / name
     out.mkdir()
     sheet, key, records = [], [], []
-    for st in (1, 4):
+    for st in (30,):
         for i in range(pairs_per_steps):
             pid = f"p{i}|steps{st}|seed42"
             a_is_base = (i % 2 == 0)
@@ -55,7 +55,7 @@ def make_compare_dir(tmp: Path, adapter: Path, *, pairs_per_steps=40, adapted_wi
                               better_A_B_tie=vote, objects_correct_A="", objects_correct_B="", artifacts_A="",
                               artifacts_B="", notes=""))
             for v in ("base", "adapted"):
-                status = "ok" if not (v == "adapted" and st == 1 and i < adapted_only_failures) else "failed:RuntimeError"
+                status = "ok" if not (v == "adapted" and st == 30 and i < adapted_only_failures) else "failed:RuntimeError"
                 records.append(dict(prompt_id=f"p{i}", prompt="x", steps=st, seed=42, variant=v, status=status))
     with (out / "review_sheet.csv").open("w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(sheet[0]))

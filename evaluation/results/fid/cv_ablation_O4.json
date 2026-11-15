@@ -1,0 +1,72 @@
+{
+ "none": {
+  "n": 300,
+  "fid": 121.20867179056916,
+  "kid_mean": 0.00996326208114624,
+  "clip_mean": 0.3034293067951997,
+  "cv_ms_mean": 95.24595233330426,
+  "laplacian_var_mean": 2007.7746407654556,
+  "flagged_share": 0.68,
+  "changed_share": 0.0
+ },
+ "enhance (CLAHE/WB/gamma, adaptive)": {
+  "n": 300,
+  "fid": 120.90205227805336,
+  "kid_mean": 0.009526288509368897,
+  "clip_mean": 0.3040179860095183,
+  "cv_ms_mean": 177.63600366655737,
+  "laplacian_var_mean": 1954.3436091841365,
+  "flagged_share": 0.5766666666666667,
+  "changed_share": 0.7366666666666667
+ },
+ "smooth (bilateral)": {
+  "n": 300,
+  "fid": 121.56389979859875,
+  "kid_mean": 0.010170557498931886,
+  "clip_mean": 0.3034511844317118,
+  "cv_ms_mean": 185.618990000609,
+  "laplacian_var_mean": 1859.4090259317557,
+  "flagged_share": 0.61,
+  "changed_share": 1.0
+ },
+ "sharpen (edge-preserving unsharp)": {
+  "n": 300,
+  "fid": 120.83504493113776,
+  "kid_mean": 0.00974184513092041,
+  "clip_mean": 0.30365248466531436,
+  "cv_ms_mean": 161.45660166735374,
+  "laplacian_var_mean": 2774.8351736237514,
+  "flagged_share": 0.6833333333333333,
+  "changed_share": 1.0
+ },
+ "smooth + sharpen": {
+  "n": 300,
+  "fid": 121.18841932522628,
+  "kid_mean": 0.00984506607055664,
+  "clip_mean": 0.3036618817349275,
+  "cv_ms_mean": 202.02972300020824,
+  "laplacian_var_mean": 2572.8663630243377,
+  "flagged_share": 0.6133333333333333,
+  "changed_share": 1.0
+ },
+ "enhance + smooth + sharpen": {
+  "n": 300,
+  "fid": 121.0331034779212,
+  "kid_mean": 0.009303786754608155,
+  "clip_mean": 0.3038815519213676,
+  "cv_ms_mean": 230.11377766621686,
+  "laplacian_var_mean": 2495.6996577669897,
+  "flagged_share": 0.5066666666666667,
+  "changed_share": 1.0
+ },
+ "correct (guarded artifact fix)": {
+  "n": 300,
+  "fid": 120.88070042539158,
+  "kid_mean": 0.009828481674194336,
+  "clip_mean": 0.30349061369895936,
+  "cv_ms_mean": 226.0275816670037,
+  "laplacian_var_mean": 1942.2462588646574,
+  "flagged_share": 0.5266666666666666,
+  "changed_share": 0.4
+ }
+}

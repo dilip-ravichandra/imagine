@@ -34,6 +34,7 @@ import {
 } from 'react-icons/fi';
 import WorkspaceLayout from '../components/WorkspaceLayout';
 
+import { SHOWCASE } from '../lib/showcase';
 interface LayerItem {
   id: number;
   name: string;
@@ -83,27 +84,27 @@ const ImagineCanvas: React.FC = () => {
 
   return (
     <WorkspaceLayout>
-      <Box p={0} minH="100vh" bg="#080B0A" display="flex" flexDir="column">
+      <Box p={0} minH="100vh" bg="#FBF8F4" display="flex" flexDir="column">
         {/* Top Header Bar */}
         <Flex
           align="center"
           justify="space-between"
           px={5}
           py={3}
-          borderBottom="1px solid #2A3A2C"
-          bg="#0D120E"
+          borderBottom="1px solid #E3DACF"
+          bg="#FFFFFF"
         >
           <Flex align="center" gap={3}>
-            <Heading size="md" color="#F4F7F0" fontWeight="700">
+            <Heading size="md" color="#1E2233" fontWeight="700">
               Imagine Canvas
             </Heading>
             <Box
-              bg="rgba(183, 255, 53, 0.1)"
+              bg="rgba(91,91,240, 0.1)"
               px={2}
               py={0.5}
               borderRadius="md"
             >
-              <Text color="#B7FF35" fontSize="xs" fontWeight="600">
+              <Text color="#5B5BF0" fontSize="xs" fontWeight="600">
                 Untitled Project
               </Text>
             </Box>
@@ -112,8 +113,8 @@ const ImagineCanvas: React.FC = () => {
           {/* Zoom Controls */}
           <HStack
             spacing={1}
-            bg="#111713"
-            border="1px solid #2A3A2C"
+            bg="#FFFFFF"
+            border="1px solid #E3DACF"
             borderRadius="lg"
             px={2}
             py={1}
@@ -123,8 +124,8 @@ const ImagineCanvas: React.FC = () => {
               icon={<FiMinus size={14} />}
               size="xs"
               variant="ghost"
-              color="#A5B1A7"
-              _hover={{ bg: '#1A2A1C', color: '#F4F7F0' }}
+              color="#5B6277"
+              _hover={{ bg: '#EFE8DF', color: '#1E2233' }}
               onClick={() => setZoom(Math.max(25, zoom - 10))}
             />
             <Box
@@ -132,10 +133,10 @@ const ImagineCanvas: React.FC = () => {
               py={1}
               minW="60px"
               textAlign="center"
-              bg="#0F1A11"
+              bg="#F7F3EE"
               borderRadius="md"
             >
-              <Text color="#B7FF35" fontSize="xs" fontWeight="700">
+              <Text color="#5B5BF0" fontSize="xs" fontWeight="700">
                 {zoom}%
               </Text>
             </Box>
@@ -144,22 +145,22 @@ const ImagineCanvas: React.FC = () => {
               icon={<FiPlus size={14} />}
               size="xs"
               variant="ghost"
-              color="#A5B1A7"
-              _hover={{ bg: '#1A2A1C', color: '#F4F7F0' }}
+              color="#5B6277"
+              _hover={{ bg: '#EFE8DF', color: '#1E2233' }}
               onClick={() => setZoom(Math.min(400, zoom + 10))}
             />
             <Divider
               orientation="vertical"
               h="20px"
-              borderColor="#2A3A2C"
+              borderColor="#E3DACF"
             />
             <IconButton
               aria-label="Fit to screen"
               icon={<FiMaximize size={14} />}
               size="xs"
               variant="ghost"
-              color="#A5B1A7"
-              _hover={{ bg: '#1A2A1C', color: '#F4F7F0' }}
+              color="#5B6277"
+              _hover={{ bg: '#EFE8DF', color: '#1E2233' }}
               onClick={() => setZoom(100)}
             />
           </HStack>
@@ -168,12 +169,12 @@ const ImagineCanvas: React.FC = () => {
           <HStack spacing={2}>
             <Button
               size="sm"
-              bg="#182019"
-              color="#F4F7F0"
-              border="1px solid #2A3A2C"
+              bg="#F5F0EA"
+              color="#1E2233"
+              border="1px solid #E3DACF"
               borderRadius="lg"
               leftIcon={<FiSave size={14} />}
-              _hover={{ bg: '#1A2A1C', borderColor: '#B7FF35' }}
+              _hover={{ bg: '#EFE8DF', borderColor: '#5B5BF0' }}
               transition="all 0.2s"
               fontWeight="500"
               fontSize="xs"
@@ -182,11 +183,11 @@ const ImagineCanvas: React.FC = () => {
             </Button>
             <Button
               size="sm"
-              bg="#B7FF35"
-              color="#080B0A"
+              bg="#5B5BF0"
+              color="#FFFFFF"
               borderRadius="lg"
               leftIcon={<FiDownload size={14} />}
-              _hover={{ bg: '#8DDB39' }}
+              _hover={{ bg: '#4747DB' }}
               transition="all 0.2s"
               fontWeight="600"
               fontSize="xs"
@@ -202,8 +203,8 @@ const ImagineCanvas: React.FC = () => {
           <Flex
             direction="column"
             align="center"
-            bg="#0D120E"
-            borderRight="1px solid #2A3A2C"
+            bg="#FFFFFF"
+            borderRight="1px solid #E3DACF"
             py={4}
             px={2}
             gap={1}
@@ -215,8 +216,8 @@ const ImagineCanvas: React.FC = () => {
                 key={tool.id}
                 label={tool.label}
                 placement="right"
-                bg="#182019"
-                color="#F4F7F0"
+                bg="#F5F0EA"
+                color="#1E2233"
                 fontSize="xs"
                 borderRadius="md"
               >
@@ -225,16 +226,16 @@ const ImagineCanvas: React.FC = () => {
                   icon={<tool.icon size={18} />}
                   size="sm"
                   variant="ghost"
-                  color={activeTool === tool.id ? '#B7FF35' : '#A5B1A7'}
-                  bg={activeTool === tool.id ? 'rgba(183,255,53,0.1)' : 'transparent'}
+                  color={activeTool === tool.id ? '#5B5BF0' : '#5B6277'}
+                  bg={activeTool === tool.id ? 'rgba(91,91,240,0.1)' : 'transparent'}
                   borderRadius="lg"
                   w="40px"
                   h="40px"
                   _hover={{
                     bg: activeTool === tool.id
-                      ? 'rgba(183,255,53,0.15)'
-                      : '#1A2A1C',
-                    color: '#F4F7F0',
+                      ? 'rgba(91,91,240,0.15)'
+                      : '#EFE8DF',
+                    color: '#1E2233',
                   }}
                   onClick={() => setActiveTool(tool.id)}
                   transition="all 0.15s"
@@ -246,12 +247,12 @@ const ImagineCanvas: React.FC = () => {
           {/* Canvas Area */}
           <Box
             flex={1}
-            bg="#0F1A11"
+            bg="#F7F3EE"
             position="relative"
             overflow="hidden"
             backgroundImage={`
-              linear-gradient(rgba(42,58,44,0.3) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(42,58,44,0.3) 1px, transparent 1px)
+              linear-gradient(rgba(227,218,207,0.3) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(227,218,207,0.3) 1px, transparent 1px)
             `}
             backgroundSize={`${20 * (zoom / 100)}px ${20 * (zoom / 100)}px`}
           >
@@ -272,41 +273,41 @@ const ImagineCanvas: React.FC = () => {
                   position="absolute"
                   top="120px"
                   left="180px"
-                  bg="#111713"
-                  border="1px solid #2A3A2C"
+                  bg="#FFFFFF"
+                  border="1px solid #E3DACF"
                   borderRadius="xl"
                   p={5}
                   minW="260px"
-                  boxShadow="0 8px 32px rgba(0,0,0,0.4)"
+                  boxShadow="0 8px 32px rgba(30,34,51,0.12)"
                   cursor="move"
                   _hover={{
-                    borderColor: '#B7FF35',
-                    boxShadow: '0 8px 32px rgba(183,255,53,0.1)',
+                    borderColor: '#5B5BF0',
+                    boxShadow: '0 8px 32px rgba(91,91,240,0.1)',
                   }}
                   transition="all 0.2s"
                 >
                   <Flex align="center" gap={2} mb={2}>
-                    <Box w={3} h={3} bg="#B7FF35" borderRadius="full" />
-                    <Text color="#B7FF35" fontSize="xs" fontWeight="600">
+                    <Box w={3} h={3} bg="#5B5BF0" borderRadius="full" />
+                    <Text color="#5B5BF0" fontSize="xs" fontWeight="600">
                       CONCEPT
                     </Text>
                   </Flex>
-                  <Text color="#F4F7F0" fontSize="md" fontWeight="700" mb={2}>
+                  <Text color="#1E2233" fontSize="md" fontWeight="700" mb={2}>
                     My Idea: Eco City
                   </Text>
-                  <Text color="#A5B1A7" fontSize="xs" lineHeight="1.6">
+                  <Text color="#5B6277" fontSize="xs" lineHeight="1.6">
                     A self-sustaining urban environment powered by renewable
                     energy and vertical farms. Every building is a living
                     ecosystem.
                   </Text>
                   <Flex mt={3} gap={2}>
                     <Box
-                      bg="rgba(183,255,53,0.1)"
+                      bg="rgba(91,91,240,0.1)"
                       px={2}
                       py={0.5}
                       borderRadius="full"
                     >
-                      <Text color="#B7FF35" fontSize="10px" fontWeight="600">
+                      <Text color="#5B5BF0" fontSize="10px" fontWeight="600">
                         Sustainability
                       </Text>
                     </Box>
@@ -316,7 +317,7 @@ const ImagineCanvas: React.FC = () => {
                       py={0.5}
                       borderRadius="full"
                     >
-                      <Text color="#8DDB39" fontSize="10px" fontWeight="600">
+                      <Text color="#4747DB" fontSize="10px" fontWeight="600">
                         Architecture
                       </Text>
                     </Box>
@@ -330,30 +331,30 @@ const ImagineCanvas: React.FC = () => {
                   position="absolute"
                   top="100px"
                   left="520px"
-                  bg="#111713"
-                  border="1px solid #2A3A2C"
+                  bg="#FFFFFF"
+                  border="1px solid #E3DACF"
                   borderRadius="xl"
                   overflow="hidden"
                   cursor="move"
-                  boxShadow="0 8px 32px rgba(0,0,0,0.4)"
+                  boxShadow="0 8px 32px rgba(30,34,51,0.12)"
                   _hover={{
-                    borderColor: '#B7FF35',
-                    boxShadow: '0 8px 32px rgba(183,255,53,0.1)',
+                    borderColor: '#5B5BF0',
+                    boxShadow: '0 8px 32px rgba(91,91,240,0.1)',
                   }}
                   transition="all 0.2s"
                 >
                   <Image
-                    src="https://picsum.photos/seed/canvas-ref/280/180"
+                    src={SHOWCASE.reef.src}
                     alt="Reference"
                     w="280px"
                     h="180px"
                     objectFit="cover"
                   />
                   <Box px={3} py={2}>
-                    <Text color="#F4F7F0" fontSize="xs" fontWeight="600">
+                    <Text color="#1E2233" fontSize="xs" fontWeight="600">
                       Reference: Green Architecture
                     </Text>
-                    <Text color="#A5B1A7" fontSize="10px" mt={0.5}>
+                    <Text color="#5B6277" fontSize="10px" mt={0.5}>
                       Imported from gallery
                     </Text>
                   </Box>
@@ -366,15 +367,15 @@ const ImagineCanvas: React.FC = () => {
                   position="absolute"
                   top="340px"
                   left="340px"
-                  bg="#111713"
-                  border="1px solid #B7FF35"
+                  bg="#FFFFFF"
+                  border="1px solid #5B5BF0"
                   borderRadius="lg"
                   px={4}
                   py={3}
                   cursor="move"
-                  boxShadow="0 0 20px rgba(183,255,53,0.1)"
+                  boxShadow="0 0 20px rgba(91,91,240,0.1)"
                   _hover={{
-                    boxShadow: '0 0 30px rgba(183,255,53,0.2)',
+                    boxShadow: '0 0 30px rgba(91,91,240,0.14)',
                   }}
                   transition="all 0.2s"
                 >
@@ -382,12 +383,12 @@ const ImagineCanvas: React.FC = () => {
                     <Box
                       w={2}
                       h={2}
-                      bg="#B7FF35"
+                      bg="#5B5BF0"
                       borderRadius="full"
-                      boxShadow="0 0 6px #B7FF35"
+                      boxShadow="0 0 6px #5B5BF0"
                     />
                     <Text
-                      color="#F4F7F0"
+                      color="#1E2233"
                       fontSize="sm"
                       fontWeight="700"
                       letterSpacing="wide"
@@ -395,7 +396,7 @@ const ImagineCanvas: React.FC = () => {
                       Smart Building
                     </Text>
                   </Flex>
-                  <Text color="#A5B1A7" fontSize="xs" mt={1}>
+                  <Text color="#5B6277" fontSize="xs" mt={1}>
                     IoT-enabled, zero-emission residential complex
                   </Text>
                 </Box>
@@ -409,7 +410,7 @@ const ImagineCanvas: React.FC = () => {
                   left="310px"
                   w="180px"
                   h="2px"
-                  bg="linear-gradient(90deg, #B7FF35, transparent)"
+                  bg="linear-gradient(90deg, #5B5BF0, transparent)"
                   opacity={0.3}
                   transform="rotate(25deg)"
                 />
@@ -428,9 +429,9 @@ const ImagineCanvas: React.FC = () => {
               py={2}
               gap={4}
               backdropFilter="blur(10px)"
-              border="1px solid #2A3A2C"
+              border="1px solid #E3DACF"
             >
-              <Text color="#A5B1A7" fontSize="10px">
+              <Text color="#5B6277" fontSize="10px">
                 Scroll to pan • Ctrl+Scroll to zoom • Click objects to select
               </Text>
             </Flex>
@@ -440,8 +441,8 @@ const ImagineCanvas: React.FC = () => {
           <Box
             w="240px"
             minW="240px"
-            bg="#0D120E"
-            borderLeft="1px solid #2A3A2C"
+            bg="#FFFFFF"
+            borderLeft="1px solid #E3DACF"
             p={0}
           >
             <Flex
@@ -449,15 +450,15 @@ const ImagineCanvas: React.FC = () => {
               justify="space-between"
               px={4}
               py={3}
-              borderBottom="1px solid #2A3A2C"
+              borderBottom="1px solid #E3DACF"
             >
               <Flex align="center" gap={2}>
-                <FiLayers size={14} color="#B7FF35" />
-                <Text color="#F4F7F0" fontSize="sm" fontWeight="600">
+                <FiLayers size={14} color="#5B5BF0" />
+                <Text color="#1E2233" fontSize="sm" fontWeight="600">
                   Layers
                 </Text>
               </Flex>
-              <Text color="#A5B1A7" fontSize="xs">
+              <Text color="#5B6277" fontSize="xs">
                 {layers.length}
               </Text>
             </Flex>
@@ -470,19 +471,19 @@ const ImagineCanvas: React.FC = () => {
                   px={4}
                   py={3}
                   gap={3}
-                  bg={idx === 0 ? 'rgba(183,255,53,0.05)' : 'transparent'}
-                  borderBottom="1px solid #2A3A2C"
-                  borderLeft={idx === 0 ? '2px solid #B7FF35' : '2px solid transparent'}
-                  _hover={{ bg: '#1A2A1C' }}
+                  bg={idx === 0 ? 'rgba(91,91,240,0.05)' : 'transparent'}
+                  borderBottom="1px solid #E3DACF"
+                  borderLeft={idx === 0 ? '2px solid #5B5BF0' : '2px solid transparent'}
+                  _hover={{ bg: '#EFE8DF' }}
                   cursor="pointer"
                   transition="all 0.15s"
                 >
-                  <Box color={layer.visible ? '#B7FF35' : '#2A3A2C'}>
+                  <Box color={layer.visible ? '#5B5BF0' : '#E3DACF'}>
                     {getLayerIcon(layer.type)}
                   </Box>
                   <Text
                     flex={1}
-                    color={layer.visible ? '#F4F7F0' : '#A5B1A7'}
+                    color={layer.visible ? '#1E2233' : '#5B6277'}
                     fontSize="xs"
                     fontWeight="500"
                     noOfLines={1}
@@ -502,8 +503,8 @@ const ImagineCanvas: React.FC = () => {
                     }
                     size="xs"
                     variant="ghost"
-                    color={layer.visible ? '#A5B1A7' : '#2A3A2C'}
-                    _hover={{ color: '#B7FF35' }}
+                    color={layer.visible ? '#5B6277' : '#E3DACF'}
+                    _hover={{ color: '#5B5BF0' }}
                     onClick={() => toggleLayerVisibility(layer.id)}
                   />
                 </Flex>
@@ -516,10 +517,10 @@ const ImagineCanvas: React.FC = () => {
                 w="100%"
                 size="xs"
                 variant="outline"
-                borderColor="#2A3A2C"
-                color="#A5B1A7"
+                borderColor="#E3DACF"
+                color="#5B6277"
                 borderRadius="lg"
-                _hover={{ borderColor: '#B7FF35', color: '#F4F7F0' }}
+                _hover={{ borderColor: '#5B5BF0', color: '#1E2233' }}
                 leftIcon={<FiPlus size={12} />}
                 fontSize="xs"
               >

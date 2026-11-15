@@ -1,146 +1,114 @@
 import { extendTheme, type ThemeConfig } from '@chakra-ui/react';
 
+// "Sunrise studio": warm cream canvas, white cards, indigo for primary actions, coral for highlights.
+// One accent per screen, generous spacing, large type, soft shadows: easy on the eyes and easy to scan.
+export const palette = {
+  canvas: '#FBF8F4',
+  card: '#FFFFFF',
+  soft: '#F7F3EE',
+  hover: '#EFE8DF',
+  border: '#E3DACF',
+  ink: '#1E2233',
+  inkSoft: '#5B6277',
+  inkMute: '#8A90A2',
+  primary: '#5B5BF0',
+  primaryDark: '#4747DB',
+  primaryTint: '#EEF0FF',
+  coral: '#FF6B57',
+  coralTint: '#FFEDEA',
+  success: '#1FA971',
+  warning: '#C77700',
+  danger: '#E5484D',
+};
+
 const config: ThemeConfig = {
-  initialColorMode: 'dark',
+  initialColorMode: 'light',
   useSystemColorMode: false,
 };
 
 const theme = extendTheme({
   config,
+  fonts: {
+    heading: "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif",
+    body: "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif",
+  },
   styles: {
     global: {
       'html, body': {
-        bg: '#080B0A',
-        color: '#F4F7F0',
-        fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
+        bg: palette.canvas,
+        color: palette.ink,
         margin: 0,
         padding: 0,
         minHeight: '100vh',
+        fontSize: '16px',
+        lineHeight: 1.55,
+        WebkitFontSmoothing: 'antialiased',
       },
-      '*': {
-        boxSizing: 'border-box',
-      },
-      '::-webkit-scrollbar': {
-        width: '6px',
-      },
-      '::-webkit-scrollbar-track': {
-        bg: '#080B0A',
-      },
-      '::-webkit-scrollbar-thumb': {
-        bg: '#2A3A2C',
-        borderRadius: '3px',
-      },
-      '::-webkit-scrollbar-thumb:hover': {
-        bg: '#3A4A3C',
-      },
+      '*': { boxSizing: 'border-box' },
+      '*:focus-visible': { outline: `3px solid ${palette.primary}`, outlineOffset: '2px' },
+      '::-webkit-scrollbar': { width: '8px' },
+      '::-webkit-scrollbar-track': { bg: palette.canvas },
+      '::-webkit-scrollbar-thumb': { bg: palette.border, borderRadius: '4px' },
+      '::-webkit-scrollbar-thumb:hover': { bg: '#CFC4B6' },
     },
   },
   colors: {
     brand: {
-      50: '#f0ffe0',
-      100: '#d4ffaa',
-      200: '#c5ff6b',
-      300: '#B7FF35',
-      400: '#8DDB39',
-      500: '#B7FF35',
-      600: '#8DDB39',
-      700: '#5FA020',
-      800: '#3A6A10',
-      900: '#1A3A05',
+      50: '#EEF0FF', 100: '#DDE0FF', 200: '#C5CAFF', 300: '#9CA3FF', 400: '#7C7CF5',
+      500: '#5B5BF0', 600: '#4747DB', 700: '#3B3BC4', 800: '#2E2E96', 900: '#1F1F6B',
     },
-    surface: {
-      bg: '#080B0A',
-      card: '#111713',
-      elevated: '#182019',
-      sidebar: '#0D120E',
-      input: '#0F1A11',
-      hover: '#1A2A1C',
-      border: '#2A3A2C',
-    },
-    text: {
-      primary: '#F4F7F0',
-      secondary: '#A5B1A7',
-      muted: '#6B7B6D',
-    },
+    surface: { bg: palette.canvas, card: palette.card, elevated: palette.soft, sidebar: palette.card, input: palette.soft, hover: palette.hover, border: palette.border },
+    text: { primary: palette.ink, secondary: palette.inkSoft, muted: palette.inkMute },
+  },
+  radii: { md: '10px', lg: '14px', xl: '18px', '2xl': '24px' },
+  shadows: {
+    card: '0 1px 2px rgba(30,34,51,0.05), 0 6px 20px rgba(30,34,51,0.06)',
+    lifted: '0 10px 30px rgba(30,34,51,0.12)',
   },
   components: {
     Button: {
+      baseStyle: { fontWeight: 600, borderRadius: '12px' },
       variants: {
         brand: {
-          bg: '#B7FF35',
-          color: '#080B0A',
-          fontWeight: '600',
-          _hover: {
-            bg: '#8DDB39',
-            transform: 'translateY(-1px)',
-          },
-          _active: {
-            bg: '#6FBB20',
-            transform: 'translateY(0)',
-          },
-          transition: 'all 0.2s ease',
+          bg: palette.primary,
+          color: '#FFFFFF',
+          _hover: { bg: palette.primaryDark, transform: 'translateY(-1px)', _disabled: { bg: palette.primary } },
+          _active: { bg: '#3B3BC4', transform: 'translateY(0)' },
+          transition: 'all 0.15s ease',
         },
-        ghost: {
-          color: '#A5B1A7',
-          _hover: {
-            bg: '#1A2A1C',
-            color: '#F4F7F0',
-          },
-        },
-        outline: {
-          borderColor: '#2A3A2C',
-          color: '#B7FF35',
-          _hover: {
-            bg: '#1A2A1C',
-            borderColor: '#B7FF35',
-          },
-        },
+        ghost: { color: palette.inkSoft, _hover: { bg: palette.hover, color: palette.ink } },
+        outline: { borderColor: palette.border, color: palette.ink, _hover: { bg: palette.primaryTint, borderColor: palette.primary } },
       },
     },
     Input: {
       variants: {
         filled: {
           field: {
-            bg: '#0F1A11',
-            border: '1px solid #2A3A2C',
-            color: '#F4F7F0',
-            _hover: { bg: '#1A2A1C', borderColor: '#3A4A3C' },
-            _focus: { bg: '#1A2A1C', borderColor: '#B7FF35', boxShadow: '0 0 0 1px #B7FF35' },
-            _placeholder: { color: '#6B7B6D' },
+            bg: palette.card, border: `1px solid ${palette.border}`, color: palette.ink, borderRadius: '12px',
+            _hover: { bg: palette.card, borderColor: '#CFC4B6' },
+            _focus: { bg: palette.card, borderColor: palette.primary, boxShadow: `0 0 0 3px ${palette.primaryTint}` },
+            _placeholder: { color: palette.inkMute },
           },
         },
       },
-      defaultProps: {
-        variant: 'filled',
-      },
+      defaultProps: { variant: 'filled' },
     },
     Select: {
       variants: {
         filled: {
           field: {
-            bg: '#0F1A11',
-            border: '1px solid #2A3A2C',
-            color: '#F4F7F0',
-            _hover: { bg: '#1A2A1C' },
-            _focus: { borderColor: '#B7FF35' },
+            bg: palette.card, border: `1px solid ${palette.border}`, color: palette.ink, borderRadius: '12px',
+            _hover: { bg: palette.card, borderColor: '#CFC4B6' },
+            _focus: { borderColor: palette.primary, boxShadow: `0 0 0 3px ${palette.primaryTint}` },
           },
         },
       },
-      defaultProps: {
-        variant: 'filled',
-      },
+      defaultProps: { variant: 'filled' },
     },
     Tabs: {
       variants: {
         'soft-rounded': {
-          tab: {
-            color: '#A5B1A7',
-            _selected: {
-              bg: '#B7FF35',
-              color: '#080B0A',
-              fontWeight: '600',
-            },
-          },
+          tab: { color: palette.inkSoft, fontWeight: 500, _selected: { bg: palette.primary, color: '#FFFFFF', fontWeight: 600 } },
         },
       },
     },

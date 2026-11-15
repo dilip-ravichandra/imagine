@@ -1,162 +1,168 @@
+"""Deploy all Imagine AI clients behind one Modal GPU backed API.
+
+Routes: / (launched React site), /research-dashboard, /download/android.apk,
+and the FastAPI /api/v1 endpoints. See MODAL_DEPLOY_GUIDE.md before deploying.
 """
-ImagineAI — Modal Labs Deployment Script
-=========================================
-Deploys the full FastAPI backend with SD‑Turbo on a Modal A10G GPU.
 
-Setup (run once):
-    pip install "modal==0.71.0"
-    modal token new          # authenticate with your Modal account
+from __future__ import annotations
 
-Deploy:
-    modal deploy modal_deploy_fixed.py
-
-The public URL printed after deploy is the base URL for:
-  - Web Dashboard : https://<your-app>.modal.run/
-  - API Docs      : https://<your-app>.modal.run/docs
-  - Android Client: set SERVER_URL = "https://<your-app>.modal.run"
-"""
+import os
+import secrets
+from pathlib import Path
 
 import modal
 
-# ---------------------------------------------------------------------------
-# 1. Container Image
-#    Build a CUDA‑based image with all required system and Python deps.
-# ---------------------------------------------------------------------------
-cuda_version = "12.4.0"
-flavor = "devel"
-os_ver = "ubuntu22.04"
-tag = f"{cuda_version}-{flavor}-{os_ver}"
+ROOT = Path(__file__).resolve().parent
+ADAPTER_DIR = "adapters/coco_sd15_lenbalanced_step2500"
+APK = "android/app/build/outputs/apk/debug/app-debug.apk"
+MODEL_ID = "stable-diffusion-v1-5/stable-diffusion-v1-5"
+MODEL_REVISION = "451f4fe16113bff5a5d2269ed5ad43b0592e9a14"
 
-imagine_image = (
-    modal.Image.from_registry(f"nvidia/cuda:{tag}", add_python="3.12")
-    # System packages
-    .apt_install("git", "libgl1", "libglib2.0-0")
-    # Base Python deps
-    .pip_install(
-        "fastapi>0.110",
-        "pydantic>2.5",
-        "uvicorn>0.27",
-        "httpx>0.27",
-        "pillow>10.0",
-        "psutil>5.9",
-        "numpy>1.26",
-        "opencv-python-headless>4.9",
-        "matplotlib>3.8",
+
+def _read_dotenv() -> dict[str, str]:
+    path = ROOT / ".env"
+    values: dict[str, str] = {}
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                key, value = line.split("=", 1)
+                values[key.strip()] = value.strip().strip("\"'")
+    return values
+
+
+def _host_api_key() -> str:
+    key_file = ROOT / ".modal-api-key"
+    if key_file.is_file():
+        return key_file.read_text(encoding="utf-8").strip()
+    key = secrets.token_urlsafe(36)
+    key_file.write_text(key, encoding="utf-8")
+    return key
+
+
+env_values = _read_dotenv()
+secret_values = {
+    "API_KEY": _host_api_key(),
+    "MODEL_ID": MODEL_ID,
+    "MODEL_REVISION": MODEL_REVISION,
+    "DEVICE": "cuda",
+    "PRECISION": "fp16",
+    "WEIGHTS_VARIANT": "fp16",
+    "PRELOAD_MODEL": "false",
+    "ADAPTER_PATH": f"/app/{ADAPTER_DIR}",
+    "ADAPTER_WEIGHT": "0.25",
+    "OUTPUT_DIR": "/app/generated_images",
+    "IMAGINEAI_HOSTED_VARIANTS": "true",
+}
+for name in ("GROQ_API_KEY", "GROQ_MODEL", "GEMINI_API_KEY", "GEMINI_MODEL", "HF_TOKEN"):
+    value = os.environ.get(name) or env_values.get(name)
+    if value:
+        secret_values[name] = value
+if not secret_values.get("HF_TOKEN"):
+    try:
+        from huggingface_hub.constants import HF_TOKEN_PATH
+
+        token_path = Path(HF_TOKEN_PATH)
+        if token_path.is_file():
+            secret_values["HF_TOKEN"] = token_path.read_text(encoding="utf-8").strip()
+    except ImportError:
+        pass
+image = (
+    modal.Image.from_registry(
+        "nvidia/cuda:12.4.0-devel-ubuntu22.04", add_python="3.12"
     )
-    # GPU‑related deps
+    .apt_install("git", "libgl1", "libglib2.0-0")
     .pip_install(
-        "torch>2.3",
-        "torchvision>0.18",
+        "fastapi>=0.110",
+        "pydantic>=2.5",
+        "uvicorn>=0.27",
+        "httpx>=0.27",
+        "pillow>=10",
+        "psutil>=5.9",
+        "numpy>=1.26",
+        "opencv-python-headless>=4.9",
+        "torch==2.5.1",
+        "torchvision==0.20.1",
         extra_index_url="https://download.pytorch.org/whl/cu124",
     )
     .pip_install(
-        "diffusers>0.30",
-        "transformers>4.40",
-        "accelerate>0.30",
-        "safetensors>0.4",
-        "peft>0.11",
+        "diffusers==0.35.1",
+        "transformers>=4.44,<5",
+        "accelerate>=0.30",
+        "safetensors>=0.4",
+        "peft>=0.11",
+        "huggingface_hub>=0.25",
+        "google-genai>=1.0",
+        "groq>=0.11",
     )
-    # Add the project source (exclude large local artifacts)
+    .add_local_dir(str(ROOT / "backend"), remote_path="/app/backend")
+    .add_local_dir(str(ROOT / "ai_engine"), remote_path="/app/ai_engine")
+    .add_local_dir(str(ROOT / "computer_vision"), remote_path="/app/computer_vision")
+    .add_local_dir(str(ROOT / "frontend" / "dist"), remote_path="/app/frontend/dist")
+    .add_local_dir(str(ROOT / ADAPTER_DIR), remote_path=f"/app/{ADAPTER_DIR}")
     .add_local_dir(
-        ".",
-        remote_path="/app",
-        ignore=[
-            ".venv",
-            "__pycache__",
-            ".git",
-            ".pytest_cache",
-            "*.pyc",
-        ],
+        str(ROOT / "evaluation" / "results" / "p7" / "images"),
+        remote_path="/app/evaluation/results/p7/images",
     )
+    .add_local_file(str(ROOT / APK), remote_path="/app/android/app-debug.apk")
 )
 
-# ---------------------------------------------------------------------------
-# 2. Modal App & GPU Config
-# ---------------------------------------------------------------------------
-app = modal.App("imagineai-p3", image=imagine_image)
-
-# Persistent volume for HuggingFace model cache (~7 GB)
-model_volume = modal.Volume.from_name(
-    "imagineai-model-cache", create_if_missing=True
-)
+# Update the existing app in place so its current CPU-only deployment is replaced.
+app = modal.App("imagineai-p3")
+model_volume = modal.Volume.from_name("imagineai-model-cache", create_if_missing=True)
+image_volume = modal.Volume.from_name("imagineai-generated-images", create_if_missing=True)
 MODEL_CACHE_DIR = "/root/.cache/huggingface"
+download_image = (
+    modal.Image.debian_slim(python_version="3.12")
+    .pip_install("huggingface_hub>=0.25")
+)
 
-# ---------------------------------------------------------------------------
-# 3. Model pre‑download (runs once, stored in the volume)
-# ---------------------------------------------------------------------------
+
 @app.function(
-    gpu="A10G",
+    image=download_image,
     volumes={MODEL_CACHE_DIR: model_volume},
-    timeout=1800,                     # 30 min for first‑time downloads
-    secrets=[modal.Secret.from_name("imagineai-secrets")],
+    secrets=[modal.Secret.from_dict(secret_values)],
+    cpu=4,
+    memory=8192,
+    timeout=3600,
 )
 def download_models():
-    """Cache SD‑Turbo, SD‑1.5 and LCM‑LoRA weights in the persistent volume."""
-    from diffusers import (
-        AutoPipelineForText2Image,
-        StableDiffusionPipeline,
-        DiffusionPipeline,
-    )
-    import torch
+    """Fetch exactly the three checkpoints used by the four model choices."""
+    from huggingface_hub import snapshot_download
 
-    print("Downloading SD‑Turbo (fp16)…")
-    AutoPipelineForText2Image.from_pretrained(
-        "stabilityai/sd-turbo", torch_dtype=torch.float16, variant="fp16"
-    )
-
-    print("Downloading SD 1.5 (fp32)…")
-    StableDiffusionPipeline.from_pretrained(
-        "runwayml/stable-diffusion-v1-5", torch_dtype=torch.float32
-    )
-
-    print("Downloading LCM‑LoRA weights…")
-    StableDiffusionPipeline.from_pretrained(
-        "runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16
-    )
-    pipe = DiffusionPipeline.from_pretrained(
-        "runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16
-    )
-    pipe.load_lora_weights("latent-consistency/lcm-lora-sdv1-5")
-
+    token = os.environ.get("HF_TOKEN")
+    if not token:
+        raise RuntimeError(
+            "HF_TOKEN is not configured. The project can still deploy from the "
+            "model cache already uploaded to the Modal volume; this helper only "
+            "downloads fresh checkpoints from Hugging Face."
+        )
+    os.environ["HF_HOME"] = MODEL_CACHE_DIR
+    snapshot_download("stabilityai/sd-turbo", token=token)
+    snapshot_download(MODEL_ID, revision=MODEL_REVISION, token=token)
+    snapshot_download("latent-consistency/lcm-lora-sdv1-5", token=token)
     model_volume.commit()
-    print("All model weights cached to volume.")
 
-# ---------------------------------------------------------------------------
-# 4. ASGI FastAPI app (served as a Modal web endpoint)
-# ---------------------------------------------------------------------------
+
 @app.function(
+    image=image,
     gpu="A10G",
-    volumes={MODEL_CACHE_DIR: model_volume},
-    timeout=300,
-    secrets=[modal.Secret.from_name("imagineai-secrets")],
+    volumes={MODEL_CACHE_DIR: model_volume, "/app/generated_images": image_volume},
+    secrets=[modal.Secret.from_dict(secret_values)],
+    timeout=600,
+    scaledown_window=60,
+    max_containers=1,
 )
 @modal.asgi_app()
 def fastapi_app():
-    """Entry point that returns the ImagineAI FastAPI application."""
     import sys
-    import os
 
-    # Ensure the repository root is on the Python path
-    sys.path.insert(0, "/app")
-
-    # Point HuggingFace caches to the persistent volume
+    os.chdir("/app")
     os.environ.setdefault("HF_HOME", MODEL_CACHE_DIR)
     os.environ.setdefault("HF_DATASETS_CACHE", MODEL_CACHE_DIR)
-    os.environ.setdefault(
-        "MODEL_REVISION", "b261bac6fd2cf515557d5d0707481eafa0485ec2"
-    )
-    os.environ.setdefault("PRELOAD_MODEL", "true")
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
+    sys.path.insert(0, "/app")
 
     from backend.app.main import create_app
 
     return create_app()
-
-# ---------------------------------------------------------------------------
-# 5. Local entrypoint — run with: modal run modal_deploy_fixed.py
-# ---------------------------------------------------------------------------
-@app.local_entrypoint()
-def main():
-    """Pre‑download models then instruct the user to deploy the endpoint."""
-    print("Pre‑downloading models into Modal volume…")
-    download_models.remote()
-    print("\nDone! Deploy the service with:\n  modal deploy modal_deploy_fixed.py")

@@ -14,6 +14,10 @@ To override the URL at build time, pass a Gradle property:
 
 The app also has a Server Configuration dialog for changing the URL without rebuilding.
 
+The Generate screen includes Android speech dictation (English, India) and AI prompt enhancement. Enhancement calls `POST /api/v1/prompt/enhance` on the backend and needs its `GROQ_API_KEY` configured. Restart the backend after adding that route. Dictated text is added to the current prompt; enhancement replaces it with the returned prompt for review.
+
+The approved adapted LoRA stays at 30 inference steps and weight 0.25, regardless of the speed preset. Image generation runs on the laptop backend GPU; the Android app is the remote client.
+
 ## Physical Android phone
 
 Set the server URL to `http://<laptop-LAN-IP>:8080/`. The laptop and phone must be on the same trusted Wi-Fi network. The backend must listen on the laptop's LAN interface and Windows Firewall must allow port 8080. The current local backend is bound to `127.0.0.1`, which is suitable for the emulator but intentionally not reachable from other devices. Do not expose this unauthenticated development server to an untrusted network.

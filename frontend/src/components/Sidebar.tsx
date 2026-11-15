@@ -1,178 +1,198 @@
 import React, { useState } from 'react';
-import { Box, Flex, Text, VStack, Icon } from '@chakra-ui/react';
+import { Box, Collapse, Flex, Text, VStack } from '@chakra-ui/react';
 import { Link, useLocation } from 'react-router-dom';
+import {
+  FiBarChart2,
+  FiBookOpen,
+  FiChevronDown,
+  FiChevronUp,
+  FiCpu,
+  FiEdit3,
+  FiGrid,
+  FiHome,
+  FiImage,
+  FiMessageCircle,
+  FiMic,
+  FiSettings,
+  FiTool,
+  FiBook,
+} from 'react-icons/fi';
+import type { IconType } from 'react-icons';
+import { useAuth } from '../hooks/useAuth';
 
-const NAV_ITEMS = [
-  { label: 'Home', path: '/dashboard', icon: '🏠' },
-  { label: 'Image Generator', path: '/create', icon: '🎨' },
-  { label: 'Storybook Studio', path: '/storybook', icon: '📖' },
-  { label: 'Gallery & Hub', path: '/gallery', icon: '🖼️' },
-];
+interface Item {
+  label: string;
+  path: string;
+  icon: IconType;
+  external?: boolean; // full page load (served by the backend, not the React router)
+}
 
-const ADMIN_ITEMS = [
-  { label: 'Profile', path: '/profile', icon: '👤' },
-  { label: 'Research', path: '/research', icon: '📊' },
-  { label: 'Training', path: '/training', icon: '🧪' },
-  { label: 'Admin', path: '/admin', icon: '⚙️' },
+// Five everyday things people actually do. Everything else is one click away under "More".
+const MAIN: Item[] = [
+  { label: 'Home', path: '/dashboard', icon: FiHome },
+  { label: 'Create image', path: '/create', icon: FiImage },
+  { label: 'Edit photo', path: '/edit', icon: FiEdit3 },
+  { label: 'Storybook', path: '/storybook', icon: FiBookOpen },
+  { label: 'My gallery', path: '/gallery', icon: FiGrid },
 ];
+const RESEARCH: Item[] = [
+  { label: 'Results', path: '/research', icon: FiBarChart2 },
+  { label: 'Experiments lab', path: '/lab', icon: FiTool },
+  { label: 'Training and data', path: '/training', icon: FiCpu },
+];
+const MORE: Item[] = [
+  { label: 'Ask about an image', path: '/ask-image', icon: FiMessageCircle },
+  { label: 'Learn', path: '/learn', icon: FiBook },
+  { label: 'Speak and translate', path: '/voice', icon: FiMic },
+  { label: 'System status', path: '/admin', icon: FiSettings },
+];
+// phone tab bar: the everyday tools plus Research
+const PHONE: Item[] = [MAIN[1], MAIN[2], MAIN[3], MAIN[4], { label: 'Research', path: '/research', icon: FiBarChart2 }];
+
+const NavLink: React.FC<{ item: Item; active: boolean; small?: boolean }> = ({ item, active, small }) => {
+  const inner = (
+    <Flex
+      align="center"
+      gap={3}
+      px={4}
+      py={small ? 2 : 2.5}
+      borderRadius="12px"
+      bg={active ? '#EEF0FF' : 'transparent'}
+      color={active ? '#4747DB' : '#5B6277'}
+      fontWeight={active ? 700 : 500}
+      fontSize={small ? '13px' : '15px'}
+      _hover={{ bg: active ? '#EEF0FF' : '#F5F0EA', color: '#1E2233' }}
+      transition="all 0.15s ease"
+    >
+      <item.icon size={small ? 16 : 18} aria-hidden />
+      <Text>{item.label}</Text>
+    </Flex>
+  );
+  return item.external ? (
+    <a href={item.path}>{inner}</a>
+  ) : (
+    <Link to={item.path} aria-current={active ? 'page' : undefined}>{inner}</Link>
+  );
+};
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
-  const [collapsed, setCollapsed] = useState(false);
+  const { user, logout } = useAuth();
+  const [showMore, setShowMore] = useState(MORE.some((i) => location.pathname === i.path));
+  const isActive = (p: string) => location.pathname === p;
+  const name = user?.name || 'You';
 
   return (
-    <Box
-      as="nav"
-      w={collapsed ? '70px' : '220px'}
-      minH="100vh"
-      bg="#0D120E"
-      borderRight="1px solid #2A3A2C"
-      py={4}
-      transition="width 0.2s ease"
-      position="fixed"
-      left={0}
-      top={0}
-      zIndex={100}
-      display="flex"
-      flexDirection="column"
-    >
-      {/* Logo */}
-      <Flex
-        align="center"
-        px={collapsed ? 3 : 5}
-        py={3}
-        mb={4}
-        cursor="pointer"
-        onClick={() => setCollapsed(!collapsed)}
+    <>
+      {/* Desktop: side rail */}
+      <Box
+        as="nav"
+        aria-label="Main"
+        display={{ base: 'none', md: 'flex' }}
+        flexDirection="column"
+        w="232px"
+        minH="100vh"
+        bg="#FFFFFF"
+        borderRight="1px solid #E3DACF"
+        py={5}
+        px={3}
+        position="fixed"
+        left={0}
+        top={0}
+        zIndex={100}
       >
-        <Box
-          w="32px"
-          h="32px"
-          borderRadius="8px"
-          bg="#B7FF35"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          fontSize="18px"
-          fontWeight="bold"
-          color="#080B0A"
-          flexShrink={0}
-        >
-          I
-        </Box>
-        {!collapsed && (
-          <Text ml={3} fontSize="lg" fontWeight="bold" color="#F4F7F0" letterSpacing="-0.5px">
-            ImagineAI
-          </Text>
-        )}
-      </Flex>
-
-      {/* Main Nav */}
-      <VStack spacing={1} align="stretch" flex={1} px={2}>
-        {NAV_ITEMS.map((item) => {
-          const isActive = location.pathname === item.path;
-          return (
-            <Link key={item.path} to={item.path}>
-              <Flex
-                align="center"
-                px={collapsed ? 3 : 4}
-                py={2.5}
-                borderRadius="10px"
-                bg={isActive ? '#1A2A1C' : 'transparent'}
-                color={isActive ? '#B7FF35' : '#A5B1A7'}
-                _hover={{ bg: '#1A2A1C', color: '#F4F7F0' }}
-                transition="all 0.15s ease"
-                cursor="pointer"
-                justify={collapsed ? 'center' : 'flex-start'}
-              >
-                <Text fontSize="18px" lineHeight="1">{item.icon}</Text>
-                {!collapsed && (
-                  <Text ml={3} fontSize="14px" fontWeight={isActive ? '600' : '400'}>
-                    {item.label}
-                  </Text>
-                )}
-              </Flex>
-            </Link>
-          );
-        })}
-
-        <Box h="1px" bg="#2A3A2C" my={3} mx={2} />
-
-        {ADMIN_ITEMS.map((item) => {
-          const isActive = location.pathname === item.path;
-          return (
-            <Link key={item.path} to={item.path}>
-              <Flex
-                align="center"
-                px={collapsed ? 3 : 4}
-                py={2.5}
-                borderRadius="10px"
-                bg={isActive ? '#1A2A1C' : 'transparent'}
-                color={isActive ? '#B7FF35' : '#6B7B6D'}
-                _hover={{ bg: '#1A2A1C', color: '#A5B1A7' }}
-                transition="all 0.15s ease"
-                cursor="pointer"
-                fontSize="13px"
-                justify={collapsed ? 'center' : 'flex-start'}
-              >
-                <Text fontSize="16px" lineHeight="1">{item.icon}</Text>
-                {!collapsed && (
-                  <Text ml={3} fontSize="13px" fontWeight={isActive ? '600' : '400'}>
-                    {item.label}
-                  </Text>
-                )}
-              </Flex>
-            </Link>
-          );
-        })}
-      </VStack>
-
-      {/* User Footer Profile */}
-      <Box p={2} borderTop="1px solid #2A3A2C" mt="auto">
-        <Link to="/profile">
-          <Flex
-            align="center"
-            p={2}
-            borderRadius="10px"
-            _hover={{ bg: '#182019' }}
-            cursor="pointer"
-            justify={collapsed ? 'center' : 'flex-start'}
-          >
-            <Box
-              w="32px"
-              h="32px"
-              borderRadius="full"
-              bg="#182019"
-              border="1px solid #B7FF35"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              fontSize="12px"
-              fontWeight="bold"
-              color="#B7FF35"
-              flexShrink={0}
-            >
-              D
-            </Box>
-            {!collapsed && (
-              <Box ml={3} overflow="hidden">
-                <Flex align="center" gap={1.5}>
-                  <Text fontSize="13px" fontWeight="600" color="#F4F7F0" isTruncated>
-                    Dilip R.
-                  </Text>
-                  <Box bg="rgba(183, 255, 53, 0.2)" color="#B7FF35" fontSize="10px" px={1.5} py={0.2} borderRadius="4px" fontWeight="bold">
-                    PRO
-                  </Box>
-                </Flex>
-                <Text fontSize="11px" color="#6B7B6D" isTruncated>
-                  dilip@example.com
-                </Text>
-              </Box>
-            )}
+        <Link to="/">
+          <Flex align="center" gap={3} px={3} mb={6}>
+            <Flex w="36px" h="36px" borderRadius="11px" bg="linear-gradient(135deg,#5B5BF0,#8B6CF6)" align="center" justify="center" color="#FFFFFF" fontWeight={800} fontSize="18px">
+              I
+            </Flex>
+            <Text fontSize="19px" fontWeight={800} color="#1E2233" letterSpacing="-0.02em">
+              ImagineAI
+            </Text>
           </Flex>
         </Link>
+
+        <VStack spacing={1} align="stretch" flex={1}>
+          {MAIN.map((i) => <NavLink key={i.path} item={i} active={isActive(i.path)} />)}
+
+          <Box mt={5}>
+            <Text px={4} pb={1} fontSize="11px" color="#8A90A2" fontWeight={700} letterSpacing="0.06em" textTransform="uppercase">Research</Text>
+            <VStack spacing={1} align="stretch">
+              {RESEARCH.map((i) => <NavLink key={i.path} item={i} active={isActive(i.path)} />)}
+            </VStack>
+          </Box>
+
+          <Box mt={3}>
+            <Flex
+              as="button"
+              w="100%"
+              align="center"
+              justify="space-between"
+              px={4}
+              py={2}
+              color="#8A90A2"
+              fontSize="12px"
+              fontWeight={700}
+              letterSpacing="0.06em"
+              textTransform="uppercase"
+              onClick={() => setShowMore((v) => !v)}
+              aria-expanded={showMore}
+            >
+              <Text>More</Text>
+              {showMore ? <FiChevronUp /> : <FiChevronDown />}
+            </Flex>
+            <Collapse in={showMore} animateOpacity>
+              <VStack spacing={1} align="stretch" mt={1}>
+                {MORE.map((i) => <NavLink key={i.path} item={i} active={isActive(i.path)} small />)}
+              </VStack>
+            </Collapse>
+          </Box>
+        </VStack>
+
+        <Link to="/profile">
+          <Flex align="center" gap={3} p={3} borderRadius="14px" _hover={{ bg: '#F5F0EA' }} borderTop="1px solid #EFE8DF" mt={3}>
+            <Flex w="34px" h="34px" borderRadius="full" bg="#EEF0FF" color="#4747DB" align="center" justify="center" fontWeight={700} fontSize="14px">
+              {name.charAt(0).toUpperCase()}
+            </Flex>
+            <Box minW={0}>
+              <Text fontSize="14px" fontWeight={600} color="#1E2233" isTruncated>{name}</Text>
+              <Text fontSize="12px" color="#8A90A2">Settings</Text>
+            </Box>
+          </Flex>
+        </Link>
+        <Box as="button" type="button" onClick={() => { void logout(); }} aria-label="Sign out" textAlign="left" px={3} py={2} fontSize="13px" color="#8A90A2" _hover={{ color: '#B3261E' }}>
+          Sign out
+        </Box>
       </Box>
-    </Box>
+
+      {/* Phone: bottom tab bar with the five everyday actions */}
+      <Flex
+        as="nav"
+        aria-label="Main"
+        display={{ base: 'flex', md: 'none' }}
+        position="fixed"
+        bottom={0}
+        left={0}
+        right={0}
+        zIndex={100}
+        bg="#FFFFFF"
+        borderTop="1px solid #E3DACF"
+        justify="space-around"
+        pb="env(safe-area-inset-bottom)"
+      >
+        {PHONE.map((i) => {
+          const active = isActive(i.path);
+          return (
+            <Link key={i.path} to={i.path} style={{ flex: 1 }} aria-current={active ? 'page' : undefined}>
+              <Flex direction="column" align="center" py={2} color={active ? '#4747DB' : '#8A90A2'} fontWeight={active ? 700 : 500}>
+                <i.icon size={21} aria-hidden />
+                <Text fontSize="10.5px" mt={0.5}>{i.label.replace('Create image', 'Create').replace('Edit photo', 'Edit').replace('My gallery', 'Gallery')}</Text>
+              </Flex>
+            </Link>
+          );
+        })}
+      </Flex>
+    </>
   );
 };
 

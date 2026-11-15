@@ -7,6 +7,7 @@ import com.imagineai.app.model.MultiModelGenerateRequest
 import com.imagineai.app.model.MultiModelGenerateResponse
 import com.imagineai.app.model.PromptAnalysisRequest
 import com.imagineai.app.model.PromptAnalysisResponse
+import com.imagineai.app.model.PromptEnhanceRequest
 import com.imagineai.app.model.StressGenerateRequest
 import com.imagineai.app.model.StressGenerateResponse
 import com.imagineai.app.network.ApiClient
@@ -24,6 +25,7 @@ data class UiState(
     val resolution: Int = 512,
     val seedText: String = "42",
     val serverBaseUrl: String = ApiClient.baseUrl,
+    val serverApiKey: String = ApiClient.apiKey,
     val isLoading: Boolean = false,
     val isCheckingServer: Boolean = false,
     val serverAvailable: Boolean? = null,
@@ -42,6 +44,8 @@ data class UiState(
     // Live prompt analysis
     val promptAnalysis: PromptAnalysisResponse? = null,
     val isAnalyzingPrompt: Boolean = false,
+    val isEnhancingPrompt: Boolean = false,
+    val promptAssistStatus: String? = null,
     // Live adaptive stress testing
     val stressPrompt: String = "A cybernetic cheetah sprinting through a futuristic desert, cinematic",
     val isStressRunning: Boolean = false,
@@ -94,8 +98,46 @@ class ImagineAiViewModel : ViewModel() {
 
     fun onPromptChange(newPrompt: String) {
         if (newPrompt.length <= 500) {
-            _uiState.update { it.copy(prompt = newPrompt, errorMessage = null) }
+            _uiState.update { it.copy(prompt = newPrompt, errorMessage = null, promptAssistStatus = null) }
             triggerPromptAnalysis(newPrompt)
+        }
+    }
+
+    fun onPromptAssistStatus(message: String) {
+        _uiState.update { it.copy(promptAssistStatus = message) }
+    }
+
+    fun enhancePrompt() {
+        val prompt = _uiState.value.prompt.trim()
+        if (prompt.isEmpty()) {
+            _uiState.update { it.copy(promptAssistStatus = "Enter a word or idea first, then enhance it.") }
+            return
+        }
+        viewModelScope.launch {
+            _uiState.update { it.copy(isEnhancingPrompt = true, promptAssistStatus = "Building a richer image prompt…") }
+            try {
+                val response = ApiClient.getApi().enhancePrompt(PromptEnhanceRequest(prompt))
+                val body = response.body()
+                if (response.isSuccessful && body != null && body.prompt.isNotBlank()) {
+                    val enhanced = body.prompt.take(500)
+                    _uiState.update {
+                        it.copy(prompt = enhanced, isEnhancingPrompt = false,
+                            promptAssistStatus = "Enhanced with ${body.model ?: "AI"}. Review or edit it before generating.")
+                    }
+                    triggerPromptAnalysis(enhanced)
+                } else {
+                    val error = ApiClient.parseErrorBody(response)?.error
+                    _uiState.update {
+                        it.copy(isEnhancingPrompt = false,
+                            promptAssistStatus = error?.message ?: "Prompt enhancement failed (${response.code()}).")
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(isEnhancingPrompt = false,
+                        promptAssistStatus = "Could not reach the prompt enhancer: ${e.localizedMessage ?: "network error"}")
+                }
+            }
         }
     }
 
@@ -144,6 +186,13 @@ class ImagineAiViewModel : ViewModel() {
         checkServerHealth()
     }
 
+    fun onServerConfigChange(url: String, apiKey: String) {
+        ApiClient.baseUrl = url
+        ApiClient.apiKey = apiKey.trim()
+        _uiState.update { it.copy(serverBaseUrl = ApiClient.baseUrl, serverApiKey = ApiClient.apiKey) }
+        checkServerHealth()
+    }
+
     fun toggleConfigDialog(show: Boolean) {
         _uiState.update { it.copy(showConfigDialog = show) }
     }
@@ -175,10 +224,10 @@ class ImagineAiViewModel : ViewModel() {
         }
 
         val seedValue = _uiState.value.seedText.toLongOrNull()
-        val targetSteps = when (_uiState.value.qualityPreset) {
+        val targetSteps = if (_uiState.value.selectedModel == "sd15_adapted" || _uiState.value.selectedModel == "sd15_baseline") 30 else when (_uiState.value.qualityPreset) {
             "quick" -> 1
             "best" -> 4
-            else -> if (_uiState.value.selectedModel == "sd15_adapted" || _uiState.value.selectedModel == "sd15_baseline") 30 else 2
+            else -> 2
         }
 
         viewModelScope.launch {

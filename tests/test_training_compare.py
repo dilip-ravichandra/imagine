@@ -24,7 +24,7 @@ def make_adapter(tmp_path, **over):
 
 def test_valid_adapter_accepted(tmp_path):
     d, _ = make_adapter(tmp_path)
-    assert C.validate_adapter(d, REV)["base_revision"] == REV
+    assert C.validate_adapter(d, REV, BASE_MODEL)["base_revision"] == REV
 
 
 @pytest.mark.parametrize("over,msg", [(dict(status="started"), "status"), (dict(status="failed"), "status"),
@@ -33,19 +33,19 @@ def test_valid_adapter_accepted(tmp_path):
 def test_bad_adapters_rejected(tmp_path, over, msg):
     d, _ = make_adapter(tmp_path, **over)
     with pytest.raises(DataError, match=msg):
-        C.validate_adapter(d, REV)
+        C.validate_adapter(d, REV, BASE_MODEL)
 
 
 def test_revision_mismatch_and_modified_weights_and_missing_files(tmp_path):
     d, w = make_adapter(tmp_path)
     with pytest.raises(DataError, match="revision"):
-        C.validate_adapter(d, "c" * 40)
+        C.validate_adapter(d, "c" * 40, BASE_MODEL)
     w.write_bytes(b"tampered")
     with pytest.raises(DataError, match="hash"):
-        C.validate_adapter(d, REV)
+        C.validate_adapter(d, REV, BASE_MODEL)
     w.unlink()
     with pytest.raises(DataError, match="needs"):
-        C.validate_adapter(d, REV)
+        C.validate_adapter(d, REV, BASE_MODEL)
 
 
 MAN = {"validation": [{"image_id": 1, "caption": "A red cup beside a blue plate"},

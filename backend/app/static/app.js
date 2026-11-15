@@ -6,6 +6,8 @@
 document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initModelComparisonChart();
+  loadMeasuredBenchmark();
+  loadResearchExtras();
   initGenerateTab();
   initBatchTab();
   initStressLab();
@@ -16,13 +18,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 let generationAvailable = true;
+// measured value for a benchmark variant (evaluation/results/fid), else a labelled estimate
+const bm = (id, key, fallback) => {
+  const row = (window.__bench || {})[id];
+  return row && row[key] != null ? Math.round(row[key]) : fallback;
+};
 
 // ==================== TABS MANAGEMENT ====================
 const tabMeta = {
   generate: {
     category: "TEXT-TO-IMAGE GENERATION",
     title: "Generative Inference",
-    desc: "Create high-quality, on-device images from natural language prompts"
+    desc: "Resource-efficient text-to-image: a GPU edge server answers lightweight mobile and web clients"
   },
   batch: {
     category: "EVALUATION",
@@ -42,7 +49,7 @@ const tabMeta = {
   comparison: {
     category: "BENCHMARKS & COMPARISON",
     title: "Model Architecture Comparison",
-    desc: "Empirical measurements across Classical, Deep Learning, and Hybrid architectures on the RTX 5050 Laptop GPU."
+    desc: "Empirical measurements across Classical, Deep Learning, and Hybrid architectures on the local GPU."
   },
   robustness: {
     category: "LINGUISTIC ROBUSTNESS",
@@ -57,7 +64,7 @@ const tabMeta = {
   catalogue: {
     category: "GALLERY & DATASET",
     title: "Empirical Generation Catalogue",
-    desc: "Pre-computed holdout prompt benchmark generations from the NVIDIA RTX 5050 GPU."
+    desc: "Pre-computed holdout prompt benchmark generations from the local GPU."
   },
   about: {
     category: "PROJECT SPECIFICATION",
@@ -65,6 +72,19 @@ const tabMeta = {
     desc: "Problem Statement 3 · Computer Vision & Generative AI Capstone Project."
   }
 };
+
+// ---- connection with the main app: embed mode (?embed=1), hosted links and ?tab=<name> deep links
+(function connectToMainApp() {
+  const q = new URLSearchParams(location.search);
+  if (q.has('embed')) document.documentElement.classList.add('embed');
+  document.addEventListener('DOMContentLoaded', () => {
+    const want = q.get('tab');
+    if (want) {
+      const btn = document.querySelector('.nav-tab[data-tab="' + want.replace(/[^a-z-]/gi, '') + '"]');
+      if (btn) setTimeout(() => btn.click(), 0);
+    }
+  });
+})();
 
 function initTabs() {
   const tabs = document.querySelectorAll('.nav-tab');
@@ -92,6 +112,7 @@ function initTabs() {
         if (titleEl) titleEl.textContent = tabMeta[tabKey].title;
         if (descEl) descEl.textContent = tabMeta[tabKey].desc;
       }
+
     });
   });
 }
@@ -117,7 +138,7 @@ async function checkSystemStatus() {
       if (modelRes.ok) {
         const info = await modelRes.json();
         if (info.loaded) {
-          label = 'Model loaded RTX 5050 · fp16';
+          label = 'Model loaded · fp16';
         }
       }
       statusText.textContent = label;
@@ -129,6 +150,65 @@ async function checkSystemStatus() {
 }
 
 // ==================== TAB 5: MODEL COMPARISON CHART ====================
+// ==================== MEASURED BENCHMARK (FID / KID / CLIP / latency) ====================
+async function loadMeasuredBenchmark() {
+  const proto = document.getElementById('bench-protocol');
+  const tbody = document.querySelector('#bench-table tbody');
+  if (!proto || !tbody) return;
+  try {
+    const [bRes, sRes] = await Promise.all([fetch('/api/v1/metrics/benchmark'), fetch('/api/v1/metrics/summary')]);
+    const bench = await bRes.json();
+    window.__bench = bench.variants || {};   // Stress Lab predictions read the measured rows
+    const summ = await sRes.json();
+    // summary cards at the top come from measured data when it exists
+    const cards = summ.summary_cards || {};
+    const vals = document.querySelectorAll('#tab-comparison .metric-summary-box .metric-data-val');
+    if (summ.source && summ.source.startsWith('measured') && vals.length >= 4) {
+      vals[0].textContent = cards.best_clip_alignment;
+      vals[1].textContent = cards.inference_speedup_x + '×';
+      vals[2].textContent = Math.round(cards.baseline_latency_ms) + ' ms';
+      vals[3].textContent = cards.vram_reduction_pct + '%';
+    }
+    if (!bench.measured) {
+      proto.textContent = 'No measured benchmark found. Run evaluation/scripts/run_fid_benchmark.py --generate --score.';
+      return;
+    }
+    proto.textContent = bench.protocol;
+    const v = bench.variants, base = v.B0;
+    tbody.innerHTML = Object.entries(v).map(([k, x]) => {
+      const sp = base ? (base.latency_median_ms / x.latency_median_ms).toFixed(1) + '×' : '';
+      return `<tr><td><b>${k}</b></td><td>${x.label}</td><td>${x.n}</td><td>${x.fid.toFixed(1)}</td>` +
+        `<td>${(x.kid_mean * 1000).toFixed(1)}</td><td>${x.clip_mean.toFixed(3)}</td>` +
+        `<td>${Math.round(x.latency_median_ms)}</td><td>${Math.round(x.peak_vram_mb)}</td>` +
+        `<td>${Math.round(x.model_size_mb)}</td><td>${sp}</td></tr>`;
+    }).join('');
+    drawParetoChart(v);
+    const note = document.getElementById('bench-note');
+    if (note) note.textContent = 'FID uses a small sample and is biased upward — compare variants against each other, not against published numbers. Latency from a laptop GPU (thermal drift possible).';
+  } catch (e) {
+    proto.textContent = 'Could not load benchmark results: ' + e.message;
+  }
+}
+
+function drawParetoChart(v) {
+  const el = document.getElementById('bench-pareto');
+  if (!el) return;
+  const pts = Object.entries(v).map(([k, x]) => ({ k, lat: x.latency_median_ms, fid: x.fid, vram: x.peak_vram_mb }));
+  const W = 760, H = 300, m = { l: 60, r: 20, t: 20, b: 46 };
+  const xs = pts.map(p => Math.log10(p.lat)), ys = pts.map(p => p.fid);
+  const x0 = Math.min(...xs) - 0.1, x1 = Math.max(...xs) + 0.1;
+  const y0 = Math.min(...ys) - 3, y1 = Math.max(...ys) + 3;
+  const X = lx => m.l + (lx - x0) / (x1 - x0) * (W - m.l - m.r);
+  const Y = f => H - m.b - (f - y0) / (y1 - y0) * (H - m.t - m.b);
+  const dots = pts.map(p => `<g><circle cx="${X(Math.log10(p.lat))}" cy="${Y(p.fid)}" r="${6 + p.vram / 1200}" fill="rgba(124,92,255,.75)" stroke="#fff" stroke-width="1"/>` +
+    `<text x="${X(Math.log10(p.lat)) + 10}" y="${Y(p.fid) - 8}" fill="currentColor" font-size="12">${p.k}</text></g>`).join('');
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;color:#cbd5e1" role="img" aria-label="FID versus latency">` +
+    `<line x1="${m.l}" y1="${H - m.b}" x2="${W - m.r}" y2="${H - m.b}" stroke="#64748b"/><line x1="${m.l}" y1="${m.t}" x2="${m.l}" y2="${H - m.b}" stroke="#64748b"/>` +
+    `<text x="${W / 2}" y="${H - 8}" text-anchor="middle" fill="currentColor" font-size="12">Median latency per image (ms, log scale) — left is faster</text>` +
+    `<text transform="translate(16 ${H / 2}) rotate(-90)" text-anchor="middle" fill="currentColor" font-size="12">FID (lower is better)</text>` +
+    dots + `</svg><p class="panel-description">Bottom-left is best. Bubble size = peak VRAM.</p>`;
+}
+
 function initModelComparisonChart() {
   const container = document.getElementById('grouped-bar-chart');
   if (!container) return;
@@ -212,8 +292,12 @@ function initGenerateTab() {
   const promptInput = document.getElementById('prompt-input');
   const charCounter = document.getElementById('char-counter');
   const clearBtn = document.getElementById('clear-prompt-btn');
+  const voicePromptBtn = document.getElementById('voice-prompt-btn');
+  const voiceLanguage = document.getElementById('voice-language');
+  const enhancePromptBtn = document.getElementById('enhance-prompt-btn');
+  const promptAssistStatus = document.getElementById('prompt-assist-status');
   const sampleBtns = document.querySelectorAll('.sample-prompt');
-  const presetBtns = document.querySelectorAll('.preset-card');
+  const qualityBtns = document.querySelectorAll('.quality-card');
   const generateBtn = document.getElementById('generate-btn');
   const downloadBtn = document.getElementById('download-btn');
 
@@ -222,9 +306,31 @@ function initGenerateTab() {
   const liveTimer = document.getElementById('live-timer');
   const resultImg = document.getElementById('generated-image');
 
-  let currentSteps = 2;
+  let selectedPreset = 'balanced';
   let selectedModel = 'sd15_adapted';
   let timerInterval = null;
+
+  const qualitySteps = {
+    sd_turbo: { quick: 1, balanced: 2, best: 4 },
+    sd15_optimized: { quick: 2, balanced: 4, best: 8 },
+    sd15_adapted: { quick: 8, balanced: 15, best: 30 },
+    sd15_baseline: { quick: 8, balanced: 15, best: 30 },
+  };
+  const presetDescriptions = {
+    quick: 'Fastest · fewer denoising steps',
+    balanced: 'Recommended speed and detail',
+    best: 'More denoising steps · takes longer',
+  };
+  const getPresetSteps = (model, preset) => (qualitySteps[model] || qualitySteps.sd_turbo)[preset];
+  const updateQualityLabels = () => {
+    qualityBtns.forEach((btn) => {
+      const preset = btn.dataset.preset;
+      const desc = btn.querySelector('.preset-desc');
+      if (desc && preset) {
+        desc.textContent = `${getPresetSteps(selectedModel, preset)} steps · ${presetDescriptions[preset]}`;
+      }
+    });
+  };
 
   const modelBtns = document.querySelectorAll('.model-card');
   modelBtns.forEach(btn => {
@@ -232,8 +338,19 @@ function initGenerateTab() {
       modelBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       selectedModel = btn.dataset.model;
+      updateQualityLabels();
     });
   });
+
+  qualityBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      qualityBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedPreset = btn.dataset.preset || 'balanced';
+      updateQualityLabels();
+    });
+  });
+  updateQualityLabels();
 
   // Character counter and debounced analysis
   let debounceTimeout = null;
@@ -257,6 +374,98 @@ function initGenerateTab() {
     }, 300);
   };
 
+  const updatePrompt = (value) => {
+    promptInput.value = value.slice(0, 500);
+    charCounter.textContent = `${promptInput.value.length} / 500`;
+    updateLinguisticAnalysis(promptInput.value);
+  };
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (typeof SpeechRecognition !== 'function') {
+    voicePromptBtn.disabled = true;
+    voicePromptBtn.title = 'Voice dictation is not supported by this browser. Try Chrome or Edge.';
+    promptAssistStatus.textContent = 'Voice input is not supported by this browser.';
+  } else {
+    const recognition = new SpeechRecognition();
+    let listening = false;
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .slice(event.resultIndex)
+        .filter((result) => result.isFinal)
+        .map((result) => result[0].transcript.trim())
+        .filter(Boolean)
+        .join(' ');
+      if (!transcript) return;
+      const current = promptInput.value.trim();
+      const combined = current ? `${current.replace(/[.,;:!?]+$/, '')}, ${transcript}` : transcript;
+      updatePrompt(combined);
+      promptAssistStatus.textContent = 'Voice text added to the prompt.';
+    };
+    recognition.onerror = (event) => {
+      const messages = {
+        'not-allowed': 'Allow microphone access in your browser to dictate.',
+        'no-speech': 'No speech was detected. Try again.',
+        'network': 'The browser speech service is unavailable. You can type the prompt instead.'
+      };
+      promptAssistStatus.textContent = messages[event.error] || 'Voice input could not be completed.';
+    };
+    recognition.onend = () => {
+      listening = false;
+      voicePromptBtn.textContent = '🎙 Dictate';
+      voicePromptBtn.setAttribute('aria-pressed', 'false');
+    };
+    voicePromptBtn.addEventListener('click', () => {
+      if (listening) {
+        recognition.stop();
+        return;
+      }
+      recognition.lang = voiceLanguage.value;
+      promptAssistStatus.textContent = 'Listening…';
+      try {
+        recognition.start();
+        listening = true;
+        voicePromptBtn.textContent = '■ Stop listening';
+        voicePromptBtn.setAttribute('aria-pressed', 'true');
+      } catch (_) {
+        promptAssistStatus.textContent = 'Voice input is already starting. Please wait.';
+      }
+    });
+  }
+
+  enhancePromptBtn.addEventListener('click', async () => {
+    const prompt = promptInput.value.trim();
+    if (!prompt) {
+      promptAssistStatus.textContent = 'Enter a word or idea first, then enhance it.';
+      promptInput.focus();
+      return;
+    }
+    enhancePromptBtn.disabled = true;
+    promptAssistStatus.textContent = 'Building a richer image prompt…';
+    try {
+      const response = await fetch('/api/v1/prompt/enhance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error?.message || 'Prompt enhancement failed.');
+      }
+      if (typeof data.prompt !== 'string' || !data.prompt.trim()) {
+        throw new Error('The prompt enhancer returned no usable text.');
+      }
+      updatePrompt(data.prompt.trim());
+      promptAssistStatus.textContent = `Enhanced with ${data.model || 'AI'}. Review or edit it before generating.`;
+    } catch (error) {
+      promptAssistStatus.textContent = error instanceof Error ? error.message : 'Prompt enhancement failed.';
+    } finally {
+      enhancePromptBtn.disabled = false;
+    }
+  });
+
   promptInput.addEventListener('input', () => {
     const len = promptInput.value.length;
     charCounter.textContent = `${len} / 500`;
@@ -276,23 +485,8 @@ function initGenerateTab() {
     });
   });
 
-  presetBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      presetBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const preset = btn.dataset.preset;
-      if (preset === 'quick') currentSteps = 1;
-      else if (preset === 'balanced') currentSteps = 2;
-      else if (preset === 'best') currentSteps = 4;
-    });
-  });
-
   // Generate Action
   generateBtn.addEventListener('click', async () => {
-    if (!generationAvailable) {
-      alert('Image generation is unavailable in the CPU deployment. Enable GPU billing and redeploy to generate images.');
-      return;
-    }
     const prompt = promptInput.value.trim();
     if (!prompt) {
       alert('Please enter a prompt.');
@@ -326,7 +520,7 @@ function initGenerateTab() {
           model_choice: selectedModel,
           resolution: resolution,
           seed: seed,
-          steps: selectedModel === 'sd_turbo' ? currentSteps : (selectedModel === 'sd15_optimized' ? 8 : 30)
+          steps: getPresetSteps(selectedModel, selectedPreset)
         })
       });
 
@@ -342,14 +536,27 @@ function initGenerateTab() {
       }
 
       const data = await response.json();
-      resultImg.src = data.image_url;
       resultImg.onload = () => {
         loader.classList.add('hidden');
         resultImg.classList.remove('hidden');
         generateBtn.disabled = false;
         downloadBtn.disabled = false;
-        downloadBtn.onclick = () => window.open(data.image_url, '_blank');
+        downloadBtn.onclick = () => {
+          const a = document.createElement('a');
+          a.href = data.image_url;
+          a.download = `imagine-ai-${data.request_id || Date.now()}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        };
       };
+      resultImg.onerror = () => {
+        loader.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        generateBtn.disabled = false;
+        alert('The image was generated, but the browser could not load it. Check the backend image URL and retry.');
+      };
+      resultImg.src = data.image_url;
 
       // Update Telemetry Panel
       document.getElementById('tel-latency').textContent = `${data.latency_ms ? data.latency_ms.toFixed(1) : '288.4'} ms`;
@@ -564,15 +771,17 @@ function initStressLab() {
         // Step 2: Step Throttling (512px, 1 step)
         chosenRes = 512;
         chosenSteps = 1;
-        predLat = 180;
-        predVram = 3678;
+        predLat = bm('T1', 'latency_median_ms', 247);
+        predVram = bm('T1', 'peak_vram_mb', 3098);
         activeLadderIdx = 1;
       } else {
         // Step 1: Optimal Combined Default (512px, 2-4 steps)
         chosenRes = 512;
         chosenSteps = (latBudget >= 1000 && vramBudget >= 5000) ? 4 : 2;
-        predLat = chosenSteps === 4 ? 485 : 288;
-        predVram = 3678;
+        predLat = chosenSteps === 4
+          ? bm('T1', 'latency_median_ms', 247) + 3 * (bm('T2', 'latency_median_ms', 313) - bm('T1', 'latency_median_ms', 247))  // linear in steps: T1/T2 measured, 4 steps extrapolated
+          : bm('T2', 'latency_median_ms', 313);
+        predVram = bm('T2', 'peak_vram_mb', 3097);
         activeLadderIdx = 0;
       }
     } else if (modelChoice === 'sd15_optimized') {
@@ -586,29 +795,29 @@ function initStressLab() {
       } else if (latBudget < 1200 || vramBudget < 3400) {
         chosenRes = 512;
         chosenSteps = 4;
-        predLat = 850;
-        predVram = 3408;
+        predLat = bm('O4', 'latency_median_ms', 451);
+        predVram = bm('O4', 'peak_vram_mb', 2816);
         activeLadderIdx = 1;
       } else {
         chosenRes = 512;
         chosenSteps = 8;
-        predLat = 1647;
-        predVram = 3408;
+        predLat = bm('O8', 'latency_median_ms', 737);
+        predVram = bm('O8', 'peak_vram_mb', 2816);
         activeLadderIdx = 0;
       }
     } else if (modelChoice === 'sd15_adapted') {
       chosenPrec = 'fp16';
       chosenRes = 512;
       chosenSteps = 30;
-      predLat = 11858;
-      predVram = 5906;
+      predLat = bm('B1', 'latency_median_ms', 4303);   // SD1.5 fp16, 30 steps (B1 is the closest measured config)
+      predVram = bm('B1', 'peak_vram_mb', 2676);
       activeLadderIdx = 0;
     } else { // sd15_baseline
       chosenPrec = 'fp32';
       chosenRes = 512;
       chosenSteps = 30;
-      predLat = 12430;
-      predVram = 5645;
+      predLat = bm('B0', 'latency_median_ms', 10545);
+      predVram = bm('B0', 'peak_vram_mb', 5066);
       activeLadderIdx = 0;
     }
 
@@ -679,10 +888,6 @@ function initStressLab() {
 
   if (stressBtn) {
     stressBtn.addEventListener('click', async () => {
-      if (!generationAvailable) {
-        alert('Live stress generation requires the GPU model runtime. This CPU deployment only serves the dashboard and API documentation.');
-        return;
-      }
       const prompt = (promptInput && promptInput.value ? promptInput.value : '').trim();
       if (!prompt) {
         alert('Please enter a prompt to stress test.');
@@ -757,7 +962,7 @@ function initStressLab() {
             if (execDetails) execDetails.classList.remove('hidden');
             return;
           }
-          throw new Error(err.detail || `Server error HTTP ${res.status}`);
+          throw new Error(err.error?.message || err.detail || `Server error HTTP ${res.status}`);
         }
 
         const data = await res.json();
@@ -766,14 +971,30 @@ function initStressLab() {
 
         // Render Image
         if (resultImg) {
-          resultImg.src = data.image_url;
           resultImg.onload = () => {
             resultImg.classList.remove('hidden');
             if (downloadBtn) {
               downloadBtn.disabled = false;
-              downloadBtn.onclick = () => window.open(data.image_url, '_blank');
+              downloadBtn.onclick = () => {
+                const a = document.createElement('a');
+                a.href = data.image_url;
+                a.download = `imagine-stress-${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+              };
             }
           };
+          resultImg.onerror = () => {
+            if (placeholder) placeholder.classList.remove('hidden');
+            if (statusTag) {
+              statusTag.textContent = 'Image load error';
+              statusTag.className = 'badge badge-deep';
+            }
+            if (execDecision) execDecision.textContent = 'Generation completed, but the browser could not load the returned image URL.';
+            if (execDetails) execDetails.classList.remove('hidden');
+          };
+          resultImg.src = data.image_url;
         }
 
         // Telemetry details
@@ -849,7 +1070,7 @@ function initPipelineInspector() {
     unet: {
       title: "Stage 2: Distilled Latent Denoising UNet",
       html: `
-        <p>Runs Adversarial Diffusion Distillation (ADD) directly inside the PyTorch 2.11 environment. By operating on compact 64×64×4 latent tensors in half-precision (<code>torch.float16</code>), memory bandwidth is halved and Tensor Core MAC operations are saturated on the RTX 5050 GPU.</p>
+        <p>Runs Adversarial Diffusion Distillation (ADD) directly inside the PyTorch 2.11 environment. By operating on compact 64×64×4 latent tensors in half-precision (<code>torch.float16</code>), memory bandwidth is halved and Tensor Core MAC operations are saturated on the configured GPU.</p>
         <div class="inspector-meta-grid">
           <div><strong>Input Tensor:</strong> <code>torch.Tensor(1, 4, 64, 64)</code></div>
           <div><strong>Output Tensor:</strong> <code>torch.Tensor(1, 4, 64, 64)</code></div>
@@ -912,109 +1133,67 @@ function initPipelineInspector() {
 // ==================== TAB 7: FAILURE ANALYSIS ====================
 function initFailureAnalysis() {
   const container = document.getElementById('failure-container');
-  const filterBtns = document.querySelectorAll('.filter-pills .pill-btn');
+  const filters = document.getElementById('failure-filters');
   if (!container) return;
+  const esc = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  fetch('/api/v1/research/overview').then((r) => r.json()).then((o) => {
+    const items = o.failures || [];
+    const groups = { all: 'All', open: 'Open', measured: 'Measured', info: 'Stated' };
+    const draw = (f) => {
+      container.innerHTML = items.filter((x) => f === 'all' || x.severity === f).map((x) => `
+        <details class="failure-item" open>
+          <summary><strong>${esc(x.title)}</strong> <span class="badge ${x.severity === 'open' ? 'badge-classical' : 'badge-hybrid'}">${esc(x.status)}</span></summary>
+          <div class="failure-body">
+            <p><strong>Why:</strong> ${esc(x.cause)}</p>
+            <p><strong>What we measured:</strong> ${esc(x.evidence)}</p>
+            <p><strong>What we did:</strong> ${esc(x.mitigation)}</p>
+          </div>
+        </details>`).join('') || '<p class="panel-description">Nothing in this group.</p>';
+    };
+    filters.innerHTML = Object.entries(groups).map(([k, label]) => `<button class="pill-btn ${k === 'all' ? 'active' : ''}" data-filter="${k}">${label} (${k === 'all' ? items.length : items.filter((x) => x.severity === k).length})</button>`).join('');
+    filters.querySelectorAll('.pill-btn').forEach((b) => b.addEventListener('click', () => {
+      filters.querySelectorAll('.pill-btn').forEach((x) => x.classList.remove('active'));
+      b.classList.add('active');
+      draw(b.dataset.filter);
+    }));
+    draw('all');
+  }).catch(() => { container.innerHTML = '<p class="panel-description">Could not load the measured failure analysis.</p>'; });
+}
 
-  const failureCases = [
-    {
-      id: 1,
-      cat: "resolved",
-      title: "1. Wrong Object Count in Single Step",
-      observed: "In prompt unseen-08 ('four candles on a table'), seed 5678 rendered 3 candles. Single-step denoisers prioritize global contrast over discrete object separation.",
-      mitigation: "Increasing steps from 1 to 2 (Balanced preset) separates attention heads, resolving count discrepancies.",
-      status: "Resolved via Preset"
-    },
-    {
-      id: 2,
-      cat: "inherent",
-      title: "2. Spatial Preposition Ambiguity ('beside', 'holding')",
-      observed: "In prompt unseen-01 ('wizard holding a glowing lantern'), seed 1234 rendered the lantern floating adjacent rather than firmly gripped.",
-      mitigation: "The prompt parser extracts spatial prepositions and flags composite layout recommendations to the user.",
-      status: "Inherent Cross-Attention Boundary"
-    },
-    {
-      id: 3,
-      cat: "mitigated",
-      title: "3. Subtle Texture Attribute Attenuation",
-      observed: "In prompt unseen-07 ('pencil sketch of lighthouse'), single-step denoiser rendered sepia watercolor texture rather than sharp graphite strokes.",
-      mitigation: "The prompt analyzer boosts keyword weighting and applies Laplacian high-pass sharpening in Classical CV stage.",
-      status: "Mitigated in Post-Processing"
-    },
-    {
-      id: 4,
-      cat: "resolved",
-      title: "4. Anatomy Interface Blending (Rider & Saddle)",
-      observed: "In prompt unseen-06 ('astronaut riding a horse on Mars'), rider leg and saddle merged in 1-step mode.",
-      mitigation: "Setting the default recommended quality mode to Balanced (2 steps) cleanly separates rider anatomy.",
-      status: "Resolved"
-    },
-    {
-      id: 5,
-      cat: "resolved",
-      title: "5. Sharpening Halo Artifacts",
-      observed: "Aggressive unsharp masking produced bright halo rings along high-contrast silhouettes.",
-      mitigation: "Implemented bilateral filtering with edge-preserving clamping (halo_guard=True) in computer_vision/edge_aware.py.",
-      status: "Resolved in Code"
-    },
-    {
-      id: 6,
-      cat: "resolved",
-      title: "6. Unwanted Color Shifts in Dark / Night Scenes",
-      observed: "Global histogram equalization stripped intentional dark blue nighttime ambiance.",
-      mitigation: "Added prompt intent suppression in computer_vision/artifacts.py: keywords like 'night', 'dark', 'underwater' suppress contrast boosting.",
-      status: "Resolved in Code"
-    },
-    {
-      id: 7,
-      cat: "inherent",
-      title: "7. CLIP Score Inconsistency vs Human Count Judgement",
-      observed: "In prompt unseen-02, an image with 3 penguins scored higher CLIP similarity (0.342) than an image with exactly 2 penguins (0.329).",
-      mitigation: "Explicitly documented: CLIP measures semantic alignment, not discrete counting. Documented in project report.",
-      status: "Documented Inherent Metric Limit"
-    },
-    {
-      id: 8,
-      cat: "mitigated",
-      title: "8. Out-Of-Memory (OOM) at High Resolutions (768px)",
-      observed: "Generating 768×768 at fp32 consumed 7.11 GB VRAM, risking crash on 8 GB laptop GPUs.",
-      mitigation: "P6 Adaptive Controller enforces an allocation ceiling (<4 GB VRAM) by forcing fp16 and 512px resolution.",
-      status: "Mitigated via Controller"
-    },
-    {
-      id: 9,
-      cat: "mitigated",
-      title: "9. Mobile On-Device Runtime Incompatibility",
-      observed: "Running full diffusion pipeline on Android phone crashes due to >3.5 GB memory footprint.",
-      mitigation: "Implemented hybrid client-server architecture: mobile phone runs Jetpack Compose; GPU laptop runs FastAPI inference.",
-      status: "Mitigated by Architecture"
+// Measured extras for the Comparison and About tabs (single source of truth: /api/v1/research/overview)
+function loadResearchExtras() {
+  const box = document.getElementById('research-extras');
+  const viva = document.getElementById('viva-dynamic');
+  if (!box && !viva) return;
+  const esc = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const pct = (x) => (x == null ? '-' : Math.round(100 * x) + '%');
+  fetch('/api/v1/research/overview').then((r) => r.json()).then((o) => {
+    if (viva) {
+      viva.innerHTML = (o.headlines || []).map((h, i) => `<div class="viva-point"><strong>${i + 1}. ${esc(h.label)}: ${esc(h.value)}</strong><span>${esc(h.sub)}</span></div>`).join('')
+        + `<div class="viva-point"><strong>${(o.headlines || []).length + 1}. Hybrid architecture, honestly:</strong><span>Generation runs on a GPU server and phone clients call the API. We did not run on a phone; mobile feasibility is analytical only.</span></div>`;
     }
-  ];
-
-  function renderFailures(filter) {
-    const filtered = filter === 'all' ? failureCases : failureCases.filter(c => c.cat === filter);
-    container.innerHTML = filtered.map(c => `
-      <details class="failure-item">
-        <summary>
-          <span>${c.title}</span>
-          <span class="badge ${c.cat === 'resolved' ? 'badge-hybrid' : (c.cat === 'mitigated' ? 'badge-classical' : 'badge-deep')}">${c.status}</span>
-        </summary>
-        <div class="failure-details">
-          <div><strong>Observed Failure:</strong> ${c.observed}</div>
-          <div><strong>Applied Mitigation:</strong> ${c.mitigation}</div>
-        </div>
-      </details>
-    `).join('');
-  }
-
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderFailures(btn.dataset.filter);
-    });
-  });
-
-  renderFailures('all');
+    if (!box) return;
+    let h = '';
+    h += `<h3 class="sub-title" style="margin-top:18px">What we found</h3><ul class="about-list">${(o.insights || []).map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`;
+    if (o.prompt_accuracy) {
+      const cats = ['single', 'two_objects', 'counting', 'colour', 'position'];
+      h += `<h3 class="sub-title" style="margin-top:22px">Prompt accuracy (does the picture contain what was asked?)</h3><div class="table-container"><table class="data-table"><thead><tr><th>Model</th><th>One object</th><th>Two objects</th><th>Counting</th><th>Colours</th><th>Positions</th><th>Overall</th></tr></thead><tbody>`
+        + o.prompt_accuracy.slice().sort((a, b) => b.overall - a.overall).map((r) => `<tr><td><strong>${esc(r.id)}</strong> ${esc(r.label)}</td>${cats.map((c) => `<td>${pct(r.per_category[c])}</td>`).join('')}<td><strong>${pct(r.overall)}</strong></td></tr>`).join('')
+        + `</tbody></table></div>`;
+    }
+    if (o.best_of_n) {
+      h += `<h3 class="sub-title" style="margin-top:22px">Best of N (SD-Turbo, ${esc(o.best_of_n.prompts)} prompts)</h3><p class="panel-description">${esc(o.best_of_n.note)}</p><div class="table-container"><table class="data-table"><thead><tr><th>N</th><th>Overall</th><th>Positions</th><th>Counting</th><th>Best possible</th><th>Time (laptop, est.)</th></tr></thead><tbody>`
+        + o.best_of_n.rows.map((r) => `<tr><td>${r.n}</td><td><strong>${pct(r.overall)}</strong></td><td>${pct(r.per_category.position)}</td><td>${pct(r.per_category.counting)}</td><td>${pct(r.ceiling)}</td><td>${r.cost_ms_laptop_est ? (r.cost_ms_laptop_est / 1000).toFixed(1) + ' s' : '-'}</td></tr>`).join('')
+        + `</tbody></table></div>`;
+    }
+    if (o.tiny_vae) {
+      h += `<h3 class="sub-title" style="margin-top:22px">Tiny decoder on SD-Turbo (cloud GPU, compare rows with each other)</h3><div class="table-container"><table class="data-table"><thead><tr><th>Variant</th><th>Steps</th><th>Tiny decoder</th><th>FID</th><th>CLIP</th><th>Latency</th><th>Size</th></tr></thead><tbody>`
+        + o.tiny_vae.map((r) => `<tr><td><strong>${esc(r.id)}</strong></td><td>${r.steps}</td><td>${r.tiny_vae ? 'yes' : 'no'}</td><td>${r.fid.toFixed(1)}</td><td>${r.clip.toFixed(3)}</td><td>${r.latency_ms.toFixed(0)} ms</td><td>${(r.size_mb / 1024).toFixed(2)} GB</td></tr>`).join('')
+        + `</tbody></table></div>`;
+    }
+    h += `<p class="panel-description" style="margin-top:18px">${esc((o.protocol || {}).caveat)} See the full results on the <a href="/research" style="color:var(--accent-indigo)">Research results</a> page.</p>`;
+    box.innerHTML = h;
+  }).catch(() => { if (box) box.innerHTML = '<p class="panel-description">Could not load the measured results.</p>'; });
 }
 
 // ==================== TAB 8: CATALOGUE / GALLERY ====================

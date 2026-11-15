@@ -19,16 +19,20 @@ import VoiceTranslation from './pages/VoiceTranslation';
 import Gallery from './pages/Gallery';
 import ProfileSettings from './pages/ProfileSettings';
 import ModelPerformance from './pages/ModelPerformance';
+import LabEmbed from './pages/LabEmbed';
 import TrainingDatasets from './pages/TrainingDatasets';
 import AdminDashboard from './pages/AdminDashboard';
+import { applyPrefs, loadPrefs } from './lib/prefs';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { token } = useAuth();
+  const { token, loading } = useAuth();
+  if (loading) return null;
   if (!token) return <Navigate to="/auth" replace />;
   return <>{children}</>;
 };
 
 const App: React.FC = () => {
+  React.useEffect(() => { applyPrefs(loadPrefs()); }, []);
   return (
     <Routes>
       {/* Public routes */}
@@ -49,6 +53,7 @@ const App: React.FC = () => {
       <Route path="/gallery" element={<ProtectedRoute><Gallery /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
       <Route path="/research" element={<ProtectedRoute><ModelPerformance /></ProtectedRoute>} />
+      <Route path="/lab" element={<ProtectedRoute><LabEmbed /></ProtectedRoute>} />
       <Route path="/training" element={<ProtectedRoute><TrainingDatasets /></ProtectedRoute>} />
       <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
 

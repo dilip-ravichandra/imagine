@@ -19,4 +19,4 @@ Date: 2026-11-07. **P9 final gate: NOT MET.** This folder holds everything that 
 3. **Android is a 14-line skeleton** (`MainActivity.kt`): no network layer, no INTERNET permission, no prompt UI, no image display. P1B/P8 were never delivered. See `ai_handoff/07_CLAUDE_ANDROID_TASK.md`.
 4. **No hosted URL**; no physical-device test; deployment mode cannot be labelled with evidence yet (today: hybrid/laptop-server at best).
 5. **Team USNs, repo URL, phone model, MODEL_REVISION pin, SD-Turbo licence check** unknown.
-6. Test suite not re-run since the merge (see `INTEGRATION_REPORT.md`).
+6. Test suite not re-run since the merge (see `docs/handoff_history/root_snapshot/INTEGRATION_REPORT.md`).

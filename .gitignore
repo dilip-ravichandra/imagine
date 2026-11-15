@@ -43,6 +43,8 @@ scratch_*.py
 # Temporary and backup scripts
 modal_deploy_backup.py
 modal_deploy_fixed.py
+.modal-api-key
+hf_space/_build/
 
 # P3A adaptation (images are third-party data; adapters are large and licence-bound)
 training_data/
@@ -56,3 +58,4 @@ evaluation/results/**/*.png
 !evaluation/results/p5a/*.png
 !evaluation/results/p5b/*.png
 evaluation/results/**/*.jpg
+colab_upload/

@@ -1,18 +1,31 @@
-import React, { useState } from 'react';
-import {
-  Box, Flex, Text, Heading, Button, Textarea, Select, Icon,
-} from '@chakra-ui/react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Box, Flex, Text, Heading, Button, Textarea, Select, Alert, AlertIcon } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
 import WorkspaceLayout from '../components/WorkspaceLayout';
+import { loadPrefs } from '../lib/prefs';
+import { getLanguages, transcribeAudio, translateText } from '../lib/api';
 
 const pulse = keyframes`
-  0% { box-shadow: 0 0 0 0 rgba(183,255,53,0.5); }
-  70% { box-shadow: 0 0 0 20px rgba(183,255,53,0); }
-  100% { box-shadow: 0 0 0 0 rgba(183,255,53,0); }
+  0% { box-shadow: 0 0 0 0 rgba(91,91,240,0.5); }
+  70% { box-shadow: 0 0 0 20px rgba(91,91,240,0); }
+  100% { box-shadow: 0 0 0 0 rgba(91,91,240,0); }
 `;
 
-const MicIcon: React.FC<{ size?: number }> = ({ size = 48 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#B7FF35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+const FALLBACK = [
+  { code: 'en', name: 'English' }, { code: 'hi', name: 'Hindi' }, { code: 'es', name: 'Spanish' }, { code: 'fr', name: 'French' },
+  { code: 'de', name: 'German' }, { code: 'ja', name: 'Japanese' },
+];
+// Browser speech voices use BCP-47 tags
+const VOICE_TAG: Record<string, string> = {
+  en: 'en-US', hi: 'hi-IN', es: 'es-ES', fr: 'fr-FR', de: 'de-DE', ja: 'ja-JP', ko: 'ko-KR', zh: 'zh-CN', ar: 'ar-SA', pt: 'pt-BR', ru: 'ru-RU',
+  it: 'it-IT', tr: 'tr-TR', bn: 'bn-IN', ta: 'ta-IN', te: 'te-IN', kn: 'kn-IN', ml: 'ml-IN', mr: 'mr-IN', gu: 'gu-IN', ur: 'ur-PK', nl: 'nl-NL',
+  pl: 'pl-PL', id: 'id-ID',
+};
+
+type TabKey = 'voice' | 'translate' | 'speech';
+
+const MicIcon: React.FC<{ size?: number; color?: string }> = ({ size = 40, color = '#5B5BF0' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
     <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
     <line x1="12" y1="19" x2="12" y2="23" />
@@ -20,543 +33,203 @@ const MicIcon: React.FC<{ size?: number }> = ({ size = 48 }) => (
   </svg>
 );
 
-const PlayIcon: React.FC = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="#080B0A" stroke="none">
-    <polygon points="5,3 19,12 5,21" />
-  </svg>
-);
+function speak(text: string, code: string): string | null {
+  if (!('speechSynthesis' in window)) return 'This browser cannot read text aloud.';
+  const tag = VOICE_TAG[code] || code;
+  const voices = window.speechSynthesis.getVoices();
+  const voice = voices.find((v) => v.lang.toLowerCase() === tag.toLowerCase()) || voices.find((v) => v.lang.toLowerCase().startsWith(code));
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = tag;
+  if (voice) u.voice = voice;
+  window.speechSynthesis.speak(u);
+  return voice || voices.length === 0 ? null : `No ${tag} voice is installed on this device, so it may sound off.`;
+}
 
-const SwapIcon: React.FC = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B7FF35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="16 3 21 3 21 8" /><line x1="4" y1="20" x2="21" y2="3" />
-    <polyline points="21 16 21 21 16 21" /><line x1="15" y1="15" x2="21" y2="21" />
-  </svg>
-);
-
-type TabKey = 'voice' | 'translate' | 'speech';
-
-const LANGUAGES = ['English', 'Spanish', 'French', 'German', 'Hindi', 'Japanese'];
+const blobToBase64 = (b: Blob) =>
+  new Promise<string>((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(',')[1] || '');
+    r.onerror = () => reject(new Error('Could not read the recording.'));
+    r.readAsDataURL(b);
+  });
 
 const VoiceTranslation: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TabKey>('voice');
-  const [isListening, setIsListening] = useState(false);
+  const [tab, setTab] = useState<TabKey>('voice');
+  const [langs, setLangs] = useState(FALLBACK);
+  const [sourceLang, setSourceLang] = useState(() => loadPrefs().voiceSource);
+  const [targetLang, setTargetLang] = useState(() => loadPrefs().voiceTarget);
   const [sourceText, setSourceText] = useState('');
-  const [translatedText, setTranslatedText] = useState('');
-  const [sourceLang, setSourceLang] = useState('English');
-  const [targetLang, setTargetLang] = useState('Spanish');
-  const [speechText, setSpeechText] = useState('');
-  const [speechLang, setSpeechLang] = useState('English');
+  const [translated, setTranslated] = useState('');
+  const [readText, setReadText] = useState('');
+  const [readLang, setReadLang] = useState('en');
+  const [recording, setRecording] = useState(false);
+  const [busy, setBusy] = useState<'' | 'transcribe' | 'translate'>('');
+  const [error, setError] = useState('');
+  const [note, setNote] = useState('');
+  const recRef = useRef<MediaRecorder | null>(null);
+  const chunks = useRef<Blob[]>([]);
+  const stopTimer = useRef<number | undefined>(undefined);
+
+  useEffect(() => { getLanguages().then((r) => setLangs(r.languages)).catch(() => undefined); }, []);
+  useEffect(() => () => { window.speechSynthesis?.cancel(); recRef.current?.stream.getTracks().forEach((t) => t.stop()); }, []);
+
+  const nameOf = (c: string) => langs.find((l) => l.code === c)?.name || c;
+
+  const doTranslate = useCallback(async (text: string) => {
+    if (!text.trim()) return '';
+    setBusy('translate');
+    try {
+      const r = await translateText(text.trim(), targetLang);
+      setTranslated(r.translation);
+      return r.translation;
+    } finally { setBusy(''); }
+  }, [targetLang]);
+
+  const handleTranslate = async () => {
+    setError(''); setNote('');
+    try { await doTranslate(sourceText); } catch (e) { setError(e instanceof Error ? e.message : 'Translation failed.'); }
+  };
+
+  const stopRecording = () => {
+    window.clearTimeout(stopTimer.current);
+    if (recRef.current && recRef.current.state !== 'inactive') recRef.current.stop();
+  };
+
+  const toggleRecording = async () => {
+    setError(''); setNote('');
+    if (recording) { stopRecording(); return; }
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      setError('This browser cannot record audio. Try Chrome, Edge or Safari, and open the site over https.');
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mime = ['audio/webm', 'audio/mp4', 'audio/ogg'].find((m) => MediaRecorder.isTypeSupported(m)) || '';
+      const rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+      chunks.current = [];
+      rec.ondataavailable = (ev) => { if (ev.data.size) chunks.current.push(ev.data); };
+      rec.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        setRecording(false);
+        const type = (rec.mimeType || mime || 'audio/webm').split(';')[0];
+        const blob = new Blob(chunks.current, { type });
+        if (blob.size < 1500) { setError('That was too short. Tap the microphone, speak, then tap again.'); return; }
+        try {
+          setBusy('transcribe');
+          const heard = await transcribeAudio(await blobToBase64(blob), type, sourceLang);
+          setSourceText(heard.text);
+          setBusy('');
+          if (!heard.text) { setError('I could not hear any speech. Try again closer to the microphone.'); return; }
+          const out = await doTranslate(heard.text);
+          if (out) { const warn = speak(out, targetLang); if (warn) setNote(warn); }
+        } catch (e) {
+          setError(e instanceof Error ? e.message : 'Something went wrong with the recording.');
+        } finally { setBusy(''); }
+      };
+      recRef.current = rec;
+      rec.start();
+      setRecording(true);
+      stopTimer.current = window.setTimeout(stopRecording, 45000); // keep clips short
+    } catch (e) {
+      const denied = e instanceof DOMException && (e.name === 'NotAllowedError' || e.name === 'SecurityError');
+      setError(denied ? 'Microphone access is blocked. Allow it in your browser’s site settings and try again.' : 'No microphone was found.');
+    }
+  };
+
+  const swap = () => { setSourceLang(targetLang); setTargetLang(sourceLang); setSourceText(translated); setTranslated(sourceText); };
+  const copy = (t: string) => { void navigator.clipboard?.writeText(t); setNote('Copied.'); };
 
   const tabs: { key: TabKey; label: string }[] = [
-    { key: 'voice', label: 'Voice Assistant' },
-    { key: 'translate', label: 'Translate' },
-    { key: 'speech', label: 'Speech' },
+    { key: 'voice', label: 'Tap to speak' }, { key: 'translate', label: 'Translate text' }, { key: 'speech', label: 'Read aloud' },
   ];
-
-  const handleTranslate = () => {
-    const mockTranslations: Record<string, string> = {
-      'Hello': 'Hola',
-      'Good morning': 'Buenos días',
-      'How are you?': '¿Cómo estás?',
-      'Thank you': 'Gracias',
-    };
-    setTranslatedText(
-      mockTranslations[sourceText] ||
-        `[${targetLang}] ${sourceText.split('').reverse().join('')}`
-    );
-  };
+  const langSelect = (value: string, onChange: (v: string) => void, label: string) => (
+    <Select aria-label={label} value={value} onChange={(e) => onChange(e.target.value)} bg="#FFFFFF" borderColor="#E3DACF" color="#1E2233">
+      {langs.map((l) => <option key={l.code} value={l.code}>{l.name}</option>)}
+    </Select>
+  );
+  const card = { bg: '#FFFFFF', border: '1px solid #E3DACF', borderRadius: '16px', p: 5 } as const;
+  const primary = { bg: '#5B5BF0', color: '#FFFFFF', _hover: { bg: '#4747DB' } } as const;
 
   return (
     <WorkspaceLayout>
-      <Box p={8} minH="100vh" bg="#080B0A">
-        {/* Header */}
-        <Flex align="center" justify="space-between" mb={8}>
-          <Box>
-            <Heading size="lg" color="#F4F7F0" fontWeight={700}>
-              Voice & Translation
-            </Heading>
-            <Text color="#A5B1A7" mt={1} fontSize="sm">
-              Speak, translate, and convert text to speech
-            </Text>
-          </Box>
-        </Flex>
+      <Box px={{ base: 4, md: 8 }} py={8} minH="100vh" bg="#FBF8F4" maxW="1000px" mx="auto">
+        <Heading size="lg" color="#1E2233" fontWeight={700}>Voice & Translation</Heading>
+        <Text color="#5B6277" mt={1} mb={6} fontSize="sm">Speak, translate and listen, in {langs.length} languages.</Text>
 
-        {/* Tab Buttons */}
-        <Flex gap={2} mb={8}>
-          {tabs.map((tab) => (
-            <Button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              bg={activeTab === tab.key ? '#B7FF35' : '#111713'}
-              color={activeTab === tab.key ? '#080B0A' : '#A5B1A7'}
-              border="1px solid"
-              borderColor={activeTab === tab.key ? '#B7FF35' : '#2A3A2C'}
-              borderRadius="10px"
-              px={6}
-              py={2}
-              fontWeight={600}
-              fontSize="sm"
-              _hover={{
-                bg: activeTab === tab.key ? '#8DDB39' : '#1A2A1C',
-                color: activeTab === tab.key ? '#080B0A' : '#F4F7F0',
-              }}
-              transition="all 0.2s ease"
-            >
-              {tab.label}
+        <Flex gap={2} mb={6} wrap="wrap" role="tablist">
+          {tabs.map((t) => (
+            <Button key={t.key} role="tab" aria-selected={tab === t.key} size="sm" onClick={() => { setTab(t.key); setError(''); setNote(''); }}
+              bg={tab === t.key ? '#5B5BF0' : '#FFFFFF'} color={tab === t.key ? '#FFFFFF' : '#5B6277'} border="1px solid #E3DACF" _hover={{ bg: tab === t.key ? '#4747DB' : '#F5F0EA' }}>
+              {t.label}
             </Button>
           ))}
         </Flex>
 
-        {/* Voice Assistant Tab */}
-        {activeTab === 'voice' && (
-          <Flex direction="column" align="center" justify="center" minH="60vh">
-            <Box
-              bg="#111713"
-              borderRadius="24px"
-              border="1px solid #2A3A2C"
-              p={12}
-              textAlign="center"
-              maxW="480px"
-              w="100%"
-            >
-              {/* Status */}
-              <Flex align="center" justify="center" gap={2} mb={8}>
-                <Box
-                  w="8px"
-                  h="8px"
-                  borderRadius="full"
-                  bg={isListening ? '#B7FF35' : '#A5B1A7'}
-                  boxShadow={isListening ? '0 0 12px #B7FF35' : 'none'}
-                />
-                <Text
-                  color={isListening ? '#B7FF35' : '#A5B1A7'}
-                  fontSize="sm"
-                  fontWeight={500}
-                  letterSpacing="0.05em"
-                  textTransform="uppercase"
-                >
-                  {isListening ? 'Listening...' : 'Ready'}
-                </Text>
-              </Flex>
+        {error && <Alert status="error" borderRadius="12px" mb={4} role="alert"><AlertIcon />{error}</Alert>}
+        {note && !error && <Alert status="info" borderRadius="12px" mb={4}><AlertIcon />{note}</Alert>}
 
-              {/* Microphone Button */}
-              <Flex justify="center" mb={6}>
-                <Box
-                  as="button"
-                  onClick={() => setIsListening(!isListening)}
-                  w="140px"
-                  h="140px"
-                  borderRadius="full"
-                  border="3px solid"
-                  borderColor={isListening ? '#B7FF35' : '#2A3A2C'}
-                  bg={isListening ? 'rgba(183,255,53,0.08)' : '#182019'}
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  cursor="pointer"
-                  transition="all 0.3s ease"
-                  animation={isListening ? `${pulse} 1.5s infinite` : 'none'}
-                  _hover={{
-                    borderColor: '#B7FF35',
-                    bg: 'rgba(183,255,53,0.12)',
-                    animation: `${pulse} 1.5s infinite`,
-                    transform: 'scale(1.05)',
-                  }}
-                >
-                  <MicIcon size={48} />
-                </Box>
-              </Flex>
-
-              <Text color="#F4F7F0" fontSize="lg" fontWeight={600} mb={1}>
-                Tap to speak
+        {tab === 'voice' && (
+          <Box {...card}>
+            <Flex gap={3} align="center" wrap="wrap" mb={6}>
+              <Box flex="1" minW="150px"><Text fontSize="xs" color="#8A90A2" mb={1}>I will speak</Text>{langSelect(sourceLang, setSourceLang, 'Language you speak')}</Box>
+              <Box flex="1" minW="150px"><Text fontSize="xs" color="#8A90A2" mb={1}>Translate to</Text>{langSelect(targetLang, setTargetLang, 'Language to translate into')}</Box>
+            </Flex>
+            <Flex direction="column" align="center" gap={3} mb={6}>
+              <Box as="button" type="button" onClick={toggleRecording} aria-label={recording ? 'Stop recording' : 'Tap to speak'} aria-pressed={recording}
+                disabled={busy !== ''} w="96px" h="96px" borderRadius="full" display="flex" alignItems="center" justifyContent="center"
+                bg={recording ? '#5B5BF0' : '#EEF0FF'} border="2px solid #5B5BF0" cursor="pointer" opacity={busy ? 0.6 : 1}
+                animation={recording ? `${pulse} 1.4s infinite` : undefined}>
+                <MicIcon size={40} color={recording ? '#FFFFFF' : '#5B5BF0'} />
+              </Box>
+              <Text fontSize="sm" color="#5B6277" aria-live="polite">
+                {recording ? 'Listening… tap again when you finish' : busy === 'transcribe' ? 'Understanding what you said…' : busy === 'translate' ? 'Translating…' : 'Tap the microphone and speak'}
               </Text>
-              <Text color="#A5B1A7" fontSize="sm">
-                Press the microphone button and start talking
-              </Text>
-
-              {/* Audio visualization bars */}
-              {isListening && (
-                <Flex justify="center" gap="3px" mt={6} h="40px" align="flex-end">
-                  {[20, 35, 28, 40, 18, 32, 25, 38, 22, 30, 15, 35].map(
-                    (h, i) => (
-                      <Box
-                        key={i}
-                        w="4px"
-                        borderRadius="2px"
-                        bg="#B7FF35"
-                        h={`${h}px`}
-                        opacity={0.6 + Math.random() * 0.4}
-                        animation={`${keyframes`
-                          0%, 100% { height: ${h * 0.4}px; }
-                          50% { height: ${h}px; }
-                        `} ${0.4 + i * 0.08}s ease-in-out infinite`}
-                      />
-                    )
-                  )}
-                </Flex>
-              )}
-            </Box>
-
-            {/* Recent Transcriptions */}
-            <Box mt={8} maxW="480px" w="100%">
-              <Text color="#A5B1A7" fontSize="xs" mb={3} textTransform="uppercase" letterSpacing="0.1em">
-                Recent Transcriptions
-              </Text>
-              {['Create an image of a sunset over mountains', 'Generate a portrait in watercolor style', 'Make a logo with modern geometric shapes'].map(
-                (t, i) => (
-                  <Box
-                    key={i}
-                    bg="#111713"
-                    border="1px solid #2A3A2C"
-                    borderRadius="10px"
-                    p={3}
-                    mb={2}
-                    _hover={{ bg: '#1A2A1C', borderColor: '#B7FF35' }}
-                    transition="all 0.2s"
-                    cursor="pointer"
-                  >
-                    <Text color="#F4F7F0" fontSize="sm">"{t}"</Text>
-                    <Text color="#A5B1A7" fontSize="xs" mt={1}>{i === 0 ? '2 min ago' : i === 1 ? '15 min ago' : '1 hour ago'}</Text>
-                  </Box>
-                )
-              )}
-            </Box>
-          </Flex>
-        )}
-
-        {/* Translate Tab */}
-        {activeTab === 'translate' && (
-          <Box maxW="900px" mx="auto">
-            <Box
-              bg="#111713"
-              borderRadius="16px"
-              border="1px solid #2A3A2C"
-              overflow="hidden"
-            >
-              {/* Language Selectors */}
-              <Flex
-                bg="#0D120E"
-                p={4}
-                align="center"
-                justify="space-between"
-                borderBottom="1px solid #2A3A2C"
-              >
-                <Select
-                  value={sourceLang}
-                  onChange={(e) => setSourceLang(e.target.value)}
-                  bg="#0F1A11"
-                  color="#F4F7F0"
-                  border="1px solid #2A3A2C"
-                  borderRadius="8px"
-                  w="200px"
-                  _hover={{ borderColor: '#B7FF35' }}
-                  _focus={{ borderColor: '#B7FF35', boxShadow: '0 0 0 1px #B7FF35' }}
-                  sx={{ option: { bg: '#111713', color: '#F4F7F0' } }}
-                >
-                  {LANGUAGES.map((l) => (
-                    <option key={l} value={l}>{l}</option>
-                  ))}
-                </Select>
-
-                <Box
-                  as="button"
-                  onClick={() => {
-                    const tmp = sourceLang;
-                    setSourceLang(targetLang);
-                    setTargetLang(tmp);
-                  }}
-                  p={2}
-                  borderRadius="8px"
-                  _hover={{ bg: '#1A2A1C' }}
-                  transition="all 0.2s"
-                  cursor="pointer"
-                >
-                  <SwapIcon />
-                </Box>
-
-                <Select
-                  value={targetLang}
-                  onChange={(e) => setTargetLang(e.target.value)}
-                  bg="#0F1A11"
-                  color="#F4F7F0"
-                  border="1px solid #2A3A2C"
-                  borderRadius="8px"
-                  w="200px"
-                  _hover={{ borderColor: '#B7FF35' }}
-                  _focus={{ borderColor: '#B7FF35', boxShadow: '0 0 0 1px #B7FF35' }}
-                  sx={{ option: { bg: '#111713', color: '#F4F7F0' } }}
-                >
-                  {LANGUAGES.map((l) => (
-                    <option key={l} value={l}>{l}</option>
-                  ))}
-                </Select>
-              </Flex>
-
-              {/* Text Areas */}
-              <Flex>
-                <Box flex={1} p={5} borderRight="1px solid #2A3A2C">
-                  <Text color="#A5B1A7" fontSize="xs" mb={2} textTransform="uppercase" letterSpacing="0.08em">
-                    Source ({sourceLang})
-                  </Text>
-                  <Textarea
-                    value={sourceText}
-                    onChange={(e) => setSourceText(e.target.value)}
-                    placeholder="Enter text to translate..."
-                    bg="transparent"
-                    color="#F4F7F0"
-                    border="none"
-                    _focus={{ boxShadow: 'none' }}
-                    _placeholder={{ color: '#A5B1A7' }}
-                    minH="200px"
-                    resize="none"
-                    fontSize="md"
-                  />
-                  <Flex justify="space-between" align="center" mt={3}>
-                    <Text color="#A5B1A7" fontSize="xs">
-                      {sourceText.length} characters
-                    </Text>
-                  </Flex>
-                </Box>
-
-                <Box flex={1} p={5} bg="rgba(183,255,53,0.02)">
-                  <Text color="#A5B1A7" fontSize="xs" mb={2} textTransform="uppercase" letterSpacing="0.08em">
-                    Translation ({targetLang})
-                  </Text>
-                  <Box minH="200px">
-                    <Text color="#F4F7F0" fontSize="md" whiteSpace="pre-wrap">
-                      {translatedText || (
-                        <Text as="span" color="#A5B1A7" fontStyle="italic">
-                          Translation will appear here...
-                        </Text>
-                      )}
-                    </Text>
-                  </Box>
-                </Box>
-              </Flex>
-
-              {/* Translate Button */}
-              <Flex p={4} borderTop="1px solid #2A3A2C" justify="flex-end" gap={3}>
-                <Button
-                  onClick={() => { setSourceText(''); setTranslatedText(''); }}
-                  bg="transparent"
-                  color="#A5B1A7"
-                  border="1px solid #2A3A2C"
-                  borderRadius="10px"
-                  _hover={{ bg: '#1A2A1C', color: '#F4F7F0' }}
-                  size="md"
-                >
-                  Clear
-                </Button>
-                <Button
-                  onClick={handleTranslate}
-                  bg="#B7FF35"
-                  color="#080B0A"
-                  borderRadius="10px"
-                  px={8}
-                  fontWeight={700}
-                  _hover={{ bg: '#8DDB39' }}
-                  _active={{ bg: '#7BC82E' }}
-                  size="md"
-                  isDisabled={!sourceText.trim()}
-                >
-                  Translate
-                </Button>
-              </Flex>
-            </Box>
-
-            {/* Translation History */}
-            <Box mt={8}>
-              <Text color="#A5B1A7" fontSize="xs" mb={3} textTransform="uppercase" letterSpacing="0.1em">
-                Translation History
-              </Text>
-              {[
-                { from: 'Hello, how are you?', to: 'Hola, ¿cómo estás?', src: 'English', tgt: 'Spanish' },
-                { from: 'Good morning', to: 'Bonjour', src: 'English', tgt: 'French' },
-                { from: 'Thank you very much', to: 'Vielen Dank', src: 'English', tgt: 'German' },
-              ].map((item, i) => (
-                <Box
-                  key={i}
-                  bg="#111713"
-                  border="1px solid #2A3A2C"
-                  borderRadius="10px"
-                  p={4}
-                  mb={2}
-                  _hover={{ borderColor: '#B7FF35' }}
-                  transition="all 0.2s"
-                >
-                  <Flex justify="space-between" align="center">
-                    <Box>
-                      <Text color="#F4F7F0" fontSize="sm">"{item.from}"</Text>
-                      <Text color="#B7FF35" fontSize="sm" mt={1}>→ "{item.to}"</Text>
-                    </Box>
-                    <Text color="#A5B1A7" fontSize="xs">{item.src} → {item.tgt}</Text>
-                  </Flex>
-                </Box>
-              ))}
-            </Box>
+            </Flex>
+            <Flex gap={4} direction={{ base: 'column', md: 'row' }}>
+              <Box flex="1"><Text fontSize="xs" color="#8A90A2" mb={1}>You said ({nameOf(sourceLang)})</Text>
+                <Box minH="90px" p={3} bg="#FBF8F4" borderRadius="12px" color="#1E2233" fontSize="sm">{sourceText || '—'}</Box></Box>
+              <Box flex="1"><Text fontSize="xs" color="#8A90A2" mb={1}>Translation ({nameOf(targetLang)})</Text>
+                <Box minH="90px" p={3} bg="#EEF0FF" borderRadius="12px" color="#1E2233" fontSize="sm">{translated || '—'}</Box>
+                {translated && <Button size="sm" mt={2} {...primary} onClick={() => { const w = speak(translated, targetLang); if (w) setNote(w); }}>Listen again</Button>}</Box>
+            </Flex>
           </Box>
         )}
 
-        {/* Speech Tab */}
-        {activeTab === 'speech' && (
-          <Box maxW="640px" mx="auto">
-            <Box
-              bg="#111713"
-              borderRadius="16px"
-              border="1px solid #2A3A2C"
-              p={6}
-            >
-              <Heading size="sm" color="#F4F7F0" mb={1}>
-                Text to Speech
-              </Heading>
-              <Text color="#A5B1A7" fontSize="sm" mb={6}>
-                Convert your text into natural-sounding speech
-              </Text>
-
-              <Text color="#A5B1A7" fontSize="xs" mb={2} textTransform="uppercase" letterSpacing="0.08em">
-                Language & Voice
-              </Text>
-              <Select
-                value={speechLang}
-                onChange={(e) => setSpeechLang(e.target.value)}
-                bg="#0F1A11"
-                color="#F4F7F0"
-                border="1px solid #2A3A2C"
-                borderRadius="8px"
-                mb={5}
-                _hover={{ borderColor: '#B7FF35' }}
-                _focus={{ borderColor: '#B7FF35', boxShadow: '0 0 0 1px #B7FF35' }}
-                sx={{ option: { bg: '#111713', color: '#F4F7F0' } }}
-              >
-                {LANGUAGES.map((l) => (
-                  <option key={l} value={l}>{l}</option>
-                ))}
-              </Select>
-
-              <Text color="#A5B1A7" fontSize="xs" mb={2} textTransform="uppercase" letterSpacing="0.08em">
-                Enter Text
-              </Text>
-              <Textarea
-                value={speechText}
-                onChange={(e) => setSpeechText(e.target.value)}
-                placeholder="Type or paste text you want to hear spoken aloud..."
-                bg="#0F1A11"
-                color="#F4F7F0"
-                border="1px solid #2A3A2C"
-                borderRadius="10px"
-                _hover={{ borderColor: '#B7FF35' }}
-                _focus={{ borderColor: '#B7FF35', boxShadow: '0 0 0 1px #B7FF35' }}
-                _placeholder={{ color: '#A5B1A7' }}
-                minH="160px"
-                resize="none"
-                mb={4}
-              />
-
-              <Text color="#A5B1A7" fontSize="xs" mb={4}>
-                {speechText.length} / 5000 characters
-              </Text>
-
-              {/* Speed & Pitch Controls */}
-              <Flex gap={4} mb={6}>
-                <Box flex={1}>
-                  <Text color="#A5B1A7" fontSize="xs" mb={2} textTransform="uppercase" letterSpacing="0.08em">
-                    Speed
-                  </Text>
-                  <Flex gap={2}>
-                    {['0.5x', '0.75x', '1x', '1.25x', '1.5x'].map((s) => (
-                      <Box
-                        key={s}
-                        as="button"
-                        px={3}
-                        py={1}
-                        borderRadius="6px"
-                        bg={s === '1x' ? '#B7FF35' : '#0F1A11'}
-                        color={s === '1x' ? '#080B0A' : '#A5B1A7'}
-                        border="1px solid"
-                        borderColor={s === '1x' ? '#B7FF35' : '#2A3A2C'}
-                        fontSize="xs"
-                        fontWeight={600}
-                        cursor="pointer"
-                        _hover={{ borderColor: '#B7FF35' }}
-                        transition="all 0.2s"
-                      >
-                        {s}
-                      </Box>
-                    ))}
-                  </Flex>
-                </Box>
-              </Flex>
-
-              {/* Playback Preview */}
-              <Box
-                bg="#0D120E"
-                borderRadius="12px"
-                p={4}
-                border="1px solid #2A3A2C"
-                mb={5}
-              >
-                <Flex align="center" gap={4}>
-                  <Box
-                    as="button"
-                    w="44px"
-                    h="44px"
-                    borderRadius="full"
-                    bg="#B7FF35"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    cursor="pointer"
-                    _hover={{ bg: '#8DDB39', transform: 'scale(1.08)' }}
-                    transition="all 0.2s"
-                    flexShrink={0}
-                  >
-                    <PlayIcon />
-                  </Box>
-                  {/* Waveform */}
-                  <Flex flex={1} gap="2px" align="center" h="32px">
-                    {Array.from({ length: 50 }, (_, i) => (
-                      <Box
-                        key={i}
-                        w="3px"
-                        h={`${8 + Math.sin(i * 0.5) * 12 + Math.random() * 8}px`}
-                        borderRadius="1px"
-                        bg={i < 20 ? '#B7FF35' : '#2A3A2C'}
-                        opacity={i < 20 ? 0.9 : 0.5}
-                      />
-                    ))}
-                  </Flex>
-                  <Text color="#A5B1A7" fontSize="xs" flexShrink={0}>
-                    0:00 / 0:00
-                  </Text>
-                </Flex>
+        {tab === 'translate' && (
+          <Box {...card}>
+            <Flex gap={3} align="end" wrap="wrap" mb={4}>
+              <Box flex="1" minW="140px"><Text fontSize="xs" color="#8A90A2" mb={1}>From</Text>{langSelect(sourceLang, setSourceLang, 'Translate from')}</Box>
+              <Button onClick={swap} variant="outline" borderColor="#E3DACF" aria-label="Swap languages">⇄</Button>
+              <Box flex="1" minW="140px"><Text fontSize="xs" color="#8A90A2" mb={1}>To</Text>{langSelect(targetLang, setTargetLang, 'Translate to')}</Box>
+            </Flex>
+            <Flex gap={4} direction={{ base: 'column', md: 'row' }}>
+              <Box flex="1">
+                <Textarea aria-label="Text to translate" value={sourceText} onChange={(e) => setSourceText(e.target.value)} maxLength={2000} minH="160px" placeholder="Type or paste text…" bg="#FFFFFF" borderColor="#E3DACF" />
+                <Text fontSize="xs" color="#8A90A2" mt={1}>{sourceText.length}/2000</Text>
               </Box>
+              <Box flex="1">
+                <Box minH="160px" p={3} bg="#EEF0FF" borderRadius="12px" color="#1E2233" fontSize="sm" whiteSpace="pre-wrap" aria-live="polite">{translated || 'Your translation appears here.'}</Box>
+                {translated && (
+                  <Flex gap={2} mt={2}>
+                    <Button size="sm" variant="outline" borderColor="#E3DACF" onClick={() => { const w = speak(translated, targetLang); if (w) setNote(w); }}>Listen</Button>
+                    <Button size="sm" variant="outline" borderColor="#E3DACF" onClick={() => copy(translated)}>Copy</Button>
+                  </Flex>
+                )}
+              </Box>
+            </Flex>
+            <Button mt={4} {...primary} onClick={handleTranslate} isLoading={busy === 'translate'} loadingText="Translating" isDisabled={!sourceText.trim()}>Translate</Button>
+          </Box>
+        )}
 
-              <Flex gap={3}>
-                <Button
-                  flex={1}
-                  bg="#B7FF35"
-                  color="#080B0A"
-                  borderRadius="10px"
-                  fontWeight={700}
-                  _hover={{ bg: '#8DDB39' }}
-                  _active={{ bg: '#7BC82E' }}
-                  isDisabled={!speechText.trim()}
-                  leftIcon={<PlayIcon />}
-                >
-                  Generate Speech
-                </Button>
-                <Button
-                  bg="transparent"
-                  color="#A5B1A7"
-                  border="1px solid #2A3A2C"
-                  borderRadius="10px"
-                  _hover={{ bg: '#1A2A1C', color: '#F4F7F0' }}
-                  px={6}
-                >
-                  Download
-                </Button>
-              </Flex>
-            </Box>
+        {tab === 'speech' && (
+          <Box {...card}>
+            <Box maxW="260px" mb={4}><Text fontSize="xs" color="#8A90A2" mb={1}>Language</Text>{langSelect(readLang, setReadLang, 'Reading language')}</Box>
+            <Textarea aria-label="Text to read aloud" value={readText} onChange={(e) => setReadText(e.target.value)} maxLength={2000} minH="160px" placeholder="Type something for me to read aloud…" bg="#FFFFFF" borderColor="#E3DACF" />
+            <Flex gap={2} mt={4}>
+              <Button {...primary} isDisabled={!readText.trim()} onClick={() => { const w = speak(readText, readLang); setNote(w || ''); }}>Read aloud</Button>
+              <Button variant="outline" borderColor="#E3DACF" onClick={() => window.speechSynthesis?.cancel()}>Stop</Button>
+            </Flex>
           </Box>
         )}
       </Box>

@@ -1,33 +1,76 @@
-# Design document — Imagine AI (P3 resource-efficient text-to-image)
-
-Every statement below is about **design and code**. No latency, memory, CLIP, FID or size figure appears because none has been measured.
+# Design document — Imagine AI (P3: resource-efficient text-to-image for mobile)
 
 ## 1. Problem and constraints
-Generate images from complex prompts under limited resources (target dev machine: RTX 5050 Laptop ~8 GB VRAM, 24 GB RAM; phone client). See `docs/01_PROJECT_CHARTER.md`, `docs/02_REQUIREMENTS_TRACEABILITY.md`.
+Generate semantically accurate, realistic images from complex prompts while cutting **latency, memory and model size**
+relative to a baseline, without a large loss in prompt alignment, quality or diversity. A public text-to-image API is not
+allowed; the optimisation must be ours and measurable. Target: mobile clients. Dev hardware: RTX 5050 Laptop GPU, 8 GB.
 
-## 2. Model choice (`docs/11_RISKS_AND_DECISIONS.md`)
-SD-Turbo (`stabilityai/sd-turbo`) as the first lightweight candidate, 1-4 step sampling. **Not benchmarked against alternatives** (BK-SDM-Tiny, SD1.5+LCM-LoRA were not tried). Revision unpinned in code defaults; the benchmark CLIs refuse to run unpinned. Licence: TODO(team) read the model card before any redistribution/hosting.
+## 2. Requirement traceability
+See README table. Every mandatory item (A classical CV, B deep learning, C optimisation) and every advanced item
+(complex prompts, semantic consistency, latency/memory, degradation study, adaptive strategy, fallback) maps to code and to a
+measured artefact in `evaluation/`.
 
-## 3. Prompt intelligence (P2)
-Deterministic lexicon/rule parser (`ai_engine/prompt/`), output schema `docs/prompt_analysis_schema_v1.json`, endpoint `/api/v1/prompt/analysis`. Rationale: reproducible, no extra model memory. Limit: hold-out result was 12/20 on the first run, frozen; those 20 prompts are now seen, so the demo needs new prompts (`docs/PROMPT_PARSER.md`).
+## 3. Benchmark (the "baseline")
+The problem statement compares against *a baseline model* without naming one. We define it as the **unoptimised pretrained
+model**: Stable Diffusion 1.5 (`451f4fe1…`), fp32, 30 PNDM steps, CFG 7.5, 512×512. Choosing the unmodified pretrained model
+makes every claimed gain attributable to our changes. All variants share prompts, seeds, resolution and warm-up policy.
 
-## 4. Adaptation (P3A/P3B)
-LoRA data prep, training launcher and compare tooling exist, plus a loader gated on an `approval.json` (`docs/ADAPTATION.md`). **No adapter was trained or approved; DL-02 is open.** The gate is an accident guard, not a security boundary.
+## 4. System architecture
+See `ARCHITECTURE.md`. Hybrid edge-server: clients → FastAPI → prompt analysis → adaptive controller → engine
+(`sd_turbo`, `sd15_optimized`, `sd15_adapted`, `sd15_baseline`) → optional classical CV → storage → response with a
+`resource_decision` that explains the chosen configuration.
 
-## 5. Optimization (P4)
-Configurable precision, attention/VAE slicing, CPU offload, weight variant, step count; 8-experiment grid (B0, E1-E6, C1) and stats/report code (`docs/P4_OPTIMIZATION.md`). Trade-offs are documented qualitatively; **quality-cost numbers do not exist**.
+## 5. Models and optimisation strategies
+| Strategy | Variant IDs | Mechanism |
+|---|---|---|
+| Reduced precision | B1 | fp32 → fp16 (Tensor Cores) |
+| Few-step sampling by consistency distillation | O8, O4, O2 | LCM-LoRA + `LCMScheduler`, CFG 1 (halves UNet work per step) |
+| Lightweight / adversarially distilled architecture | T1, T2 | SD-Turbo, 1–2 steps |
+| Weight quantisation | Q4 | int8 weight-only UNet (torchao) |
+| Latent-space / decoder optimisation | O4T | TAESD tiny VAE decoder |
+| Adaptation | A4, D4, D2 | COCO LoRA (ours), warm-started LCM distillation on COCO (ours) |
+Each variant changes one thing relative to its parent so the ablation is attributable. Results: generated report.
 
-## 6. Classical CV (P5A/P5B) — the five modules
-1. Resize (`computer_vision/resize`), 2. colour/enhancement, 3. edge-aware smoothing/sharpening, 4. quality assessment (`quality/metrics.py`), 5. artifact detection + guarded correction (`artifacts/`). Thresholds are provisional, set on synthetic images (`docs/P5B_CV.md` section 4). Conservative sharpening did not repair blur on the synthetic set. Not evaluated on real SD-Turbo output.
+## 6. Adaptation (fine-tuning) design
+- **Data:** COCO captions, length-balanced derivative: 10,000 train / 1,000 validation, a leakage guard against the frozen
+  evaluation prompts, per-image licences recorded. Validation captions are the benchmark prompts and are never trained on.
+- **LoRA (ours):** SD1.5, rank 4, 2,500 steps, blind pairwise review gate (hash-bound `approval.json`); approved at a conservative scale.
+- **Warm-started LCM distillation (ours):** the pinned upstream trainer is unmodified; `ai_engine/training/lcm_warmstart.py`
+  initialises the student LoRA from the public LCM-LoRA and continues consistency distillation with the SD1.5 teacher on our COCO
+  shards. Rationale: adapt an existing few-step adapter to COCO-style prompts in few steps rather than relearn consistency.
+- **Honesty:** an adapter is only reported as better if the benchmark shows it; the approval gate rejects regressions.
 
-## 7. Resource-adaptive controller (P6)
-Deterministic profile-driven controller with quick/balanced/best, headroom check on measured GPU peak, fallback ladder (resolution -> precision -> steps -> model -> consented remote), runtime OOM fallback, JSONL decision log, human-readable explanation (`docs/P6_ADAPTIVE.md`). Because the engine cannot change precision/model without a reload, only resolution/steps vary at run time. **No measured profile exists**; the synthetic fixture is refused unless `ADAPTIVE_ALLOW_SYNTHETIC=true`. Defaults are uncalibrated.
+## 7. Classical CV
+Resize (interpolation chosen by scale direction), enhancement (adaptive CLAHE / white balance / gamma), edge-aware smoothing and
+sharpening (bilateral, guided, unsharp with halo guard), quality metrics, artifact detection and guarded correction.
+**Measured on real generated images:** no stage changes FID/CLIP beyond noise and each costs 95–230 ms, so CV is an opt-in gated
+stage. The artifact detector flags a high share of images (thresholds are uncalibrated) — documented as a limitation.
 
-## 8. Evaluation design (P7A/P7B)
-Variants V0-V7, prompt-cluster bootstrap CIs, FID gate that refuses small samples, mechanical report, human-review sheet (`docs/P7A_EVAL.md`). V6/V7 blocked. Synthetic output can never satisfy the gate.
+## 8. Adaptive controller and fallback
+A measured hardware profile (steps × resolution → latency, VRAM) plus live VRAM readings select Quick/Balanced/Best settings
+under a latency/VRAM budget; a fallback ladder lowers steps/resolution and flags `fallback_used` instead of failing on OOM.
+Demonstrated interactively in the Stress Lab and unit-tested.
 
-## 9. Mobile and deployment (P8)
-Not delivered. `android/` is a Compose skeleton (`MainActivity.kt`, 14 lines, no Retrofit, no INTERNET permission). Honest labels per `docs/09_MOBILE_DEPLOYMENT.md`: on-device = full path on phone; hybrid = phone + laptop server; cloud = hosted. Current best case after P8 would be **hybrid**. A full-pipeline on-device feasibility experiment was not run.
+## 9. Evaluation design
+Metrics in the problem-statement order: CLIP similarity, FID (+KID, preferred at small n), latency (median/p95, cool-start
+controlled), peak memory, model size, quality-versus-cost. Complex-prompt consistency uses a detector-based compositional
+benchmark (single, two-object, counting, colour binding, position) because CLIP cannot verify counts or relations.
+Statistical care: same seeds, warm-up discarded, thermal control, small-sample caveats stated.
 
-## 10. Known limitations (carry into the viva)
-No real results; FID not computable (no reference set / Inception extractor); stage-level latency not exposed by the engine; default sample is small so CIs will be wide; CV thresholds provisional; API contract unsigned; Windows/Docker/Android never built.
+## 10. Deployment
+Hybrid edge-server. Public hosting: Hugging Face Space (ZeroGPU) via `hf_space/` or any GPU host via the Dockerfile. Mobile
+feasibility is analytical (`evaluation/reports/mobile_feasibility.md`); no phone benchmark was run.
+
+## 11. Failure analysis
+`evaluation/reports/failure_analysis.md` (categories with causes) and auto-extracted compositional failures with image links.
+Typical causes: counts and spatial relations fail in single-pass diffusion without layout guidance; colour binding degrades
+with very few steps; CLIP does not penalise count errors.
+
+## 12. Limitations and ethics
+Not on-device; FID is small-sample; laptop thermal throttling; imperfect automatic checker; non-commercial/restricted licences on
+some weights; training data licences are mixed; models can reproduce social biases and can generate misleading images — outputs
+should be labelled as AI-generated. Demo sign-in is not real authentication. Secrets are never committed (`.env`, tokens ignored).
+
+## 13. Team contributions (fill before the viva)
+Each member must be able to explain: the baseline and metric protocol, one optimisation strategy end-to-end, the adaptive
+controller, the CV ablation result, and one failure case. See `VIVA_PREP.md`.

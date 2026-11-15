@@ -1,0 +1,54 @@
+{
+ "T1": {
+  "steps": 1,
+  "tiny_vae": false,
+  "n": 300,
+  "fid": 116.97080448633864,
+  "kid_mean": 0.009164347478693173,
+  "clip_mean": 0.32141256267825763,
+  "latency_median_ms": 124.02675450000089,
+  "latency_p95_ms": 126.10509900000011,
+  "peak_vram_mb": 3096.60986328125,
+  "model_size_mb": 2460.8845539093018,
+  "gpu": "NVIDIA A10"
+ },
+ "T1T": {
+  "steps": 1,
+  "tiny_vae": true,
+  "n": 300,
+  "fid": 116.26646620793366,
+  "kid_mean": 0.007981660314078258,
+  "clip_mean": 0.3209396478533745,
+  "latency_median_ms": 56.355258000003516,
+  "latency_p95_ms": 58.35593099999414,
+  "peak_vram_mb": 3067.677734375,
+  "model_size_mb": 2305.9488582611084,
+  "gpu": "NVIDIA A10"
+ },
+ "T2": {
+  "steps": 2,
+  "tiny_vae": false,
+  "n": 300,
+  "fid": 119.34511120981819,
+  "kid_mean": 0.010152859079071956,
+  "clip_mean": 0.3163322971264521,
+  "latency_median_ms": 157.92929700000968,
+  "latency_p95_ms": 160.0089089999983,
+  "peak_vram_mb": 3677.31640625,
+  "model_size_mb": 2460.8845539093018,
+  "gpu": "NVIDIA A10"
+ },
+ "T2T": {
+  "steps": 2,
+  "tiny_vae": true,
+  "n": 300,
+  "fid": 118.70682834696476,
+  "kid_mean": 0.009125375946969681,
+  "clip_mean": 0.31711042021711666,
+  "latency_median_ms": 89.17970299998501,
+  "latency_p95_ms": 90.85179199999516,
+  "peak_vram_mb": 3069.794921875,
+  "model_size_mb": 2305.9488582611084,
+  "gpu": "NVIDIA A10"
+ }
+}

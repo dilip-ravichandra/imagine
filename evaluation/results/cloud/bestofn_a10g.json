@@ -1,0 +1,60 @@
+{
+ "steps": 1,
+ "ns": [
+  1,
+  2,
+  4,
+  8
+ ],
+ "n_prompts": 100,
+ "results": {
+  "1": {
+   "per_category": {
+    "single": 1.0,
+    "two_objects": 0.8,
+    "counting": 0.25,
+    "colour": 0.8,
+    "position": 0.25
+   },
+   "overall": 0.6199999999999999,
+   "oracle_any_pass": 0.62
+  },
+  "2": {
+   "per_category": {
+    "single": 1.0,
+    "two_objects": 0.85,
+    "counting": 0.3,
+    "colour": 0.8,
+    "position": 0.2
+   },
+   "overall": 0.6300000000000001,
+   "oracle_any_pass": 0.72
+  },
+  "4": {
+   "per_category": {
+    "single": 1.0,
+    "two_objects": 0.95,
+    "counting": 0.3,
+    "colour": 0.8,
+    "position": 0.45
+   },
+   "overall": 0.7,
+   "oracle_any_pass": 0.82
+  },
+  "8": {
+   "per_category": {
+    "single": 1.0,
+    "two_objects": 0.95,
+    "counting": 0.4,
+    "colour": 0.85,
+    "position": 0.55
+   },
+   "overall": 0.75,
+   "oracle_any_pass": 0.9
+  }
+ },
+ "gen_ms_per_image_a10g": 126.24882774500024,
+ "verifier_ms_per_image_a10g": 43.487857279999986,
+ "gpu": "A10G",
+ "protocol": "select: DETR + HSV colour; evaluate: OWL-ViT + CLIP colour"
+}

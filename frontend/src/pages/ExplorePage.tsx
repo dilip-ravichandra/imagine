@@ -15,6 +15,7 @@ import {
 import { Link } from 'react-router-dom';
 import ChatBot from '../components/ChatBot';
 
+import { showcaseAt } from '../lib/showcase';
 const NAV_LINKS = ['Home', 'Features', 'Explore', 'Pricing'];
 
 const CATEGORIES = [
@@ -66,7 +67,7 @@ const GALLERY_ITEMS: GalleryItem[] = [
 const ITEMS_PER_PAGE = 12;
 
 const SearchIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A5B1A7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6277" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="11" cy="11" r="8" />
     <path d="M21 21l-4.35-4.35" />
   </svg>
@@ -85,16 +86,16 @@ const Navbar: React.FC = () => (
     px={{ base: 4, md: 10 }}
     py={3}
     sx={{
-      bg: 'rgba(8,11,10,0.85)',
+      bg: 'rgba(251,248,244,0.85)',
       backdropFilter: 'blur(20px)',
-      borderBottom: '1px solid #2A3A2C',
+      borderBottom: '1px solid #E3DACF',
     }}
   >
     <Link to="/" style={{ textDecoration: 'none' }}>
       <Heading
         size="md"
         sx={{
-          bgGradient: 'linear(to-r, #B7FF35, #8DDB39)',
+          bgGradient: 'linear(to-r, #5B5BF0, #4747DB)',
           bgClip: 'text',
           fontWeight: 800,
           letterSpacing: '-0.5px',
@@ -117,9 +118,9 @@ const Navbar: React.FC = () => (
               fontSize="sm"
               fontWeight={isActive ? 600 : 500}
               sx={{
-                color: isActive ? '#B7FF35' : '#A5B1A7',
+                color: isActive ? '#5B5BF0' : '#5B6277',
                 transition: 'color 0.2s',
-                _hover: { color: '#F4F7F0' },
+                _hover: { color: '#1E2233' },
               }}
             >
               {l}
@@ -135,8 +136,8 @@ const Navbar: React.FC = () => (
           variant="ghost"
           size="sm"
           sx={{
-            color: '#A5B1A7',
-            _hover: { bg: '#1A2A1C', color: '#F4F7F0' },
+            color: '#5B6277',
+            _hover: { bg: '#EFE8DF', color: '#1E2233' },
           }}
         >
           Sign In
@@ -146,10 +147,10 @@ const Navbar: React.FC = () => (
         <Button
           size="sm"
           sx={{
-            bg: '#B7FF35',
-            color: '#080B0A',
+            bg: '#5B5BF0',
+            color: '#FFFFFF',
             fontWeight: 700,
-            _hover: { bg: '#8DDB39', transform: 'translateY(-1px)' },
+            _hover: { bg: '#4747DB', transform: 'translateY(-1px)' },
             transition: 'all 0.2s',
           }}
         >
@@ -192,16 +193,16 @@ const ExplorePage: React.FC = () => {
   });
 
   return (
-    <Box minH="100vh" sx={{ bg: '#080B0A' }}>
+    <Box minH="100vh" sx={{ bg: '#FBF8F4' }}>
       <Navbar />
 
       <Box pt="100px" px={{ base: 4, md: 10, lg: 16 }} pb={16}>
         {/* Header */}
         <Box textAlign="center" mb={8}>
-          <Heading size="lg" mb={2} sx={{ color: '#F4F7F0', fontWeight: 700 }}>
+          <Heading size="lg" mb={2} sx={{ color: '#1E2233', fontWeight: 700 }}>
             Explore Creations
           </Heading>
-          <Text fontSize="md" sx={{ color: '#A5B1A7' }}>
+          <Text fontSize="md" sx={{ color: '#5B6277' }}>
             Discover stunning AI-generated artwork from our community
           </Text>
         </Box>
@@ -222,15 +223,15 @@ const ExplorePage: React.FC = () => {
               size="md"
               borderRadius="12px"
               sx={{
-                bg: '#0F1A11',
-                border: '1px solid #2A3A2C',
-                color: '#F4F7F0',
+                bg: '#F7F3EE',
+                border: '1px solid #E3DACF',
+                color: '#1E2233',
                 fontSize: 'sm',
-                _placeholder: { color: '#5A6B5C' },
-                _hover: { borderColor: '#3A4A3C' },
+                _placeholder: { color: '#9AA0B2' },
+                _hover: { borderColor: '#CFC4B6' },
                 _focus: {
-                  borderColor: '#B7FF35',
-                  boxShadow: '0 0 0 1px rgba(183,255,53,0.3)',
+                  borderColor: '#5B5BF0',
+                  boxShadow: '0 0 0 1px rgba(91,91,240,0.14)',
                 },
                 transition: 'all 0.2s',
               }}
@@ -257,15 +258,15 @@ const ExplorePage: React.FC = () => {
                   setVisibleCount(ITEMS_PER_PAGE);
                 }}
                 sx={{
-                  bg: isActive ? '#B7FF35' : '#111713',
-                  color: isActive ? '#080B0A' : '#A5B1A7',
+                  bg: isActive ? '#5B5BF0' : '#FFFFFF',
+                  color: isActive ? '#FBF8F4' : '#5B6277',
                   fontWeight: isActive ? 700 : 500,
                   fontSize: 'xs',
                   px: 5,
-                  border: isActive ? 'none' : '1px solid #2A3A2C',
+                  border: isActive ? 'none' : '1px solid #E3DACF',
                   _hover: {
-                    bg: isActive ? '#8DDB39' : '#1A2A1C',
-                    color: isActive ? '#080B0A' : '#F4F7F0',
+                    bg: isActive ? '#4747DB' : '#EFE8DF',
+                    color: isActive ? '#FBF8F4' : '#1E2233',
                   },
                   transition: 'all 0.2s',
                 }}
@@ -285,10 +286,10 @@ const ExplorePage: React.FC = () => {
             py={20}
           >
             <Text fontSize="4xl" mb={3}>🔍</Text>
-            <Text fontSize="lg" fontWeight={600} sx={{ color: '#F4F7F0' }}>
+            <Text fontSize="lg" fontWeight={600} sx={{ color: '#1E2233' }}>
               No results found
             </Text>
-            <Text fontSize="sm" sx={{ color: '#A5B1A7' }}>
+            <Text fontSize="sm" sx={{ color: '#5B6277' }}>
               Try adjusting your search or category filter
             </Text>
           </Flex>
@@ -314,13 +315,13 @@ const ExplorePage: React.FC = () => {
                     borderRadius="12px"
                     overflow="hidden"
                     sx={{
-                      border: '1px solid #2A3A2C',
-                      bg: '#111713',
+                      border: '1px solid #E3DACF',
+                      bg: '#FFFFFF',
                       cursor: 'pointer',
                       transition: 'all 0.35s ease',
                       _hover: {
-                        borderColor: 'rgba(183,255,53,0.3)',
-                        boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
+                        borderColor: 'rgba(91,91,240,0.3)',
+                        boxShadow: '0 12px 40px rgba(30,34,51,0.12)',
                         '& .card-overlay': { opacity: 1 },
                         '& .card-img': { transform: 'scale(1.06)' },
                       },
@@ -329,7 +330,7 @@ const ExplorePage: React.FC = () => {
                     <Box overflow="hidden">
                       <Image
                         className="card-img"
-                        src={`https://picsum.photos/seed/${item.id}/${item.w}/${item.h}`}
+                        src={showcaseAt(item.id)}
                         alt={item.title}
                         w="100%"
                         display="block"
@@ -350,13 +351,13 @@ const ExplorePage: React.FC = () => {
                         opacity: 0,
                         transition: 'opacity 0.3s ease',
                         bgGradient:
-                          'linear(to-t, rgba(8,11,10,0.92), rgba(8,11,10,0.4), transparent)',
+                          'linear(to-t, rgba(251,248,244,0.92), rgba(251,248,244,0.4), transparent)',
                       }}
                     >
                       <Text
                         fontWeight={700}
                         fontSize="sm"
-                        sx={{ color: '#F4F7F0' }}
+                        sx={{ color: '#1E2233' }}
                       >
                         {item.title}
                       </Text>
@@ -367,8 +368,8 @@ const ExplorePage: React.FC = () => {
                           py={0.5}
                           borderRadius="full"
                           sx={{
-                            bg: 'rgba(183,255,53,0.15)',
-                            color: '#B7FF35',
+                            bg: 'rgba(91,91,240,0.15)',
+                            color: '#5B5BF0',
                             fontWeight: 600,
                           }}
                         >
@@ -393,13 +394,13 @@ const ExplorePage: React.FC = () => {
               onClick={handleLoadMore}
               sx={{
                 bg: 'transparent',
-                color: '#B7FF35',
-                border: '1px solid #B7FF35',
+                color: '#5B5BF0',
+                border: '1px solid #5B5BF0',
                 fontWeight: 600,
                 _hover: {
-                  bg: 'rgba(183,255,53,0.08)',
+                  bg: 'rgba(91,91,240,0.08)',
                   transform: 'translateY(-2px)',
-                  boxShadow: '0 6px 20px rgba(183,255,53,0.15)',
+                  boxShadow: '0 6px 20px rgba(91,91,240,0.15)',
                 },
                 transition: 'all 0.25s',
               }}
@@ -417,10 +418,10 @@ const ExplorePage: React.FC = () => {
         justify="space-between"
         px={{ base: 4, md: 12 }}
         py={6}
-        sx={{ borderTop: '1px solid #2A3A2C' }}
+        sx={{ borderTop: '1px solid #E3DACF' }}
         gap={4}
       >
-        <Text fontSize="sm" sx={{ color: '#A5B1A7' }}>
+        <Text fontSize="sm" sx={{ color: '#5B6277' }}>
           © 2024 ImagineAI. All rights reserved.
         </Text>
         <HStack spacing={6}>
@@ -431,8 +432,8 @@ const ExplorePage: React.FC = () => {
               href="#"
               fontSize="sm"
               sx={{
-                color: '#A5B1A7',
-                _hover: { color: '#B7FF35' },
+                color: '#5B6277',
+                _hover: { color: '#5B5BF0' },
                 transition: 'color 0.2s',
               }}
             >

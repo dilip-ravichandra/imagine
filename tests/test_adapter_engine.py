@@ -34,6 +34,7 @@ def install(monkeypatch, lora_error=None):
         scheduler = types.SimpleNamespace(config={"timestep_spacing": "trailing"})
         def __init__(self): self.lora = False
         def to(self, d): return self
+        def set_adapters(self, *a, **kw): pass
         def set_progress_bar_config(self, **kw): pass
         def load_lora_weights(self, path, weight_name=None):
             state["lora_calls"].append((path, weight_name))
@@ -170,13 +171,13 @@ def test_model_endpoint_default_and_exact_keys(tmp_path, monkeypatch):
     c = client_for(tmp_path, monkeypatch, None)
     j = c.get("/api/v1/model").json()
     assert set(j) == {"api_version", "model", "model_revision", "loaded", "adapter"}
-    assert set(j["adapter"]) == {"configured", "active", "reason", "adapter_sha256", "adapter_bytes", "base_revision"}
+    assert set(j["adapter"]) >= {"configured", "active", "reason", "adapter_sha256", "adapter_bytes", "base_revision"}
     assert j["adapter"]["configured"] is False and j["loaded"] is False and j["model"] == "stabilityai/sd-turbo"
 
 
 def test_existing_contracts_are_unchanged(tmp_path, monkeypatch):
     c = client_for(tmp_path, monkeypatch, make_approved(tmp_path))
-    assert set(c.get("/api/v1/capabilities").json()) == {"api_version", "quality_modes", "min_resolution",
+    assert set(c.get("/api/v1/capabilities").json()) >= {"api_version", "quality_modes", "min_resolution",
                                                           "max_resolution", "generation_available", "deployment_mode"}
     j = c.post("/api/v1/generate", json=BODY).json()
     assert set(j) == {"status", "request_id", "image_url", "generation", "performance", "quality", "resource_decision"}

@@ -24,7 +24,7 @@ def dataset(tmp_path):
 
 def args(data, out, **kw):
     base = dict(data=str(data), out=str(out), revision=REV, preset="smoke", steps=None, accum=None, warmup=None,
-                rank=4, learning_rate=5e-5, resolution=512, seed=1, eval_prompts=None, dry_run=True)
+                rank=4, learning_rate=5e-5, resolution=512, seed=1, checkpoint_every=None, eval_prompts=None, dry_run=True)
     base.update(kw)
     return Namespace(**base)
 
@@ -59,7 +59,7 @@ def test_command_has_required_flags_and_none_of_the_harmful_ones(tmp_path):
     a = args(tmp_path / "d", tmp_path / "o")
     cmd = T.build_command(a, T.resolve_settings(a))
     joined = " ".join(cmd)
-    for must in ("--pretrained_model_name_or_path=stabilityai/sd-turbo", f"--revision={REV}", "--variant=fp16",
+    for must in ("--pretrained_model_name_or_path=stable-diffusion-v1-5/stable-diffusion-v1-5", f"--revision={REV}", "--variant=fp16",
                  "--center_crop", "--gradient_checkpointing", "--train_batch_size=1", "--report_to=none",
                  "--lr_scheduler=constant", "--max_grad_norm=1.0", "--caption_column=text", "--image_column=image"):
         assert must in cmd, must
@@ -147,7 +147,9 @@ def test_dry_run_reports_problems_with_nonzero_exit(dataset, tmp_path, capsys):
     assert rc == 1 and "40-character" in capsys.readouterr().out
 
 
-def test_real_run_refuses_to_launch_without_gpu_stack(dataset, tmp_path, capsys):
+def test_real_run_refuses_to_launch_without_gpu_stack(dataset, tmp_path, capsys, monkeypatch):
+    _pre = T.preflight
+    monkeypatch.setattr(T, "preflight", lambda a, s, **k: _pre(a, s, **dict(k, cuda_available=False)))
     d, ev = dataset
     out = tmp_path / "adapter"
     rc = T.run(args(d, out, dry_run=False, eval_prompts=[str(ev)]))

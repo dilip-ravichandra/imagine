@@ -1,526 +1,351 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Alert,
+  AlertIcon,
+  Badge,
   Box,
-  Flex,
-  Text,
-  Heading,
   Button,
+  Checkbox,
+  CloseButton,
+  Flex,
+  Grid,
+  Heading,
+  HStack,
   IconButton,
   Image,
+  Input,
   Select,
+  SimpleGrid,
   Slider,
-  SliderTrack,
   SliderFilledTrack,
   SliderThumb,
-  Badge,
-  VStack,
-  HStack,
-  Divider,
+  SliderTrack,
+  Spinner,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
   Tooltip,
-  Grid,
+  VStack,
 } from '@chakra-ui/react';
-import {
-  FiUpload,
-  FiDownload,
-  FiSave,
-  FiImage,
-  FiDroplet,
-  FiSun,
-  FiZap,
-  FiScissors,
-  FiTrash2,
-  FiLayers,
-  FiToggleLeft,
-  FiToggleRight,
-  FiMaximize,
-  FiGrid,
-} from 'react-icons/fi';
+import { FiCornerUpLeft, FiCornerUpRight, FiDownload, FiEye, FiImage, FiSave, FiUpload } from 'react-icons/fi';
 import WorkspaceLayout from '../components/WorkspaceLayout';
+import InteractiveCanvasMask from '../components/InteractiveCanvasMask';
+import {
+  createGalleryItem,
+  cvAdjust,
+  cvStylize,
+  cvUpscale,
+  generateInpaint,
+  getGalleryItems,
+  getStyles,
+  toSameOriginImageUrl,
+  type AdjustParams,
+  type GalleryItem,
+  type StyleInfo,
+} from '../lib/api';
+
+interface Version {
+  url: string; // data URL or same-origin image URL
+  label: string;
+}
+
+const FALLBACK_STYLES: StyleInfo[] = ['Watercolor', 'Oil painting', 'Pencil sketch', 'Comic Book', 'Anime', 'Cinematic', 'Vintage film', 'Cyberpunk', 'Retro Pixel']
+  .map((s) => ({ id: s, label: s, description: '', cv_finisher: true }));
+
+const NEUTRAL: AdjustParams = { brightness: 0, contrast: 0, saturation: 0, warmth: 0, sharpness: 0, denoise: 0, auto: false };
+const INPAINT_STEPS: Record<string, number> = { Quick: 12, Balanced: 24, Best: 36 };
+
+async function toDataUrl(url: string): Promise<string> {
+  if (url.startsWith('data:')) return url;
+  const blob = await (await fetch(toSameOriginImageUrl(url))).blob();
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result));
+    r.onerror = () => reject(new Error('Could not read the image.'));
+    r.readAsDataURL(blob);
+  });
+}
 
 const ImageEditor: React.FC = () => {
-  const [brightness, setBrightness] = useState(50);
-  const [contrast, setContrast] = useState(50);
-  const [saturation, setSaturation] = useState(50);
-  const [showBefore, setShowBefore] = useState(false);
-  const [hasImage, setHasImage] = useState(true);
-  const [selectedStyle, setSelectedStyle] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [history, setHistory] = useState<Version[]>([]);
+  const [cursor, setCursor] = useState(-1);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [showOriginal, setShowOriginal] = useState(false);
+  const [tab, setTab] = useState(0);
+  const [recent, setRecent] = useState<GalleryItem[]>([]);
+
+  // edit-region state
+  const [maskUrl, setMaskUrl] = useState<string | null>(null);
+  const [instruction, setInstruction] = useState('');
+  const [snapToEdges, setSnapToEdges] = useState(false);
+  const [blend, setBlend] = useState(true);
+  const [quality, setQuality] = useState('Balanced');
+  // style / adjust / upscale state
+  const [styles, setStyles] = useState<StyleInfo[]>(FALLBACK_STYLES);
+  const [styleStrength, setStyleStrength] = useState(100);
+  const [adj, setAdj] = useState<AdjustParams>(NEUTRAL);
+  const [scale, setScale] = useState(2);
+
+  const current = history[cursor];
+  const original = history[0];
+
+  useEffect(() => {
+    getStyles().then((r) => r.styles.length && setStyles(r.styles)).catch(() => undefined);
+    getGalleryItems({}).then((r) => setRecent(r.items.slice(0, 12))).catch(() => undefined);
+  }, []);
+
+  const push = useCallback((v: Version) => {
+    setHistory((h) => [...h.slice(0, cursor + 1), v]);
+    setCursor((c) => c + 1);
+    setMaskUrl(null);
+    setAdj(NEUTRAL);
+  }, [cursor]);
+
+  const load = async (src: string, label: string) => {
+    setError(null);
+    setNotice(null);
+    try {
+      const url = await toDataUrl(src);
+      setHistory([{ url, label }]);
+      setCursor(0);
+      setMaskUrl(null);
+      setAdj(NEUTRAL);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not load the image.');
+    }
+  };
+
+  const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (!f.type.startsWith('image/')) {
+      setError('Please choose an image file (PNG, JPEG or WebP).');
+      return;
+    }
+    const r = new FileReader();
+    r.onload = () => load(String(r.result), f.name);
+    r.readAsDataURL(f);
+    e.target.value = '';
+  };
+
+  const run = async (label: string, fn: () => Promise<string>) => {
+    setBusy(label);
+    setError(null);
+    setNotice(null);
+    try {
+      const url = await toDataUrl(await fn());
+      push({ url, label });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : `${label} failed.`);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const applyRegionEdit = () => {
+    if (!current || !maskUrl) return;
+    run(`Edit: ${instruction.trim().slice(0, 28)}`, async () => {
+      const res = await generateInpaint({
+        prompt: instruction.trim(),
+        imageBase64: current.url,
+        maskBase64: maskUrl,
+        steps: INPAINT_STEPS[quality],
+        smartSelect: snapToEdges,
+        harmonise: blend,
+        style: 'Photorealistic',
+      });
+      return res.image_url;
+    });
+  };
+
+  const download = () => {
+    if (!current) return;
+    const a = document.createElement('a');
+    a.href = current.url;
+    a.download = 'imagineai-edit.png';
+    a.click();
+  };
+
+  const saveToGallery = async () => {
+    if (!current) return;
+    setBusy('Saving');
+    try {
+      // the gallery stores server URLs: re-upload the current pixels through the (free) CV adjust endpoint with neutral settings
+      const res = await cvAdjust(current.url, NEUTRAL);
+      await createGalleryItem({ image_url: res.image_url, prompt: current.label || 'Edited image', category: 'single', style: 'Edited', model: 'editor', width: res.width, height: res.height });
+      setNotice('Saved to your gallery.');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not save to the gallery.');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const preview = `brightness(${1 + adj.brightness / 100}) contrast(${1 + adj.contrast / 100}) saturate(${1 + adj.saturation / 100})`;
+  const slider = (key: keyof AdjustParams, label: string, min = -100) => (
+    <Box key={key}>
+      <Flex justify="space-between"><Text fontSize="xs" color="#5B6277">{label}</Text><Text fontSize="xs" color="#8A90A2">{Number(adj[key])}</Text></Flex>
+      <Slider min={min} max={100} value={Number(adj[key])} onChange={(v) => setAdj((a) => ({ ...a, [key]: v }))} aria-label={label}>
+        <SliderTrack bg="#EFE8DF"><SliderFilledTrack bg="#5B5BF0" /></SliderTrack>
+        <SliderThumb />
+      </Slider>
+    </Box>
+  );
+
+  const panelBtn = { size: 'sm' as const, bg: '#5B5BF0', color: '#FFFFFF', fontWeight: 'bold', _hover: { bg: '#4747DB' }, isLoading: !!busy };
 
   return (
     <WorkspaceLayout>
-      <Box p={6} minH="100vh" bg="#080B0A">
-        {/* Header */}
-        <Flex align="center" justify="space-between" mb={6}>
+      <Box p={{ base: 3, md: 6 }} minH="100vh" bg="#FBF8F4">
+        <Flex align="center" justify="space-between" mb={4} wrap="wrap" gap={3}>
           <Flex align="center" gap={3}>
-            <Heading size="lg" color="#F4F7F0" fontWeight="700">
-              Image Editor
-            </Heading>
-            <Badge
-              bg="rgba(183, 255, 53, 0.15)"
-              color="#B7FF35"
-              px={3}
-              py={1}
-              borderRadius="full"
-              fontSize="xs"
-              fontWeight="600"
-              textTransform="none"
-            >
-              AI Edit
-            </Badge>
+            <Heading size="lg" color="#1E2233" fontWeight="700">Image Editor</Heading>
+            <Badge bg="rgba(91,91,240, 0.15)" color="#5B5BF0" px={3} py={1} borderRadius="full" fontSize="xs" textTransform="none">AI + computer vision</Badge>
           </Flex>
-          <HStack spacing={3}>
-            <Button
-              size="sm"
-              variant="outline"
-              borderColor="#2A3A2C"
-              color="#A5B1A7"
-              _hover={{ bg: '#1A2A1C', borderColor: '#B7FF35', color: '#F4F7F0' }}
-              leftIcon={<FiGrid />}
-            >
-              Grid View
+          <HStack spacing={2}>
+            <Tooltip label="Undo"><IconButton aria-label="Undo" size="sm" variant="outline" borderColor="#E3DACF" color="#5B6277" icon={<FiCornerUpLeft />} isDisabled={cursor <= 0 || !!busy} onClick={() => setCursor((c) => c - 1)} /></Tooltip>
+            <Tooltip label="Redo"><IconButton aria-label="Redo" size="sm" variant="outline" borderColor="#E3DACF" color="#5B6277" icon={<FiCornerUpRight />} isDisabled={cursor >= history.length - 1 || !!busy} onClick={() => setCursor((c) => c + 1)} /></Tooltip>
+            <Button size="sm" variant="outline" borderColor="#E3DACF" color="#5B6277" leftIcon={<FiEye />} isDisabled={history.length < 2}
+              onMouseDown={() => setShowOriginal(true)} onMouseUp={() => setShowOriginal(false)} onMouseLeave={() => setShowOriginal(false)}
+              onTouchStart={() => setShowOriginal(true)} onTouchEnd={() => setShowOriginal(false)}>
+              Hold to compare
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              borderColor="#2A3A2C"
-              color="#A5B1A7"
-              _hover={{ bg: '#1A2A1C', borderColor: '#B7FF35', color: '#F4F7F0' }}
-              leftIcon={<FiMaximize />}
-            >
-              Fullscreen
-            </Button>
+            <Button size="sm" variant="outline" borderColor="#E3DACF" color="#5B6277" leftIcon={<FiDownload />} isDisabled={!current} onClick={download}>Download</Button>
+            <Button size="sm" variant="outline" borderColor="#E3DACF" color="#5B6277" leftIcon={<FiSave />} isDisabled={!current || !!busy} onClick={saveToGallery}>Save</Button>
           </HStack>
         </Flex>
 
-        {/* Main Layout */}
-        <Flex gap={5} h="calc(100vh - 140px)">
-          {/* Left: Image Preview Area */}
-          <Box flex={1} display="flex" flexDir="column" gap={4}>
-            {/* Upload Zone */}
-            <Box
-              bg="#111713"
-              border="2px dashed #2A3A2C"
-              borderRadius="xl"
-              p={4}
-              textAlign="center"
-              cursor="pointer"
-              _hover={{ borderColor: '#B7FF35', bg: '#182019' }}
-              transition="all 0.2s ease"
-              onClick={() => setHasImage(true)}
-            >
-              <Flex align="center" justify="center" gap={3}>
-                <FiUpload color="#A5B1A7" size={18} />
-                <Text color="#A5B1A7" fontSize="sm">
-                  Upload or select an image — drag & drop or click to browse
-                </Text>
-              </Flex>
-            </Box>
+        {error && (
+          <Alert status="error" bg="#FEECEC" color="#B42318" borderRadius="10px" mb={3}>
+            <AlertIcon /><Text fontSize="sm" flex={1}>{error}</Text><CloseButton onClick={() => setError(null)} />
+          </Alert>
+        )}
+        {notice && (
+          <Alert status="success" bg="#E7F8EE" color="#5B5BF0" borderRadius="10px" mb={3}>
+            <AlertIcon /><Text fontSize="sm" flex={1}>{notice}</Text><CloseButton onClick={() => setNotice(null)} />
+          </Alert>
+        )}
 
-            {/* Image Preview */}
-            <Box
-              flex={1}
-              bg="#111713"
-              borderRadius="xl"
-              border="1px solid #2A3A2C"
-              overflow="hidden"
-              position="relative"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              {hasImage ? (
-                <>
-                  <Image
-                    src={
-                      showBefore
-                        ? 'https://picsum.photos/seed/editor-before/900/600'
-                        : 'https://picsum.photos/seed/editor-after/900/600'
-                    }
-                    alt="Editing preview"
-                    objectFit="contain"
-                    maxH="100%"
-                    maxW="100%"
-                    filter={`brightness(${brightness / 50}) contrast(${contrast / 50}) saturate(${saturation / 50})`}
-                    transition="filter 0.3s ease"
-                  />
-                  {/* Before/After Toggle */}
-                  <Flex
-                    position="absolute"
-                    bottom={4}
-                    left="50%"
-                    transform="translateX(-50%)"
-                    bg="rgba(17, 23, 19, 0.9)"
-                    borderRadius="full"
-                    border="1px solid #2A3A2C"
-                    p={1}
-                    gap={1}
-                    backdropFilter="blur(10px)"
-                  >
-                    <Button
-                      size="sm"
-                      bg={!showBefore ? '#B7FF35' : 'transparent'}
-                      color={!showBefore ? '#080B0A' : '#A5B1A7'}
-                      borderRadius="full"
-                      px={4}
-                      fontSize="xs"
-                      fontWeight="600"
-                      _hover={{ bg: !showBefore ? '#B7FF35' : '#1A2A1C' }}
-                      onClick={() => setShowBefore(false)}
-                    >
-                      After
-                    </Button>
-                    <Button
-                      size="sm"
-                      bg={showBefore ? '#B7FF35' : 'transparent'}
-                      color={showBefore ? '#080B0A' : '#A5B1A7'}
-                      borderRadius="full"
-                      px={4}
-                      fontSize="xs"
-                      fontWeight="600"
-                      _hover={{ bg: showBefore ? '#B7FF35' : '#1A2A1C' }}
-                      onClick={() => setShowBefore(true)}
-                    >
-                      Before
-                    </Button>
-                  </Flex>
+        <input ref={fileRef} type="file" accept="image/*" hidden onChange={onFile} data-testid="editor-file-input" />
 
-                  {/* Image Info */}
-                  <Flex
-                    position="absolute"
-                    top={4}
-                    left={4}
-                    bg="rgba(17, 23, 19, 0.85)"
-                    borderRadius="lg"
-                    px={3}
-                    py={1.5}
-                    gap={3}
-                    backdropFilter="blur(10px)"
-                    border="1px solid #2A3A2C"
-                  >
-                    <Text color="#A5B1A7" fontSize="xs">1920 × 1280</Text>
-                    <Text color="#2A3A2C">|</Text>
-                    <Text color="#A5B1A7" fontSize="xs">2.4 MB</Text>
-                    <Text color="#2A3A2C">|</Text>
-                    <Text color="#A5B1A7" fontSize="xs">PNG</Text>
-                  </Flex>
-                </>
-              ) : (
-                <VStack spacing={3}>
-                  <FiImage color="#2A3A2C" size={64} />
-                  <Text color="#A5B1A7" fontSize="sm">
-                    No image loaded
-                  </Text>
+        <Flex gap={5} direction={{ base: 'column', lg: 'row' }}>
+          {/* canvas */}
+          <Box flex={1} minW={0}>
+            {!current ? (
+              <Box bg="#FFFFFF" border="2px dashed #E3DACF" borderRadius="xl" p={{ base: 6, md: 10 }} textAlign="center">
+                <VStack spacing={4}>
+                  <Box color="#5B5BF0"><FiImage size={36} /></Box>
+                  <Text color="#1E2233" fontWeight="600">Open an image to start editing</Text>
+                  <Text color="#5B6277" fontSize="sm">Select any part of it and describe the change, apply an art style, adjust colours or upscale.</Text>
+                  <Button {...panelBtn} leftIcon={<FiUpload />} onClick={() => fileRef.current?.click()}>Upload image</Button>
+                  {recent.length > 0 && (
+                    <Box w="full">
+                      <Text fontSize="xs" color="#8A90A2" mb={2} textTransform="uppercase" letterSpacing="0.05em">Or pick from your gallery</Text>
+                      <SimpleGrid columns={{ base: 3, md: 6 }} spacing={2}>
+                        {recent.map((it) => (
+                          <Image key={it.id} src={toSameOriginImageUrl(it.image_url)} alt={it.prompt} borderRadius="8px" cursor="pointer" border="1px solid #E3DACF"
+                            _hover={{ borderColor: '#5B5BF0' }} onClick={() => load(it.image_url, it.prompt)} />
+                        ))}
+                      </SimpleGrid>
+                    </Box>
+                  )}
                 </VStack>
-              )}
-            </Box>
+              </Box>
+            ) : (
+              <Box bg="#FFFFFF" borderRadius="xl" border="1px solid #E3DACF" p={3} position="relative">
+                {busy && (
+                  <Flex position="absolute" inset={0} zIndex={5} bg="rgba(251,248,244,0.72)" align="center" justify="center" direction="column" gap={3} borderRadius="xl">
+                    <Spinner color="#5B5BF0" size="lg" /><Text color="#1E2233" fontSize="sm">{busy}...</Text>
+                  </Flex>
+                )}
+                {showOriginal ? (
+                  <Image src={original.url} alt="Original" maxH="70vh" mx="auto" objectFit="contain" />
+                ) : tab === 0 ? (
+                  <InteractiveCanvasMask key={current.url.length + ':' + cursor} imageUrl={current.url}
+                    onMaskChange={(has, m) => setMaskUrl(has && m ? m : null)} />
+                ) : (
+                  <Image src={current.url} alt="Current edit" maxH="70vh" mx="auto" objectFit="contain" style={tab === 2 ? { filter: preview } : undefined} />
+                )}
+                <Flex justify="space-between" mt={2}>
+                  <Text fontSize="xs" color="#8A90A2">Version {cursor + 1} of {history.length}: {current.label}</Text>
+                  <Button size="xs" variant="link" color="#5B6277" onClick={() => fileRef.current?.click()}>Open another image</Button>
+                </Flex>
+              </Box>
+            )}
           </Box>
 
-          {/* Right: Edit Controls Panel */}
-          <Box
-            w="340px"
-            minW="340px"
-            bg="#111713"
-            borderRadius="xl"
-            border="1px solid #2A3A2C"
-            p={5}
-            overflowY="auto"
-            css={{
-              '&::-webkit-scrollbar': { width: '4px' },
-              '&::-webkit-scrollbar-track': { bg: 'transparent' },
-              '&::-webkit-scrollbar-thumb': {
-                bg: '#2A3A2C',
-                borderRadius: '4px',
-              },
-            }}
-          >
-            <VStack spacing={5} align="stretch">
-              {/* AI Tools */}
-              <Box>
-                <Text
-                  color="#A5B1A7"
-                  fontSize="xs"
-                  fontWeight="600"
-                  textTransform="uppercase"
-                  letterSpacing="wider"
-                  mb={3}
-                >
-                  AI Tools
-                </Text>
-                <Grid templateColumns="1fr 1fr" gap={2}>
-                  <Button
-                    size="sm"
-                    bg="#182019"
-                    color="#F4F7F0"
-                    border="1px solid #2A3A2C"
-                    borderRadius="lg"
-                    leftIcon={<FiDroplet size={14} />}
-                    _hover={{ bg: '#1A2A1C', borderColor: '#B7FF35' }}
-                    transition="all 0.2s"
-                    fontWeight="500"
-                    fontSize="xs"
-                  >
-                    Inpaint
-                  </Button>
-                  <Button
-                    size="sm"
-                    bg="#182019"
-                    color="#F4F7F0"
-                    border="1px solid #2A3A2C"
-                    borderRadius="lg"
-                    leftIcon={<FiMaximize size={14} />}
-                    _hover={{ bg: '#1A2A1C', borderColor: '#B7FF35' }}
-                    transition="all 0.2s"
-                    fontWeight="500"
-                    fontSize="xs"
-                  >
-                    Outpaint
-                  </Button>
-                  <Button
-                    size="sm"
-                    bg="#182019"
-                    color="#F4F7F0"
-                    border="1px solid #2A3A2C"
-                    borderRadius="lg"
-                    leftIcon={<FiScissors size={14} />}
-                    _hover={{ bg: '#1A2A1C', borderColor: '#B7FF35' }}
-                    transition="all 0.2s"
-                    fontWeight="500"
-                    fontSize="xs"
-                  >
-                    Remove Object
-                  </Button>
-                  <Button
-                    size="sm"
-                    bg="#182019"
-                    color="#F4F7F0"
-                    border="1px solid #2A3A2C"
-                    borderRadius="lg"
-                    leftIcon={<FiTrash2 size={14} />}
-                    _hover={{ bg: '#1A2A1C', borderColor: '#B7FF35' }}
-                    transition="all 0.2s"
-                    fontWeight="500"
-                    fontSize="xs"
-                  >
-                    Remove BG
-                  </Button>
-                </Grid>
-              </Box>
+          {/* tools */}
+          <Box w={{ base: 'full', lg: '340px' }} flexShrink={0} bg="#FFFFFF" border="1px solid #E3DACF" borderRadius="xl" p={3}>
+            <Tabs index={tab} onChange={setTab} variant="soft-rounded" colorScheme="green" isLazy={false}>
+              <TabList flexWrap="wrap" gap={1}>
+                {['Edit region', 'Styles', 'Adjust', 'Upscale'].map((t) => <Tab key={t} fontSize="xs" color="#5B6277" _selected={{ color: '#FFFFFF', bg: '#5B5BF0' }}>{t}</Tab>)}
+              </TabList>
+              <TabPanels>
+                <TabPanel px={1}>
+                  <VStack align="stretch" spacing={3}>
+                    <Text fontSize="xs" color="#5B6277">Paint, circle or box the part you want to change, then say what it should become. Everything outside your selection stays exactly as it is.</Text>
+                    <Input value={instruction} onChange={(e) => setInstruction(e.target.value)} placeholder="e.g. a red umbrella" size="sm" bg="#F7F3EE" color="#1E2233" border="1px solid #E3DACF" _focus={{ borderColor: '#5B5BF0' }} aria-label="What should appear in the selection" />
+                    <Select size="sm" value={quality} onChange={(e) => setQuality(e.target.value)} bg="#F7F3EE" color="#1E2233" border="1px solid #E3DACF" aria-label="Edit quality">
+                      {Object.keys(INPAINT_STEPS).map((q) => <option key={q} value={q} style={{ background: '#FFFFFF' }}>{q} ({INPAINT_STEPS[q]} steps)</option>)}
+                    </Select>
+                    <Checkbox size="sm" colorScheme="green" isChecked={snapToEdges} onChange={(e) => setSnapToEdges(e.target.checked)}><Text fontSize="xs" color="#5B6277">Snap selection to object edges (GrabCut)</Text></Checkbox>
+                    <Checkbox size="sm" colorScheme="green" isChecked={blend} onChange={(e) => setBlend(e.target.checked)}><Text fontSize="xs" color="#5B6277">Blend seamlessly (colour match + multiband)</Text></Checkbox>
+                    <Text fontSize="11px" color={maskUrl ? '#5B5BF0' : '#C77700'}>{maskUrl ? 'Selection ready' : 'No area selected yet'}</Text>
+                    <Button {...panelBtn} isDisabled={!current || !maskUrl || !instruction.trim()} onClick={applyRegionEdit}>Apply to selection</Button>
+                  </VStack>
+                </TabPanel>
 
-              <Divider borderColor="#2A3A2C" />
+                <TabPanel px={1}>
+                  <VStack align="stretch" spacing={3}>
+                    <Text fontSize="xs" color="#5B6277">Re-style the whole image with classical computer-vision filters (instant, no AI model needed).</Text>
+                    <Box><Flex justify="space-between"><Text fontSize="xs" color="#5B6277">Strength</Text><Text fontSize="xs" color="#8A90A2">{styleStrength}%</Text></Flex>
+                      <Slider min={20} max={100} value={styleStrength} onChange={setStyleStrength} aria-label="Style strength"><SliderTrack bg="#EFE8DF"><SliderFilledTrack bg="#5B5BF0" /></SliderTrack><SliderThumb /></Slider></Box>
+                    <Grid templateColumns="1fr 1fr" gap={2}>
+                      {styles.filter((s) => s.cv_finisher).map((s) => (
+                        <Tooltip key={s.id} label={s.description} hasArrow isDisabled={!s.description}>
+                          <Button size="xs" variant="outline" borderColor="#E3DACF" color="#1E2233" _hover={{ borderColor: '#5B5BF0' }} isDisabled={!current || !!busy}
+                            onClick={() => run(`Style: ${s.label}`, async () => (await cvStylize({ imageBase64: current!.url, style: s.label, strength: styleStrength / 100 })).image_url)}>
+                            {s.label}
+                          </Button>
+                        </Tooltip>
+                      ))}
+                    </Grid>
+                  </VStack>
+                </TabPanel>
 
-              {/* Style */}
-              <Box>
-                <Text
-                  color="#A5B1A7"
-                  fontSize="xs"
-                  fontWeight="600"
-                  textTransform="uppercase"
-                  letterSpacing="wider"
-                  mb={3}
-                >
-                  Change Style
-                </Text>
-                <Select
-                  size="sm"
-                  bg="#0F1A11"
-                  border="1px solid #2A3A2C"
-                  borderRadius="lg"
-                  color="#F4F7F0"
-                  _hover={{ borderColor: '#B7FF35' }}
-                  _focus={{ borderColor: '#B7FF35', boxShadow: '0 0 0 1px #B7FF35' }}
-                  value={selectedStyle}
-                  onChange={(e) => setSelectedStyle(e.target.value)}
-                >
-                  <option value="" style={{ background: '#111713' }}>
-                    Select a style...
-                  </option>
-                  <option value="realistic" style={{ background: '#111713' }}>
-                    Photorealistic
-                  </option>
-                  <option value="anime" style={{ background: '#111713' }}>
-                    Anime / Manga
-                  </option>
-                  <option value="oil" style={{ background: '#111713' }}>
-                    Oil Painting
-                  </option>
-                  <option value="watercolor" style={{ background: '#111713' }}>
-                    Watercolor
-                  </option>
-                  <option value="sketch" style={{ background: '#111713' }}>
-                    Pencil Sketch
-                  </option>
-                  <option value="cyberpunk" style={{ background: '#111713' }}>
-                    Cyberpunk
-                  </option>
-                  <option value="fantasy" style={{ background: '#111713' }}>
-                    Fantasy Art
-                  </option>
-                </Select>
-              </Box>
+                <TabPanel px={1}>
+                  <VStack align="stretch" spacing={3}>
+                    {slider('brightness', 'Brightness')}
+                    {slider('contrast', 'Contrast')}
+                    {slider('saturation', 'Saturation')}
+                    {slider('warmth', 'Warmth')}
+                    {slider('sharpness', 'Sharpness (edge-aware)', 0)}
+                    {slider('denoise', 'Denoise', 0)}
+                    <Checkbox size="sm" colorScheme="green" isChecked={adj.auto} onChange={(e) => setAdj((a) => ({ ...a, auto: e.target.checked }))}><Text fontSize="xs" color="#5B6277">Auto enhance (white balance + CLAHE)</Text></Checkbox>
+                    <HStack>
+                      <Button {...panelBtn} flex={1} isDisabled={!current} onClick={() => run('Adjust', async () => (await cvAdjust(current!.url, adj)).image_url)}>Apply</Button>
+                      <Button size="sm" variant="ghost" color="#5B6277" onClick={() => setAdj(NEUTRAL)}>Reset</Button>
+                    </HStack>
+                  </VStack>
+                </TabPanel>
 
-              <Divider borderColor="#2A3A2C" />
-
-              {/* Adjustments */}
-              <Box>
-                <Text
-                  color="#A5B1A7"
-                  fontSize="xs"
-                  fontWeight="600"
-                  textTransform="uppercase"
-                  letterSpacing="wider"
-                  mb={4}
-                >
-                  Adjustments
-                </Text>
-                <VStack spacing={5} align="stretch">
-                  {/* Brightness */}
-                  <Box>
-                    <Flex justify="space-between" mb={2}>
-                      <Flex align="center" gap={2}>
-                        <FiSun size={13} color="#A5B1A7" />
-                        <Text color="#F4F7F0" fontSize="xs" fontWeight="500">
-                          Brightness
-                        </Text>
-                      </Flex>
-                      <Text color="#B7FF35" fontSize="xs" fontWeight="600">
-                        {brightness}%
-                      </Text>
-                    </Flex>
-                    <Slider
-                      value={brightness}
-                      onChange={setBrightness}
-                      min={0}
-                      max={100}
-                    >
-                      <SliderTrack bg="#0F1A11" h="6px" borderRadius="full">
-                        <SliderFilledTrack bg="#B7FF35" borderRadius="full" />
-                      </SliderTrack>
-                      <SliderThumb
-                        boxSize={4}
-                        bg="#B7FF35"
-                        border="2px solid #080B0A"
-                        _focus={{ boxShadow: '0 0 0 3px rgba(183,255,53,0.3)' }}
-                      />
-                    </Slider>
-                  </Box>
-
-                  {/* Contrast */}
-                  <Box>
-                    <Flex justify="space-between" mb={2}>
-                      <Flex align="center" gap={2}>
-                        <FiZap size={13} color="#A5B1A7" />
-                        <Text color="#F4F7F0" fontSize="xs" fontWeight="500">
-                          Contrast
-                        </Text>
-                      </Flex>
-                      <Text color="#B7FF35" fontSize="xs" fontWeight="600">
-                        {contrast}%
-                      </Text>
-                    </Flex>
-                    <Slider
-                      value={contrast}
-                      onChange={setContrast}
-                      min={0}
-                      max={100}
-                    >
-                      <SliderTrack bg="#0F1A11" h="6px" borderRadius="full">
-                        <SliderFilledTrack bg="#8DDB39" borderRadius="full" />
-                      </SliderTrack>
-                      <SliderThumb
-                        boxSize={4}
-                        bg="#8DDB39"
-                        border="2px solid #080B0A"
-                        _focus={{ boxShadow: '0 0 0 3px rgba(141,219,57,0.3)' }}
-                      />
-                    </Slider>
-                  </Box>
-
-                  {/* Saturation */}
-                  <Box>
-                    <Flex justify="space-between" mb={2}>
-                      <Flex align="center" gap={2}>
-                        <FiDroplet size={13} color="#A5B1A7" />
-                        <Text color="#F4F7F0" fontSize="xs" fontWeight="500">
-                          Saturation
-                        </Text>
-                      </Flex>
-                      <Text color="#B7FF35" fontSize="xs" fontWeight="600">
-                        {saturation}%
-                      </Text>
-                    </Flex>
-                    <Slider
-                      value={saturation}
-                      onChange={setSaturation}
-                      min={0}
-                      max={100}
-                    >
-                      <SliderTrack bg="#0F1A11" h="6px" borderRadius="full">
-                        <SliderFilledTrack
-                          bg="linear-gradient(90deg, #8DDB39, #B7FF35)"
-                          borderRadius="full"
-                        />
-                      </SliderTrack>
-                      <SliderThumb
-                        boxSize={4}
-                        bg="#B7FF35"
-                        border="2px solid #080B0A"
-                        _focus={{ boxShadow: '0 0 0 3px rgba(183,255,53,0.3)' }}
-                      />
-                    </Slider>
-                  </Box>
-                </VStack>
-              </Box>
-
-              <Divider borderColor="#2A3A2C" />
-
-              {/* Apply */}
-              <Button
-                bg="#B7FF35"
-                color="#080B0A"
-                size="md"
-                borderRadius="lg"
-                fontWeight="700"
-                _hover={{ bg: '#8DDB39', transform: 'translateY(-1px)' }}
-                _active={{ transform: 'translateY(0)' }}
-                transition="all 0.2s"
-                boxShadow="0 0 20px rgba(183,255,53,0.2)"
-              >
-                ✨ Apply Changes
-              </Button>
-
-              <Divider borderColor="#2A3A2C" />
-
-              {/* Save/Download */}
-              <VStack spacing={2}>
-                <Button
-                  w="100%"
-                  size="sm"
-                  bg="#182019"
-                  color="#F4F7F0"
-                  border="1px solid #2A3A2C"
-                  borderRadius="lg"
-                  leftIcon={<FiSave size={14} />}
-                  _hover={{ bg: '#1A2A1C', borderColor: '#B7FF35' }}
-                  transition="all 0.2s"
-                  fontWeight="500"
-                >
-                  Save to Gallery
-                </Button>
-                <Button
-                  w="100%"
-                  size="sm"
-                  bg="#182019"
-                  color="#F4F7F0"
-                  border="1px solid #2A3A2C"
-                  borderRadius="lg"
-                  leftIcon={<FiDownload size={14} />}
-                  _hover={{ bg: '#1A2A1C', borderColor: '#B7FF35' }}
-                  transition="all 0.2s"
-                  fontWeight="500"
-                >
-                  Download
-                </Button>
-              </VStack>
-            </VStack>
+                <TabPanel px={1}>
+                  <VStack align="stretch" spacing={3}>
+                    <Text fontSize="xs" color="#5B6277">Enlarge with Lanczos resampling plus an edge-aware detail boost (no halos).</Text>
+                    <Select size="sm" value={scale} onChange={(e) => setScale(Number(e.target.value))} bg="#F7F3EE" color="#1E2233" border="1px solid #E3DACF" aria-label="Upscale factor">
+                      {[1.5, 2, 3, 4].map((s) => <option key={s} value={s} style={{ background: '#FFFFFF' }}>{s}x</option>)}
+                    </Select>
+                    <Button {...panelBtn} isDisabled={!current} onClick={() => run(`Upscale ${scale}x`, async () => (await cvUpscale(current!.url, scale)).image_url)}>Upscale</Button>
+                  </VStack>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
           </Box>
         </Flex>
       </Box>

@@ -96,6 +96,15 @@ data class PromptAnalysisRequest(
     @SerializedName("prompt") val prompt: String
 )
 
+data class PromptEnhanceRequest(
+    @SerializedName("prompt") val prompt: String
+)
+
+data class PromptEnhanceResponse(
+    @SerializedName("prompt") val prompt: String,
+    @SerializedName("model") val model: String? = null
+)
+
 data class ParsedObject(
     @SerializedName("canonical") val canonical: String? = null,
     @SerializedName("count") val count: Int? = 1,

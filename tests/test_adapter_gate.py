@@ -30,15 +30,14 @@ def test_tally_by_steps_maps_blind_votes_and_separates_steps():
                                                (39, 39, 0, False),    # one pair short
                                                (41, 30, 12, True)])
 def test_rule_boundaries_per_steps(n, adapted, base, ok):
-    passed, reasons = A.evaluate_rule({1: T(n, adapted, base), 4: T(40, 40, 0)}, 0)
+    passed, reasons = A.evaluate_rule({30: T(n, adapted, base)}, 0)
     assert passed is ok, reasons
 
 
 def test_every_required_steps_must_pass_independently():
     good, bad = T(40, 40, 0), T(40, 10, 30)
-    assert A.evaluate_rule({1: good, 4: good}, 0)[0]
-    assert not A.evaluate_rule({1: good, 4: bad}, 0)[0]   # great at 1 step does not excuse 4 steps
-    assert not A.evaluate_rule({1: bad, 4: good}, 0)[0]
+    assert A.evaluate_rule({30: good}, 0)[0]
+    assert not A.evaluate_rule({30: bad}, 0)[0]
     assert not A.evaluate_rule({1: good}, 0)[0]            # missing a required step count
     assert not A.evaluate_rule({}, 0)[0]
 
@@ -51,14 +50,14 @@ def test_new_failures_counted_only_when_base_was_fine():
             dict(prompt_id="c", steps=1, seed=1, variant="base", status="ok"),
             dict(prompt_id="c", steps=1, seed=1, variant="adapted", status="ok")]
     assert A.new_failures(recs) == 1
-    assert not A.evaluate_rule({1: good_tally(), 4: good_tally()}, 1)[0]
+    assert not A.evaluate_rule({30: good_tally()}, 1)[0]
 
 
 # ---- write_approval
 def test_write_approval_refuses_and_writes_nothing(tmp_path):
     d = make_adapter(tmp_path)
     for kw in (dict(confirmed=False), dict(reviewer="  "), dict(failures=1),
-               dict(per={1: good_tally(), 4: T(40, 5, 30)})):
+               dict(per={30: T(40, 5, 30)})):
         with pytest.raises(A.AdapterRejected):
             approve(d, **kw)
         assert not (d / A.APPROVAL_FILE).exists()
@@ -125,7 +124,7 @@ def test_non_passing_approval_records_are_rejected(tmp_path, edit):
 def test_hand_edited_tallies_that_fail_the_rule_are_rejected(tmp_path):
     d = make_approved(tmp_path)
     a = json.loads((d / A.APPROVAL_FILE).read_text())
-    a["per_steps"]["4"]["rated"] = 12  # claims passed:true but the recorded numbers do not satisfy the rule
+    a["per_steps"]["30"]["rated"] = 12  # claims passed:true but the recorded numbers do not satisfy the rule
     (d / A.APPROVAL_FILE).write_text(json.dumps(a))
     with pytest.raises(A.AdapterRejected, match="no longer satisfies"):
         A.load_approved_adapter(d, REV)

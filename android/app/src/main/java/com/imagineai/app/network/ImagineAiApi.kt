@@ -10,6 +10,8 @@ import com.imagineai.app.model.MultiModelGenerateRequest
 import com.imagineai.app.model.MultiModelGenerateResponse
 import com.imagineai.app.model.PromptAnalysisRequest
 import com.imagineai.app.model.PromptAnalysisResponse
+import com.imagineai.app.model.PromptEnhanceRequest
+import com.imagineai.app.model.PromptEnhanceResponse
 import com.imagineai.app.model.StressGenerateRequest
 import com.imagineai.app.model.StressGenerateResponse
 import okhttp3.Interceptor
@@ -41,6 +43,9 @@ interface ImagineAiApi {
 
     @POST("api/v1/prompt/analysis")
     suspend fun analyzePrompt(@Body request: PromptAnalysisRequest): Response<PromptAnalysisResponse>
+
+    @POST("api/v1/prompt/enhance")
+    suspend fun enhancePrompt(@Body request: PromptEnhanceRequest): Response<PromptEnhanceResponse>
 }
 
 object ApiClient {

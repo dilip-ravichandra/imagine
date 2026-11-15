@@ -1,6 +1,10 @@
 package com.imagineai.app.ui
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.speech.RecognizerIntent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -111,7 +115,8 @@ fun ImagineAiScreen(viewModel: ImagineAiViewModel) {
     if (state.showConfigDialog) {
         ServerConfigDialog(
             currentUrl = state.serverBaseUrl,
-            onSave = { viewModel.onBaseUrlChange(it); viewModel.toggleConfigDialog(false) },
+            currentApiKey = state.serverApiKey,
+            onSave = { url, apiKey -> viewModel.onServerConfigChange(url, apiKey); viewModel.toggleConfigDialog(false) },
             onDismiss = { viewModel.toggleConfigDialog(false) }
         )
     }
@@ -178,7 +183,16 @@ private fun AppHeaderBar(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(modifier = Modifier.size(7.dp).clip(CircleShape).background(statusColor))
                     Spacer(Modifier.width(6.dp))
-                    Text("Model ready GPU · fp16", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = statusColor)
+                    Text(
+                        when (serverAvailable) {
+                            true -> "Laptop API · Connected"
+                            false -> "Laptop API · Offline"
+                            null -> "Connecting…"
+                        },
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = statusColor
+                    )
                 }
             }
 
@@ -241,6 +255,21 @@ private fun GeneratePanel(
     spinAngle: Float,
     context: android.content.Context
 ) {
+    val speechLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val spokenText = result.data
+            ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            ?.firstOrNull()
+            ?.trim()
+        if (!spokenText.isNullOrBlank()) {
+            val current = state.prompt.trim().trimEnd(',', '.', ';', ':')
+            val combined = if (current.isBlank()) spokenText else "$current, $spokenText"
+            viewModel.onPromptChange(combined.take(500))
+            viewModel.onPromptAssistStatus("Voice text added to the prompt.")
+        } else if (result.resultCode == android.app.Activity.RESULT_OK) {
+            viewModel.onPromptAssistStatus("No speech was recognized. Try again.")
+        }
+    }
+
     val samplePrompts = listOf(
         "Cabin at Sunset" to "A cozy wooden cabin beside a mountain lake at sunset",
         "Astronaut on Mars" to "An astronaut riding a horse on Mars, cinematic lighting, ultra high res",
@@ -254,7 +283,7 @@ private fun GeneratePanel(
         Column {
             Text("TEXT-TO-IMAGE GENERATION", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFFC084FC), letterSpacing = 1.sp)
             Text("Generative Inference", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = TextPrimary)
-            Text("Create high-quality, on-device images from natural language prompts", fontSize = 13.sp, color = TextSecondary)
+            Text("Create images on your laptop GPU from natural language prompts", fontSize = 13.sp, color = TextSecondary)
         }
 
         // Prompt Input Card
@@ -307,6 +336,50 @@ private fun GeneratePanel(
                             )
                         }
                     }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                                putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-IN")
+                                putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak your image idea")
+                                putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+                            }
+                            try {
+                                speechLauncher.launch(intent)
+                            } catch (_: ActivityNotFoundException) {
+                                viewModel.onPromptAssistStatus("Speech recognition is unavailable on this device.")
+                            }
+                        },
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 7.dp)
+                    ) {
+                        Icon(Icons.Default.Mic, contentDescription = null, modifier = Modifier.size(16.dp), tint = AccentCyan)
+                        Spacer(Modifier.width(6.dp))
+                        Text("Dictate", color = TextPrimary, fontSize = 12.sp)
+                    }
+                    Button(
+                        onClick = { viewModel.enhancePrompt() },
+                        enabled = !state.isEnhancingPrompt && state.prompt.isNotBlank(),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 7.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = AccentPurple)
+                    ) {
+                        if (state.isEnhancingPrompt) {
+                            CircularProgressIndicator(modifier = Modifier.size(15.dp), strokeWidth = 2.dp, color = Color.White)
+                        } else {
+                            Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(15.dp))
+                        }
+                        Spacer(Modifier.width(6.dp))
+                        Text(if (state.isEnhancingPrompt) "Enhancing…" else "Enhance prompt", fontSize = 12.sp)
+                    }
+                }
+                state.promptAssistStatus?.let { status ->
+                    Text(status, fontSize = 11.sp, color = TextSecondary, modifier = Modifier.padding(top = 6.dp))
                 }
 
                 // Sample Prompt Chips
@@ -481,7 +554,7 @@ private fun GeneratePanel(
             if (state.isLoading) {
                 CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                 Spacer(Modifier.width(10.dp))
-                Text("Generating on RTX 5050...", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text("Generating on laptop GPU...", fontWeight = FontWeight.Bold, fontSize = 14.sp)
             } else {
                 Icon(Icons.Default.Bolt, contentDescription = null, tint = Color.White)
                 Spacer(Modifier.width(8.dp))
@@ -1537,8 +1610,9 @@ private fun PipelineStageCard(
 }
 
 @Composable
-private fun ServerConfigDialog(currentUrl: String, onSave: (String) -> Unit, onDismiss: () -> Unit) {
+private fun ServerConfigDialog(currentUrl: String, currentApiKey: String, onSave: (String, String) -> Unit, onDismiss: () -> Unit) {
     var tempUrl by remember { mutableStateOf(currentUrl) }
+    var tempApiKey by remember { mutableStateOf(currentApiKey) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -1553,6 +1627,15 @@ private fun ServerConfigDialog(currentUrl: String, onSave: (String) -> Unit, onD
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
+                Text("Hosted API key:", fontSize = 12.sp, color = TextSecondary)
+                OutlinedTextField(
+                    value = tempApiKey,
+                    onValueChange = { tempApiKey = it },
+                    singleLine = true,
+                    visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text("The key is kept in memory for this app session.", fontSize = 10.sp, color = TextMuted)
                 Text("Quick presets:", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Box(
@@ -1580,7 +1663,7 @@ private fun ServerConfigDialog(currentUrl: String, onSave: (String) -> Unit, onD
             }
         },
         confirmButton = {
-            Button(onClick = { onSave(tempUrl) }, colors = ButtonDefaults.buttonColors(containerColor = AccentPurple)) {
+            Button(onClick = { onSave(tempUrl, tempApiKey) }, colors = ButtonDefaults.buttonColors(containerColor = AccentPurple)) {
                 Text("Save & Connect")
             }
         },

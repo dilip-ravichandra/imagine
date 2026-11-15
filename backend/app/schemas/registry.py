@@ -14,6 +14,8 @@ class ModelCatalogueEntry(BaseModel):
     available: bool
     availability_reason: str
     configured: bool
+    benchmark_variant: str | None = None  # id in evaluation/results/fid (None = not benchmarked as configured here)
+    measured: dict | None = None  # FID/KID/CLIP/latency/VRAM/size from the measured benchmark, never hard-coded
 
 
 class ModelCatalogueResponse(BaseModel):

@@ -32,7 +32,9 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen: initialOpen = false }) => {
     setMessages((prev) => [...prev, { role: 'user', text: userText, time }]);
     setMessage('');
     try {
-      const result = await sendChat([{ role: 'user', content: userText }]);
+      const history = [...messages.filter((m, i) => i > 0), { role: 'user' as const, text: userText, time }]
+        .slice(-12).map((m) => ({ role: m.role, content: m.text }));
+      const result = await sendChat(history);
       setMessages((prev) => [
         ...prev,
         {
@@ -59,28 +61,28 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen: initialOpen = false }) => {
       {!isOpen && (
         <Box
           position="fixed"
-          bottom="24px"
-          right="24px"
+          bottom={{ base: "88px", md: "24px" }}
+          right={{ base: "16px", md: "24px" }}
           zIndex={1000}
         >
-          <Tooltip label="Imagine Assistant (Powered by Groq)" placement="left" hasArrow bg="#111713" color="#F4F7F0" border="1px solid #2A3A2C">
+          <Tooltip label="Imagine Assistant (Powered by Groq)" placement="left" hasArrow bg="#FFFFFF" color="#1E2233" border="1px solid #E3DACF">
             <Box
               position="relative"
               w="58px"
               h="58px"
               borderRadius="full"
-              bg="#111713"
-              border="2px solid #B7FF35"
+              bg="#FFFFFF"
+              border="2px solid #5B5BF0"
               display="flex"
               alignItems="center"
               justifyContent="center"
               cursor="pointer"
-              boxShadow="0 8px 32px rgba(0,0,0,0.8), 0 0 24px rgba(183,255,53,0.35)"
+              boxShadow="0 8px 32px rgba(30,34,51,0.16), 0 0 24px rgba(91,91,240,0.14)"
               transition="all 0.25s ease"
               _hover={{
                 transform: 'scale(1.1) translateY(-2px)',
-                boxShadow: '0 12px 36px rgba(0,0,0,0.9), 0 0 35px rgba(183,255,53,0.5)',
-                bg: '#182019',
+                boxShadow: '0 12px 36px rgba(30,34,51,0.16), 0 0 35px rgba(91,91,240,0.5)',
+                bg: '#F5F0EA',
               }}
               onClick={() => setIsOpen(true)}
             >
@@ -97,9 +99,9 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen: initialOpen = false }) => {
                 w="12px"
                 h="12px"
                 borderRadius="full"
-                bg="#B7FF35"
-                border="2px solid #080B0A"
-                boxShadow="0 0 8px #B7FF35"
+                bg="#5B5BF0"
+                border="2px solid #FBF8F4"
+                boxShadow="0 0 8px #5B5BF0"
               />
             </Box>
           </Tooltip>
@@ -110,51 +112,51 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen: initialOpen = false }) => {
       {isOpen && (
         <Box
           position="fixed"
-          bottom="24px"
-          right="24px"
+          bottom={{ base: "88px", md: "24px" }}
+          right={{ base: "16px", md: "24px" }}
           w={{ base: 'calc(100% - 32px)', sm: '380px' }}
-          h="520px"
-          bg="#111713"
-          border="1px solid #3A4A3C"
+          h={{ base: 'min(520px, calc(100vh - 110px))', md: '520px' }}
+          bg="#FFFFFF"
+          border="1px solid #CFC4B6"
           borderRadius="20px"
           zIndex={1001}
           display="flex"
           flexDirection="column"
-          boxShadow="0 24px 64px rgba(0,0,0,0.9), 0 0 30px rgba(183,255,53,0.2)"
+          boxShadow="0 24px 64px rgba(30,34,51,0.16), 0 0 30px rgba(91,91,240,0.14)"
           overflow="hidden"
           animation="fadeIn 0.2s ease"
         >
           {/* Header */}
           <Flex
-            bg="#0D120E"
+            bg="#FFFFFF"
             px={4}
             py={3.5}
             align="center"
             justify="space-between"
-            borderBottom="1px solid #2A3A2C"
+            borderBottom="1px solid #E3DACF"
           >
             <Flex align="center" gap={2.5}>
               <Box
                 w="28px"
                 h="28px"
                 borderRadius="full"
-                bg="#B7FF35"
+                bg="#5B5BF0"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
                 fontSize="14px"
                 fontWeight="bold"
-                color="#080B0A"
+                color="#FFFFFF"
               >
                 ✦
               </Box>
               <Box>
-                <Text fontWeight="700" color="#F4F7F0" fontSize="13px" lineHeight="1.2">
+                <Text fontWeight="700" color="#1E2233" fontSize="13px" lineHeight="1.2">
                   Imagine Assistant
                 </Text>
                 <Flex align="center" gap={1.5}>
-                  <Box w="6px" h="6px" borderRadius="full" bg="#B7FF35" />
-                  <Text fontSize="10px" color="#8DDB39" fontWeight="600">
+                  <Box w="6px" h="6px" borderRadius="full" bg="#5B5BF0" />
+                  <Text fontSize="10px" color="#4747DB" fontWeight="600">
                     Groq Fast Inference
                   </Text>
                 </Flex>
@@ -166,15 +168,15 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen: initialOpen = false }) => {
               icon={<FiX size={16} />}
               size="xs"
               variant="ghost"
-              color="#A5B1A7"
-              _hover={{ color: '#F4F7F0', bg: '#182019' }}
+              color="#5B6277"
+              _hover={{ color: '#1E2233', bg: '#F5F0EA' }}
               borderRadius="full"
               onClick={() => setIsOpen(false)}
             />
           </Flex>
 
           {/* Messages Feed */}
-          <Box flex={1} overflowY="auto" p={3.5} bg="#080B0A">
+          <Box flex={1} overflowY="auto" p={3.5} bg="#FBF8F4">
             {messages.map((msg, i) => (
               <Flex key={i} justify={msg.role === 'user' ? 'flex-end' : 'flex-start'} mb={3}>
                 <Box
@@ -182,18 +184,18 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen: initialOpen = false }) => {
                   px={3.5}
                   py={2.5}
                   borderRadius={msg.role === 'user' ? '14px 14px 2px 14px' : '14px 14px 14px 2px'}
-                  bg={msg.role === 'user' ? '#B7FF35' : '#111713'}
-                  color={msg.role === 'user' ? '#080B0A' : '#F4F7F0'}
+                  bg={msg.role === 'user' ? '#5B5BF0' : '#FFFFFF'}
+                  color={msg.role === 'user' ? '#FBF8F4' : '#1E2233'}
                   border="1px solid"
-                  borderColor={msg.role === 'user' ? '#B7FF35' : '#2A3A2C'}
+                  borderColor={msg.role === 'user' ? '#5B5BF0' : '#E3DACF'}
                   fontSize="12.5px"
                   lineHeight="1.5"
-                  boxShadow="0 2px 8px rgba(0,0,0,0.3)"
+                  boxShadow="0 2px 8px rgba(30,34,51,0.12)"
                 >
                   <Text>{msg.text}</Text>
                   <Text
                     fontSize="9px"
-                    color={msg.role === 'user' ? 'rgba(0,0,0,0.6)' : '#6B7B6D'}
+                    color={msg.role === 'user' ? 'rgba(0,0,0,0.6)' : '#8A90A2'}
                     textAlign="right"
                     mt={1}
                   >
@@ -205,20 +207,20 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen: initialOpen = false }) => {
           </Box>
 
           {/* Input Bar */}
-          <Box p={3} bg="#0D120E" borderTop="1px solid #2A3A2C">
+          <Box p={3} bg="#FFFFFF" borderTop="1px solid #E3DACF">
             <Flex gap={2} align="center">
               <Input
                 placeholder="Ask about prompts, models, stories..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-                bg="#0F1A11"
-                border="1px solid #2A3A2C"
+                bg="#F7F3EE"
+                border="1px solid #E3DACF"
                 borderRadius="12px"
-                color="#F4F7F0"
+                color="#1E2233"
                 fontSize="13px"
-                _placeholder={{ color: '#6B7B6D' }}
-                _focus={{ borderColor: '#B7FF35' }}
+                _placeholder={{ color: '#8A90A2' }}
+                _focus={{ borderColor: '#5B5BF0' }}
                 size="sm"
                 h="38px"
               />
@@ -226,10 +228,10 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen: initialOpen = false }) => {
                 aria-label="Send message"
                 icon={<FiSend size={14} />}
                 size="sm"
-                bg="#B7FF35"
-                color="#080B0A"
+                bg="#5B5BF0"
+                color="#FFFFFF"
                 borderRadius="10px"
-                _hover={{ bg: '#8DDB39' }}
+                _hover={{ bg: '#4747DB' }}
                 onClick={sendMessage}
                 flexShrink={0}
               />

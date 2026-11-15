@@ -1,0 +1,110 @@
+{
+ "T1": {
+  "label": "SD-Turbo fp16, 1 step",
+  "per_category": {
+   "single": 1.0,
+   "two_objects": 0.85,
+   "counting": 0.25,
+   "colour": 0.9,
+   "position": 0.35
+  },
+  "n_per_category": {
+   "single": 20,
+   "two_objects": 20,
+   "counting": 20,
+   "colour": 20,
+   "position": 20
+  },
+  "overall": 0.67
+ },
+ "T2": {
+  "label": "SD-Turbo fp16, 2 steps",
+  "per_category": {
+   "single": 1.0,
+   "two_objects": 0.75,
+   "counting": 0.25,
+   "colour": 0.9,
+   "position": 0.25
+  },
+  "n_per_category": {
+   "single": 20,
+   "two_objects": 20,
+   "counting": 20,
+   "colour": 20,
+   "position": 20
+  },
+  "overall": 0.63
+ },
+ "O4": {
+  "label": "+ LCM-LoRA, fp16, 4 steps",
+  "per_category": {
+   "single": 1.0,
+   "two_objects": 0.55,
+   "counting": 0.2,
+   "colour": 0.65,
+   "position": 0.1
+  },
+  "n_per_category": {
+   "single": 20,
+   "two_objects": 20,
+   "counting": 20,
+   "colour": 20,
+   "position": 20
+  },
+  "overall": 0.5
+ },
+ "Q4": {
+  "label": "+ LCM-LoRA, fp16, 4 steps, int8 weight-only UNet",
+  "per_category": {
+   "single": 1.0,
+   "two_objects": 0.6,
+   "counting": 0.2,
+   "colour": 0.7,
+   "position": 0.1
+  },
+  "n_per_category": {
+   "single": 20,
+   "two_objects": 20,
+   "counting": 20,
+   "colour": 20,
+   "position": 20
+  },
+  "overall": 0.52
+ },
+ "B0": {
+  "label": "Baseline: SD1.5 fp32, 30 steps (PNDM, CFG 7.5)",
+  "per_category": {
+   "single": 1.0,
+   "two_objects": 0.6,
+   "counting": 0.35,
+   "colour": 0.75,
+   "position": 0.15
+  },
+  "n_per_category": {
+   "single": 20,
+   "two_objects": 20,
+   "counting": 20,
+   "colour": 20,
+   "position": 20
+  },
+  "overall": 0.5700000000000001
+ },
+ "D4": {
+  "label": "ImagineAI-Distilled: SD1.5 + OUR COCO-warm-started LCM-LoRA, fp16, 4 steps",
+  "per_category": {
+   "single": 1.0,
+   "two_objects": 0.5,
+   "counting": 0.35,
+   "colour": 0.65,
+   "position": 0.05
+  },
+  "n_per_category": {
+   "single": 20,
+   "two_objects": 20,
+   "counting": 20,
+   "colour": 20,
+   "position": 20
+  },
+  "overall": 0.51
+ }
+}

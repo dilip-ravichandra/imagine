@@ -15,11 +15,24 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 KEY = "k3y-for-tests-0123456789"
 
 
+def _repo_files():
+    """Files git would track (tracked + untracked-not-ignored); falls back to a walk if git is unavailable."""
+    import subprocess
+    try:
+        out = subprocess.run(["git", "ls-files", "-co", "--exclude-standard"], cwd=ROOT, capture_output=True,
+                             text=True, check=True).stdout.splitlines()
+        return [ROOT / f for f in out if (ROOT / f).is_file()]
+    except Exception:
+        return [p for p in ROOT.rglob("*") if p.is_file()]
+
+
+
 # ---- static file route: no traversal, no listing, no leaking --------------------------------------------------
 @pytest.mark.parametrize("path", ["/images/../README.md", "/images/%2e%2e/README.md", "/images/..%2f..%2fREADME.md",
                                   "/images/..%5c..%5cREADME.md", "/images/%2e%2e%2f%2e%2e%2fbackend/app/main.py",
                                   "/images/", "/images", "/images/does-not-exist.png",
                                   "/images/README.md", "/images/backend/app/main.py"])  # real repo files must not be served
+
 def test_images_route_is_not_traversable_or_listable(client, path):
     r = client.get(path, follow_redirects=True)
     assert r.status_code == 404
@@ -58,11 +71,19 @@ def secured(engine, settings):
     return TestClient(create_app(engine=engine, settings=replace(settings, api_key=KEY)), raise_server_exceptions=False)
 
 
-def test_auth_is_off_by_default(client):
+def test_sign_in_required_by_default_and_no_api_key_configured(client):
     assert Settings().api_key is None
-    assert client.post("/api/v1/generate", json=GOOD).status_code == 200
+    assert client.post("/api/v1/generate", json=GOOD).status_code == 200  # the test user is signed in
 
 
+@pytest.mark.real_auth
+def test_anonymous_requests_are_refused_by_default(client, engine):
+    r = client.post("/api/v1/generate", json=GOOD)
+    assert r.status_code == 401 and r.json()["error"]["code"] == "UNAUTHENTICATED"
+    assert engine.calls == []
+
+
+@pytest.mark.real_auth
 @pytest.mark.parametrize("method,path", [("get", "/api/v1/capabilities"), ("get", "/api/v1/model"),
                                          ("post", "/api/v1/generate"), ("post", "/api/v1/prompt/analysis")])
 def test_api_routes_require_key_when_configured(secured, method, path):
@@ -71,22 +92,25 @@ def test_api_routes_require_key_when_configured(secured, method, path):
         r = getattr(secured, method)(path, headers=headers, **({"json": body} if method == "post" else {}))
         assert r.status_code == 401, (path, headers)
         e = r.json()
-        assert e["status"] == "error" and e["error"]["code"] == "UNAUTHORIZED" and e["error"]["retryable"] is False
+        assert e["status"] == "error" and e["error"]["code"] == "UNAUTHENTICATED" and e["error"]["retryable"] is False
         assert KEY not in r.text
     ok = getattr(secured, method)(path, headers={"X-API-Key": KEY}, **({"json": body} if method == "post" else {}))
     assert ok.status_code == 200
 
 
+@pytest.mark.real_auth
 def test_auth_runs_before_validation_and_generation(secured, engine):
     assert secured.post("/api/v1/generate", json={"prompt": ""}).status_code == 401  # no validation oracle for strangers
     assert secured.post("/api/v1/generate", json=GOOD).status_code == 401
     assert engine.calls == []  # an unauthenticated request never reaches the GPU
 
 
-def test_health_and_images_stay_open_with_auth_on(secured):
+@pytest.mark.real_auth
+def test_health_stays_open_but_images_need_sign_in(secured):
     assert secured.get("/health").status_code == 200
+    assert secured.get("/images/anything.png").status_code == 401
     ok = secured.post("/api/v1/generate", json=GOOD, headers={"X-API-Key": KEY})
-    assert secured.get("/images/" + ok.json()["image_url"].rsplit("/", 1)[1]).status_code == 200
+    assert secured.get("/images/" + ok.json()["image_url"].rsplit("/", 1)[1], headers={"X-API-Key": KEY}).status_code == 200
 
 
 def test_api_key_never_in_repr_and_validated(monkeypatch):
@@ -125,8 +149,8 @@ def test_no_secrets_or_weights_committed():
     bad_suffix = {".safetensors", ".ckpt", ".pt", ".pth", ".bin", ".onnx", ".apk", ".aab", ".jks", ".keystore", ".pem"}
     pattern = re.compile(r"(hf_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{30,}|"
                          r"-----BEGIN [A-Z ]*PRIVATE KEY)")
-    for p in ROOT.rglob("*"):
-        if any(part in {"__pycache__", ".pytest_cache", ".git", ".venv", ".gradle", "build"} for part in p.parts) or not p.is_file():
+    for p in _repo_files():
+        if any(part in {"__pycache__", ".pytest_cache", ".git", ".venv", ".gradle", "build"} for part in p.parts):
             continue
         assert p.suffix not in bad_suffix, p
         assert p.name != ".env", p

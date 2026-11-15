@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   Box,
   Flex,
@@ -20,6 +20,10 @@ import {
   ModalCloseButton,
   ModalFooter,
   Tooltip,
+  Checkbox,
+  Collapse,
+  SimpleGrid,
+  Spinner,
 } from '@chakra-ui/react';
 import {
   FiMic,
@@ -32,12 +36,29 @@ import {
   FiLayers,
   FiArrowRight,
   FiSliders,
+  FiChevronDown,
+  FiChevronUp,
+  FiEdit3,
+  FiInfo,
 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+import { SHOWCASE } from '../lib/showcase';
 import WorkspaceLayout from '../components/WorkspaceLayout';
 import InteractiveCanvasMask from '../components/InteractiveCanvasMask';
-import { generateImage, generateWithModel } from '../lib/api';
-import { getModelCatalogue, ModelCatalogueEntry } from '../lib/api';
+import {
+  enhancePrompt,
+  generateImage,
+  generateWithModel,
+  generateInpaint,
+  generateImg2Img,
+  getCapabilities,
+  getGalleryItems,
+  toSameOriginImageUrl,
+  getModelCatalogue,
+  ModelCatalogueEntry,
+  cvAnalyze,
+  type ImageAnalysis,
+} from '../lib/api';
 
 interface GenerationItem {
   id: string;
@@ -46,6 +67,7 @@ interface GenerationItem {
   enhancedPrompt?: string;
   style: string;
   model: string;
+  steps?: number;
   aspect: string;
   imageUrl: string;
   referenceImage?: string;
@@ -64,19 +86,88 @@ const STYLE_OPTIONS = [
   'Cyberpunk',
   'Watercolor',
   'Retro Pixel',
+  'Oil Painting',
+  'Pencil Sketch',
+  'Vintage Film',
 ];
 
 const ASPECT_OPTIONS = ['1:1 Square', '16:9 Landscape', '9:16 Portrait', '4:3 Standard'];
-const QUALITY_OPTIONS = ['Quick (1-step)', 'Balanced (4-step)', 'Best (High Res)'];
+const aspectLabel = (a: string) => a.split(' ').slice(1).join(' ') || a;
+const QUALITY_HINT: Record<string, string> = { Quick: 'fastest', Balanced: 'recommended', Best: 'most detail' };
+const QUALITY_OPTIONS = ['Quick', 'Balanced', 'Best'];
+
+const QUALITY_STEPS: Record<string, Record<string, number>> = {
+  sd_turbo: { quick: 1, balanced: 2, best: 4 },
+  sd15_optimized: { quick: 2, balanced: 4, best: 8 },
+  imagineai_lcm: { quick: 2, balanced: 4, best: 8 },
+  sd15_adapted: { quick: 8, balanced: 15, best: 30 },
+  sd15_baseline: { quick: 8, balanced: 15, best: 30 },
+};
+
+// The dedicated SD inpainting model is a normal (multi-step) diffusion model, unlike the 1-4 step text-to-image presets.
+const INPAINT_STEPS: Record<string, number> = { quick: 12, balanced: 24, best: 36 };
+
+const getQualityPreset = (quality: string) =>
+  quality.toLowerCase().startsWith('quick') ? 'quick' : quality.toLowerCase().startsWith('best') ? 'best' : 'balanced';
+
+const getQualitySteps = (modelChoice: string, preset: string) =>
+  QUALITY_STEPS[modelChoice]?.[preset] ?? QUALITY_STEPS.sd_turbo[preset];
+
+// Plain-language engine names (the technical model id stays in the tooltip/details).
+const MODEL_UI_NAMES: Record<string, string> = {
+  sd_turbo: 'Fastest (SD-Turbo)',
+  sd15: 'Highest detail (slower)',
+  sd15_optimized: 'Fast and detailed',
+  imagineai_lcm: 'Our own model (ImagineAI)',
+  sd15_adapted: 'Everyday photos (tuned)',
+};
+
+const modelUiName = (entry: ModelCatalogueEntry) => MODEL_UI_NAMES[entry.id] || entry.display_name;
+
+const ASPECT_DIMENSIONS: Record<string, { width: number; height: number }> = {
+  '1:1 Square': { width: 512, height: 512 },
+  '16:9 Landscape': { width: 768, height: 432 },
+  '9:16 Portrait': { width: 432, height: 768 },
+  '4:3 Standard': { width: 640, height: 480 },
+};
+
+async function imageUrlToDataUrl(url: string): Promise<string> {
+  const sameOrigin = toSameOriginImageUrl(url);
+  const res = await fetch(sameOrigin);
+  const blob = await res.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+const handleDownloadImage = async (imgUrl: string, filename = 'imagineai-creation.png') => {
+  try {
+    const res = await fetch(toSameOriginImageUrl(imgUrl));
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
+  } catch {
+    window.open(imgUrl, '_blank');
+  }
+};
 
 const STYLE_PROMPTS: Record<string, string> = {
-  Photorealistic: 'photorealistic, natural lighting, realistic materials, high detail',
+  Photorealistic: 'photorealistic, natural lighting, realistic materials, high detail, 8k resolution',
   'Cinematic 3D': 'cinematic 3D render, physically based materials, dramatic lighting, depth of field',
   'Anime & Manga': 'anime and manga illustration, clean linework, expressive composition, cel shading',
   'Comic Book': 'comic book art, bold ink lines, dynamic composition, rich colors, halftone detail',
   'Fantasy Art': 'fantasy concept art, imaginative worldbuilding, atmospheric lighting, intricate detail',
   Cyberpunk: 'cyberpunk concept art, neon lighting, futuristic technology, rain-slick atmosphere',
-  Watercolor: 'watercolor painting, visible brush texture, soft washes, paper grain',
+  Watercolor: 'watercolor painting, visible brush texture, soft washes, paper grain, artistic',
   'Retro Pixel': 'retro pixel art, crisp pixel clusters, limited color palette, readable silhouette',
 };
 
@@ -91,70 +182,29 @@ const LANGUAGES = [
 ];
 
 const INITIAL_IMAGE: GenerationItem = {
-  id: 'gen-active',
-  timestamp: 'Just now',
-  prompt: 'A futuristic city with green energy, at sunset, cinematic, ultra realistic',
-  enhancedPrompt: 'A breathtaking futuristic metropolis powered by glowing emerald bioluminescent energy towers, majestic crystalline skybridges, golden sunset reflections, 8k resolution, volumetric fog, octane render.',
+  id: 'demo-cabin',
+  timestamp: 'Ready',
+  prompt: 'A cozy modern wooden cabin nestled in pine forest beside a calm mountain lake at golden hour',
+  enhancedPrompt: 'A cozy architectural wooden cabin beside a reflective mountain lake surrounded by autumn pines at sunset, 8k resolution.',
   style: 'Photorealistic',
-  model: 'SD-Turbo (Realtime 0.8s)',
+  model: 'SD 1.5 (example made with ImagineAI)',
   aspect: '16:9 Landscape',
-  imageUrl: 'https://picsum.photos/seed/futurecity99/900/500',
-  voiceLanguage: 'Hindi (हिंदी)',
-  originalVoiceText: 'एक भविष्य का शहर जिसमें हरी ऊर्जा और सूर्यास्त का दृश्य हो',
+  imageUrl: SHOWCASE.cabin.src,
 };
 
-const INITIAL_GALLERY: GenerationItem[] = [
-  INITIAL_IMAGE,
-  {
-    id: 'gen-2',
-    timestamp: '5 mins ago',
-    prompt: 'A cute metallic steampunk robot petting a curious fluffy kitten in a flower garden',
-    style: 'Cinematic 3D',
-    model: 'SD-Turbo (Realtime 0.8s)',
-    aspect: '1:1 Square',
-    imageUrl: 'https://picsum.photos/seed/robotcat77/600/600',
-  },
-  {
-    id: 'gen-3',
-    timestamp: '20 mins ago',
-    prompt: 'Majestic celestial dragon flying above snow-covered mountain peaks with aurora borealis',
-    style: 'Fantasy Art',
-    model: 'Stable Diffusion 1.5',
-    aspect: '16:9 Landscape',
-    imageUrl: 'https://picsum.photos/seed/dragonice55/900/500',
-  },
-  {
-    id: 'gen-4',
-    timestamp: '1 hour ago',
-    prompt: 'Cyberpunk street food vendor in rainy Tokyo with neon signs and steam',
-    style: 'Cyberpunk',
-    model: 'SD-Turbo (Realtime 0.8s)',
-    aspect: '1:1 Square',
-    imageUrl: 'https://picsum.photos/seed/cyberstreet33/600/600',
-  },
-  {
-    id: 'gen-5',
-    timestamp: '2 hours ago',
-    prompt: 'Enchanted underwater coral palace with bioluminescent sea turtles',
-    style: 'Photorealistic',
-    model: 'SD-Turbo (Realtime 0.8s)',
-    aspect: '16:9 Landscape',
-    imageUrl: 'https://picsum.photos/seed/oceanpalace88/900/500',
-  },
-];
+const INITIAL_GALLERY: GenerationItem[] = [INITIAL_IMAGE];
 
 const CreateStudio: React.FC = () => {
-  // THE ONE ACTIVE GENERATION DISPLAYED IN THE PROFESSIONAL GENERATOR
   const [activeImage, setActiveImage] = useState<GenerationItem>(INITIAL_IMAGE);
-  // THE REST STORED CLEANLY IN GALLERY
   const [galleryItems, setGalleryItems] = useState<GenerationItem[]>(INITIAL_GALLERY);
 
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState(() => new URLSearchParams(window.location.search).get('prompt') || '');
   const [style, setStyle] = useState('Photorealistic');
-  const [model, setModel] = useState('SD 1.5 Adaptive LoRA');
+  const [model, setModel] = useState('Fastest (SD-Turbo)');
   const [aspect, setAspect] = useState('16:9 Landscape');
-  const [quality, setQuality] = useState('Balanced (4-step)');
+  const [quality, setQuality] = useState('Balanced');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isEnhancing, setIsEnhancing] = useState(false);
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [modelCatalogue, setModelCatalogue] = useState<ModelCatalogueEntry[]>([]);
@@ -171,10 +221,17 @@ const CreateStudio: React.FC = () => {
   // Selective Recreation Modal State
   const [isRecreationOpen, setIsRecreationOpen] = useState(false);
   const [recreationInstruction, setRecreationInstruction] = useState('');
+  const [snapToEdges, setSnapToEdges] = useState(false);
+  const [blendSeamless, setBlendSeamless] = useState(true);
   const [hasMaskSelected, setHasMaskSelected] = useState(false);
+  const [currentMaskDataUrl, setCurrentMaskDataUrl] = useState<string | null>(null);
+  const [inpaintAvailable, setInpaintAvailable] = useState(true);
 
   // Vision inspection
   const [showVisionAnalysis, setShowVisionAnalysis] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+  const [analysis, setAnalysis] = useState<ImageAnalysis | null>(null);
+  const [analysing, setAnalysing] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -182,6 +239,32 @@ const CreateStudio: React.FC = () => {
     getModelCatalogue()
       .then((result) => setModelCatalogue(result.models))
       .catch((error) => setGenerationError(error instanceof Error ? error.message : 'Unable to load model catalogue.'));
+
+    getCapabilities()
+      .then((caps) => {
+        setInpaintAvailable(Boolean(caps.generation_available && caps.inpainting_available !== false));
+      })
+      .catch(() => {});
+
+    getGalleryItems()
+      .then((res) => {
+        if (res.items && res.items.length > 0) {
+          const mapped: GenerationItem[] = res.items.map((it) => ({
+            id: it.id,
+            timestamp: new Date(it.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            prompt: it.prompt,
+            style: it.style || 'Photorealistic',
+            model: it.model || 'SD-Turbo',
+            aspect: it.width > it.height ? '16:9 Landscape' : it.height > it.width ? '9:16 Portrait' : '1:1 Square',
+            imageUrl: it.image_url,
+            isRecreation: it.category === 'inpaint',
+            recreationNote: it.recreation_note,
+          }));
+          setActiveImage(mapped[0]);
+          setGalleryItems(mapped);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Voice Recording Simulation
@@ -212,22 +295,33 @@ const CreateStudio: React.FC = () => {
     setIsVoiceOpen(false);
   };
 
-  const handleEnhancePrompt = () => {
-    if (!prompt.trim()) {
-      setPrompt('A futuristic eco-friendly floating city with waterfalls, solar sail architecture, golden hour cinematic lighting, 8k octane render, masterpiece');
+  const handleEnhancePrompt = async () => {
+    const sourcePrompt = prompt.trim();
+    if (!sourcePrompt) {
+      setGenerationError('Enter a word or idea before enhancing the prompt.');
       return;
     }
-    setPrompt(
-      (prev) =>
-        `${prev}, cinematic composition, hyper-detailed textures, volumetric atmospheric lighting, 8k resolution, ray-traced reflections, trending on ArtStation, masterpiece.`
-    );
+
+    setIsEnhancing(true);
+    setGenerationError(null);
+    try {
+      const result = await enhancePrompt(sourcePrompt);
+      setPrompt(result.prompt);
+    } catch (error) {
+      setGenerationError(error instanceof Error ? error.message : 'AI prompt enhancement failed.');
+    } finally {
+      setIsEnhancing(false);
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setAttachedImage(url);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setAttachedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -242,556 +336,197 @@ const CreateStudio: React.FC = () => {
     const newPrompt = prompt.trim() || 'Visual remix from uploaded reference image';
     setGenerationError(null);
     try {
-      const qualityMode = quality.startsWith('Quick')
-        ? 'quick'
-        : quality.startsWith('Best')
-          ? 'best'
-          : 'balanced';
-      const styledPrompt = `${newPrompt}, ${STYLE_PROMPTS[style] || STYLE_PROMPTS.Photorealistic}`;
-      const selectedModelId = modelCatalogue.find((entry) => entry.display_name === model)?.id;
+      const styleText = STYLE_PROMPTS[style] || STYLE_PROMPTS.Photorealistic;
+      let styledPrompt = `${newPrompt}, ${styleText}`;
+      if (styledPrompt.length > 500) {
+        const maxLen = 500 - styleText.length - 2;
+        styledPrompt = `${newPrompt.slice(0, Math.max(10, maxLen)).trim()}, ${styleText}`;
+      }
+
+      const dims = ASPECT_DIMENSIONS[aspect] || { width: 512, height: 512 };
+      const selectedModelId = modelCatalogue.find((entry) => modelUiName(entry) === model)?.id;
       const modelChoice = selectedModelId === 'sd15'
         ? 'sd15_baseline'
         : selectedModelId === 'sd15_optimized'
           ? 'sd15_optimized'
+          : selectedModelId === 'imagineai_lcm'
+            ? 'imagineai_lcm'
           : selectedModelId === 'sd15_adapted'
             ? 'sd15_adapted'
-            : null;
-      const result = modelChoice
-        ? await generateWithModel({
-            prompt: styledPrompt,
-            modelChoice,
-            resolution: 512,
-            steps: modelChoice === 'sd15_optimized' ? 8 : 30,
-          })
-        : await generateImage({
-            prompt: styledPrompt,
-            qualityMode,
-            resolution: 512,
-          });
+            : 'sd_turbo';
+      const qualityPreset = getQualityPreset(quality);
+      const steps = getQualitySteps(modelChoice, qualityPreset);
+
+      let resultUrl = '';
+      let requestId = '';
+      let usedModel = model;
+      let usedSteps = steps;
+
+      if (attachedImage) {
+        // True Image-to-Image reference conditioning
+        const res = await generateImg2Img({
+          prompt: styledPrompt,
+          imageBase64: attachedImage,
+          modelChoice,
+          steps,
+          style,
+        });
+        resultUrl = res.image_url;
+        requestId = res.request_id;
+        usedSteps = res.steps;
+        usedModel = `${model} (Img2Img)`;
+      } else {
+        const res = await generateWithModel({
+          prompt: newPrompt,
+          modelChoice,
+          width: dims.width,
+          height: dims.height,
+          resolution: Math.max(dims.width, dims.height),
+          steps,
+          category: 'single',
+          style,
+        });
+        resultUrl = res.image_url;
+        requestId = res.request_id;
+        usedSteps = res.steps;
+      }
+
       const newGen: GenerationItem = {
-        id: result.request_id,
+        id: requestId,
         timestamp: 'Just now',
         prompt: newPrompt,
         style,
-        model,
+        model: usedModel,
+        steps: usedSteps,
         aspect,
-        imageUrl: result.image_url,
+        imageUrl: resultUrl,
         referenceImage: attachedImage || undefined,
         voiceLanguage: spokenText && prompt.includes(translatedPrompt) ? voiceLang.name : undefined,
         originalVoiceText: spokenText && prompt.includes(translatedPrompt) ? spokenText : undefined,
       };
 
-      // Set as THE active generation
       setActiveImage(newGen);
-      // Store into gallery collection
       setGalleryItems((prev) => [newGen, ...prev]);
-      setIsGenerating(false);
       setPrompt('');
       setAttachedImage(null);
     } catch (error) {
       setGenerationError(error instanceof Error ? error.message : 'Image generation failed.');
+    } finally {
       setIsGenerating(false);
     }
   };
 
   // Selective Recreation Handler
+  const toggleDetails = async () => {
+    const next = !showVisionAnalysis;
+    setShowVisionAnalysis(next);
+    if (!next) return;
+    setAnalysis(null);
+    setAnalysing(true);
+    try {
+      setAnalysis(await cvAnalyze(await imageUrlToDataUrl(activeImage.imageUrl)));
+    } catch {
+      setAnalysis(null);
+    } finally {
+      setAnalysing(false);
+    }
+  };
+
+  useEffect(() => {
+    setShowVisionAnalysis(false);
+    setAnalysis(null);
+  }, [activeImage.id]);
+
   const handleOpenSelectiveRecreate = () => {
     setRecreationInstruction('Change the sky to deep violet with shooting stars and neon aurora');
     setIsRecreationOpen(true);
   };
 
-  const handleApplySelectiveRecreation = () => {
+  const handleMaskChange = useCallback((hasMask: boolean, maskUrl?: string) => {
+    setHasMaskSelected(hasMask);
+    setCurrentMaskDataUrl(maskUrl || null);
+  }, []);
+
+  const handleApplySelectiveRecreation = async () => {
+    if (!currentMaskDataUrl) {
+      setGenerationError('Please circle or brush an area on the canvas first.');
+      return;
+    }
+    if (!inpaintAvailable) {
+      setGenerationError('Inpainting is currently unavailable on the backend runtime.');
+      return;
+    }
+
     setIsGenerating(true);
     setIsRecreationOpen(false);
+    setGenerationError(null);
 
-    setTimeout(() => {
-      const recreated: GenerationItem = {
-        id: `recreate-${Date.now()}`,
-        timestamp: 'Just now (Inpainted)',
-        prompt: `${activeImage.prompt} [Circled Inpaint: ${recreationInstruction}]`,
+    try {
+      const originalBase64 = await imageUrlToDataUrl(activeImage.imageUrl);
+      const inpaintRes = await generateInpaint({
+        prompt: recreationInstruction.trim() || activeImage.prompt,
+        imageBase64: originalBase64,
+        maskBase64: currentMaskDataUrl,
+        steps: INPAINT_STEPS[getQualityPreset(quality)],
+        sourceId: activeImage.id,
         style: activeImage.style,
-        model: activeImage.model,
+        recreationNote: recreationInstruction,
+        smartSelect: snapToEdges,
+        harmonise: blendSeamless,
+      });
+
+      const recreated: GenerationItem = {
+        id: inpaintRes.request_id,
+        timestamp: 'Just now (Inpainted)',
+        prompt: `${activeImage.prompt} [Inpaint: ${recreationInstruction}]`,
+        style: activeImage.style,
+        model: inpaintRes.model_choice,
+        steps: inpaintRes.steps,
         aspect: activeImage.aspect,
-        imageUrl: `https://picsum.photos/seed/recreate${Date.now()}/900/500`,
+        imageUrl: inpaintRes.image_url,
         isRecreation: true,
-        recreationNote: `Circled Area: "${recreationInstruction}"`,
+        recreationNote: `Inpaint: "${recreationInstruction}"`,
       };
 
-      // Set the recreated image as active
       setActiveImage(recreated);
-      // Save it into the gallery
       setGalleryItems((prev) => [recreated, ...prev]);
+    } catch (error) {
+      setGenerationError(error instanceof Error ? error.message : 'Inpainting failed.');
+    } finally {
       setIsGenerating(false);
-    }, 1500);
+    }
   };
 
   return (
     <WorkspaceLayout>
-      <Box p={{ base: 4, md: 6 }} minH="100vh" bg="#080B0A" display="flex" flexDir="column">
-        {/* Top Professional Toolbar */}
-        {generationError && (
-          <Box
-            mb={3}
-            px={4}
-            py={3}
-            borderRadius="10px"
-            bg="rgba(255,68,68,0.12)"
-            border="1px solid rgba(255,68,68,0.4)"
-            color="#FFB3B3"
-            fontSize="sm"
-            role="alert"
-          >
-            {generationError}
-          </Box>
-        )}
-        <Box
-          bg="#111713"
-          border="1px solid #2A3A2C"
-          borderRadius="16px"
-          px={5}
-          py={3.5}
-          mb={5}
-          boxShadow="0 4px 20px rgba(0,0,0,0.5)"
-        >
-          <Flex
-            direction={{ base: 'column', md: 'row' }}
-            justify="space-between"
-            align={{ base: 'flex-start', md: 'center' }}
-            gap={3}
-          >
-            <Flex align="center" gap={3}>
-              <Box
-                w="36px"
-                h="36px"
-                borderRadius="10px"
-                bg="#B7FF35"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                fontSize="18px"
-                fontWeight="bold"
-                color="#080B0A"
-              >
-                🎨
-              </Box>
-              <Box>
-                <Flex align="center" gap={2}>
-                  <Heading size="sm" color="#F4F7F0" fontWeight="700">
-                    Image Generator
-                  </Heading>
-                  <Badge bg="rgba(183, 255, 53, 0.15)" color="#B7FF35" px={2} py={0.5} borderRadius="full" fontSize="10px">
-                    Professional Studio
-                  </Badge>
-                </Flex>
-                <Text color="#A5B1A7" fontSize="xs">
-                  Active generation workspace · All outputs automatically archived to Gallery
-                </Text>
-              </Box>
-            </Flex>
+      <Box p={{ base: 3, md: 5 }} minH="100vh" bg="#FBF8F4" display="flex" flexDir="column">
+        <Box maxW="860px" mx="auto" w="100%">
+          <Heading as="h1" size="lg" color="#1E2233" fontWeight="800" letterSpacing="-0.02em">
+            Create an image
+          </Heading>
+          <Text color="#5B6277" mt={1} mb={6}>
+            Describe what you imagine in your own words, and we will draw it for you.
+          </Text>
 
-            {/* Presets and Model Selectors */}
-            <Flex wrap="wrap" align="center" gap={2}>
-              <Select
-                size="sm"
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                bg="#0F1A11"
-                color="#F4F7F0"
-                border="1px solid #2A3A2C"
-                borderRadius="8px"
-                w={{ base: 'full', sm: '190px' }}
-                _hover={{ borderColor: '#B7FF35' }}
-              >
-                {(modelCatalogue.length > 0 ? modelCatalogue : [{
-                  id: 'sd_turbo',
-                  display_name: 'SD-Turbo',
-                  task: 'text-to-image',
-                  role: 'Quick generation',
-                  checkpoint: 'stabilityai/sd-turbo',
-                  license_reference: 'Hugging Face model card',
-                  quality_modes: ['quick', 'balanced', 'best'],
-                  available: true,
-                  availability_reason: 'Configured and available.',
-                  configured: true,
-                }]).map((entry) => (
-                  <option
-                    key={entry.id}
-                    value={entry.display_name}
-                    disabled={!entry.available}
-                    style={{ background: '#111713' }}
-                  >
-                    {entry.display_name}{entry.available ? '' : ' (Unavailable)'}
-                  </option>
-                ))}
-              </Select>
-
-              <Select
-                size="sm"
-                value={style}
-                onChange={(e) => setStyle(e.target.value)}
-                bg="#0F1A11"
-                color="#F4F7F0"
-                border="1px solid #2A3A2C"
-                borderRadius="8px"
-                w={{ base: 'full', sm: '135px' }}
-                _hover={{ borderColor: '#B7FF35' }}
-              >
-                {STYLE_OPTIONS.map((s) => (
-                  <option key={s} value={s} style={{ background: '#111713' }}>
-                    {s}
-                  </option>
-                ))}
-              </Select>
-
-              <Select
-                size="sm"
-                value={aspect}
-                onChange={(e) => setAspect(e.target.value)}
-                bg="#0F1A11"
-                color="#F4F7F0"
-                border="1px solid #2A3A2C"
-                borderRadius="8px"
-                w="125px"
-                _hover={{ borderColor: '#B7FF35' }}
-              >
-                {ASPECT_OPTIONS.map((a) => (
-                  <option key={a} value={a} style={{ background: '#111713' }}>
-                    {a}
-                  </option>
-                ))}
-              </Select>
-
-              <Select
-                size="sm"
-                value={quality}
-                onChange={(e) => setQuality(e.target.value)}
-                bg="#0F1A11"
-                color="#F4F7F0"
-                border="1px solid #2A3A2C"
-                borderRadius="8px"
-                w="125px"
-                _hover={{ borderColor: '#B7FF35' }}
-              >
-                {QUALITY_OPTIONS.map((q) => (
-                  <option key={q} value={q} style={{ background: '#111713' }}>
-                    {q}
-                  </option>
-                ))}
-              </Select>
-
-              <Button
-                as={Link}
-                to="/gallery"
-                size="sm"
-                variant="outline"
-                borderColor="#2A3A2C"
-                color="#A5B1A7"
-                _hover={{ color: '#B7FF35', borderColor: '#B7FF35' }}
-                leftIcon={<FiLayers />}
-              >
-                Gallery ({galleryItems.length})
-              </Button>
-            </Flex>
-          </Flex>
-        </Box>
-
-        {/* MAIN STAGE: THE ONE ACTIVE GENERATION */}
-        <Box flex={1} display="flex" flexDir="column" pb="150px">
-          <Box
-            bg="#111713"
-            border="1px solid"
-            borderColor={activeImage.isRecreation ? '#B7FF35' : '#2A3A2C'}
-            borderRadius="18px"
-            p={5}
-            boxShadow="0 12px 40px rgba(0,0,0,0.6)"
-            position="relative"
-          >
-            {/* Active Generation Header Info */}
-            <Flex justify="space-between" align="center" mb={3} pb={2.5} borderBottom="1px solid #1A2A1C">
-              <Box flex={1}>
-                <Flex align="center" gap={2} mb={1}>
-                  <Badge bg="rgba(183,255,53,0.15)" color="#B7FF35" fontSize="10px" px={2} py={0.5} borderRadius="4px">
-                    Active Output
-                  </Badge>
-                  <Text fontSize="11px" color="#6B7B6D">
-                    {activeImage.timestamp} · Generated with {activeImage.model}
-                  </Text>
-                  {activeImage.isRecreation && (
-                    <Badge bg="#182019" color="#8DDB39" fontSize="10px">
-                      {activeImage.recreationNote}
-                    </Badge>
-                  )}
-                </Flex>
-                <Text fontSize="sm" color="#F4F7F0" fontWeight="600" noOfLines={2}>
-                  {activeImage.prompt}
-                </Text>
-              </Box>
-
-              <HStack spacing={2}>
-                {/* Selective Inpaint Recreate button */}
-                <Button
-                  size="sm"
-                  bg="rgba(183, 255, 53, 0.15)"
-                  color="#B7FF35"
-                  border="1px solid rgba(183, 255, 53, 0.35)"
-                  _hover={{ bg: '#B7FF35', color: '#080B0A' }}
-                  leftIcon={<Text>⭕</Text>}
-                  onClick={handleOpenSelectiveRecreate}
-                  fontWeight="bold"
-                >
-                  Selective Recreate (Circle Region)
-                </Button>
-
-                {/* Download */}
-                <Button
-                  as="a"
-                  href={activeImage.imageUrl}
-                  download="imagineai-creation.png"
-                  target="_blank"
-                  size="sm"
-                  variant="ghost"
-                  color="#A5B1A7"
-                  _hover={{ color: '#B7FF35', bg: '#182019' }}
-                  leftIcon={<FiDownload />}
-                >
-                  Save
-                </Button>
-              </HStack>
-            </Flex>
-
-            {/* Main Stage Image Display */}
-            <Box
-              position="relative"
-              borderRadius="14px"
-              overflow="hidden"
-              border="1px solid #2A3A2C"
-              bg="#080B0A"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              minH="360px"
-              maxH="520px"
-            >
-              {isGenerating ? (
-                <Flex direction="column" align="center" justify="center" p={12} gap={3}>
-                  <Text fontSize="28px" animation="spin 1.5s linear infinite">
-                    ✦
-                  </Text>
-                  <Text fontSize="sm" color="#B7FF35" fontWeight="600">
-                    Generating high-resolution artwork with {model}...
-                  </Text>
-                </Flex>
-              ) : (
-                <Image
-                  src={activeImage.imageUrl}
-                  alt={activeImage.prompt}
-                  w="100%"
-                  maxH="520px"
-                  objectFit="contain"
-                  transition="transform 0.3s ease"
-                />
-              )}
-
-              {/* Tag Overlays */}
-              <Flex position="absolute" top={3} left={3} gap={2}>
-                <Badge bg="rgba(8,11,10,0.85)" color="#F4F7F0" backdropFilter="blur(8px)" fontSize="10px" px={2.5} py={1} borderRadius="6px">
-                  {activeImage.style}
-                </Badge>
-                <Badge bg="rgba(183,255,53,0.2)" color="#B7FF35" backdropFilter="blur(8px)" fontSize="10px" px={2.5} py={1} borderRadius="6px">
-                  {activeImage.aspect}
-                </Badge>
-              </Flex>
+          {generationError && (
+            <Box mb={4} px={4} py={3} borderRadius="12px" bg="#FEECEC" border="1px solid #F5C2C4" color="#B42318" fontSize="sm" role="alert">
+              {generationError}
             </Box>
-
-            {/* Quick Actions & Vision inspector */}
-            <Flex justify="space-between" align="center" mt={3} pt={2}>
-              <HStack spacing={3}>
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  color="#A5B1A7"
-                  _hover={{ color: '#F4F7F0', bg: '#182019' }}
-                  leftIcon={<FiSliders />}
-                  onClick={() => setPrompt(activeImage.prompt)}
-                >
-                  Load Prompt into Composer
-                </Button>
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  color="#A5B1A7"
-                  _hover={{ color: '#B7FF35', bg: '#182019' }}
-                  onClick={() => setShowVisionAnalysis(!showVisionAnalysis)}
-                >
-                  {showVisionAnalysis ? 'Hide Vision Inspection' : '👁️ Vision Analysis'}
-                </Button>
-              </HStack>
-              <Text fontSize="11px" color="#6B7B6D">
-                Saved in Gallery · Ready for Export or Remix
-              </Text>
-            </Flex>
-
-            {showVisionAnalysis && (
-              <Box mt={3} p={3.5} bg="#0D120E" border="1px solid #2A3A2C" borderRadius="10px">
-                <Text fontSize="11px" color="#B7FF35" fontWeight="bold" mb={1}>
-                  👁️ Imagine Vision Assistant
-                </Text>
-                <Text fontSize="xs" color="#A5B1A7">
-                  The generation demonstrates well-balanced focal hierarchy with volumetric atmospheric depth. High-frequency contrast accents the architectural details, with soft warm glow in the specular highlights.
-                </Text>
-              </Box>
-            )}
-          </Box>
-
-          {/* RECENT OUTPUTS FILMSTRIP (REST INSIDE GALLERY) */}
-          <Box mt={4} p={3.5} bg="#111713" border="1px solid #2A3A2C" borderRadius="14px">
-            <Flex justify="space-between" align="center" mb={2.5}>
-              <Flex align="center" gap={2}>
-                <Text fontSize="xs" color="#A5B1A7" fontWeight="bold" textTransform="uppercase" letterSpacing="0.05em">
-                  Recent Outputs in Gallery
-                </Text>
-                <Badge bg="#182019" color="#8DDB39" fontSize="10px">
-                  {galleryItems.length} Saved
-                </Badge>
-              </Flex>
-
-              <Button
-                as={Link}
-                to="/gallery"
-                size="xs"
-                variant="ghost"
-                color="#B7FF35"
-                rightIcon={<FiArrowRight />}
-              >
-                Open Full Gallery
-              </Button>
-            </Flex>
-
-            {/* Thumbnails row */}
-            <Flex gap={3} overflowX="auto" pb={1}>
-              {galleryItems.map((item) => {
-                const isSelected = item.id === activeImage.id;
-                return (
-                  <Box
-                    key={item.id}
-                    position="relative"
-                    w="90px"
-                    h="65px"
-                    flexShrink={0}
-                    borderRadius="8px"
-                    overflow="hidden"
-                    border="2px solid"
-                    borderColor={isSelected ? '#B7FF35' : '#2A3A2C'}
-                    cursor="pointer"
-                    _hover={{ borderColor: '#B7FF35', transform: 'scale(1.04)' }}
-                    transition="all 0.2s ease"
-                    onClick={() => setActiveImage(item)}
-                  >
-                    <Image src={item.imageUrl} alt={item.prompt} w="100%" h="100%" objectFit="cover" />
-                    {isSelected && (
-                      <Box
-                        position="absolute"
-                        bottom={1}
-                        right={1}
-                        w="8px"
-                        h="8px"
-                        borderRadius="full"
-                        bg="#B7FF35"
-                      />
-                    )}
-                  </Box>
-                );
-              })}
-            </Flex>
-          </Box>
-        </Box>
-
-        {/* BOTTOM MULTIMODAL PROMPT DOCK */}
-        <Box
-          position="fixed"
-          bottom="20px"
-          left={{ base: '20px', md: '240px' }}
-          right="96px"
-          zIndex={90}
-          bg="#0D120E"
-          border="1px solid #3A4A3C"
-          borderRadius="18px"
-          p={3}
-          boxShadow="0 12px 48px rgba(0,0,0,0.8), 0 0 30px rgba(183,255,53,0.15)"
-        >
-          {attachedImage && (
-            <Flex gap={2} mb={2} px={1} align="center">
-              <Flex align="center" gap={1.5} bg="#182019" px={2.5} py={1} borderRadius="8px" border="1px solid #2A3A2C">
-                <Image src={attachedImage} w="20px" h="20px" borderRadius="4px" objectFit="cover" />
-                <Text fontSize="xs" color="#A5B1A7">Image Reference</Text>
-                <IconButton
-                  aria-label="Remove image"
-                  icon={<FiX size={12} />}
-                  size="xs"
-                  variant="ghost"
-                  color="#FF4444"
-                  onClick={() => setAttachedImage(null)}
-                />
-              </Flex>
-            </Flex>
           )}
 
-          <Flex align="flex-end" gap={2}>
-            {/* Attachment input */}
-            <input
-              type="file"
-              ref={fileInputRef}
-              style={{ display: 'none' }}
-              accept="image/*"
-              onChange={handleImageUpload}
-            />
-            <Tooltip label="Upload image reference (Image-to-Image)">
-              <IconButton
-                aria-label="Upload reference"
-                icon={<FiPaperclip size={18} />}
-                variant="ghost"
-                color={attachedImage ? '#B7FF35' : '#A5B1A7'}
-                bg={attachedImage ? '#182019' : 'transparent'}
-                _hover={{ color: '#F4F7F0', bg: '#182019' }}
-                borderRadius="10px"
-                onClick={() => fileInputRef.current?.click()}
-              />
-            </Tooltip>
-
-            {/* Voice Assistant & Translation Button */}
-            <Tooltip label="Speak in any language (Voice Translator & Prompter)">
-              <IconButton
-                aria-label="Voice input"
-                icon={<FiMic size={18} />}
-                variant="ghost"
-                color="#A5B1A7"
-                _hover={{ color: '#B7FF35', bg: '#182019' }}
-                borderRadius="10px"
-                onClick={() => setIsVoiceOpen(true)}
-              />
-            </Tooltip>
-
-            {/* Enhance prompt button */}
-            <Tooltip label="✨ Enhance prompt with AI detail">
-              <Button
-                size="sm"
-                variant="outline"
-                borderColor="#2A3A2C"
-                color="#B7FF35"
-                _hover={{ bg: '#1A2A1C', borderColor: '#B7FF35' }}
-                borderRadius="10px"
-                px={3}
-                onClick={handleEnhancePrompt}
-                leftIcon={<FiZap size={14} />}
-                fontSize="xs"
-              >
-                Enhance
-              </Button>
-            </Tooltip>
-
-            {/* Main Textarea */}
+          {/* STEP 1: DESCRIBE */}
+          <Box bg="#FFFFFF" border="1px solid #E3DACF" borderRadius="20px" p={{ base: 4, md: 5 }}
+            boxShadow="0 1px 2px rgba(30,34,51,0.05), 0 8px 24px rgba(30,34,51,0.06)">
+            <Text fontSize="sm" fontWeight="700" color="#1E2233" mb={2}>1. What do you want to see?</Text>
+            {attachedImage && (
+              <Flex align="center" gap={2} mb={2} bg="#F7F3EE" px={3} py={2} borderRadius="10px" w="fit-content">
+                <Image src={attachedImage} w="28px" h="28px" borderRadius="6px" objectFit="cover" alt="Your reference photo" />
+                <Text fontSize="xs" color="#5B6277">We will use your photo as a starting point</Text>
+                <IconButton aria-label="Remove photo" icon={<FiX size={14} />} size="xs" variant="ghost" color="#E5484D" onClick={() => setAttachedImage(null)} />
+              </Flex>
+            )}
             <Textarea
-              placeholder="Describe what you want to generate, or use the mic to speak... (Press Enter to generate)"
+              placeholder="For example: a cozy cabin in a snowy forest at sunset"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               onKeyDown={(e) => {
@@ -800,45 +535,176 @@ const CreateStudio: React.FC = () => {
                   handleGenerate();
                 }
               }}
-              minH="44px"
-              maxH="120px"
-              py={2.5}
-              px={3}
-              variant="unstyled"
-              color="#F4F7F0"
-              fontSize="sm"
-              _placeholder={{ color: '#6B7B6D' }}
-              resize="none"
-              flex={1}
+              minH="96px"
+              fontSize="md"
+              resize="vertical"
+              aria-label="Describe your image"
             />
+            <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleImageUpload} />
+            <Flex mt={3} align="center" justify="space-between" wrap="wrap" gap={3}>
+              <HStack spacing={1} wrap="wrap">
+                <Button size="sm" variant="ghost" leftIcon={<FiPaperclip />} onClick={() => fileInputRef.current?.click()}
+                  color={attachedImage ? '#5B5BF0' : '#5B6277'}>Add a photo</Button>
+                <Button size="sm" variant="ghost" leftIcon={<FiMic />} onClick={() => setIsVoiceOpen(true)} color="#5B6277">Speak it</Button>
+                <Tooltip label="Rewrites your idea with richer detail" hasArrow>
+                  <Button size="sm" variant="ghost" leftIcon={<FiZap />} onClick={handleEnhancePrompt} isLoading={isEnhancing}
+                    isDisabled={isEnhancing || isGenerating || !prompt.trim()} color="#5B6277">Improve my words</Button>
+                </Tooltip>
+              </HStack>
+              <Button variant="brand" size="lg" px={8} onClick={handleGenerate} isLoading={isGenerating} loadingText="Creating..."
+                rightIcon={<FiSend />} isDisabled={!prompt.trim() && !attachedImage}>
+                Create image
+              </Button>
+            </Flex>
+          </Box>
 
-            {/* Generate Button */}
-            <Button
-              bg="#B7FF35"
-              color="#080B0A"
-              fontWeight="700"
-              fontSize="sm"
-              borderRadius="12px"
-              px={5}
-              h="42px"
-              _hover={{ bg: '#8DDB39', transform: 'translateY(-1px)' }}
-              _active={{ bg: '#6FBB20' }}
-              onClick={handleGenerate}
-              isLoading={isGenerating}
-              rightIcon={<FiSend size={14} />}
-            >
-              Generate
-            </Button>
-          </Flex>
+          {/* STEP 2: LOOK */}
+          <Box mt={6}>
+            <Text fontSize="sm" fontWeight="700" color="#1E2233" mb={2}>2. Choose a look</Text>
+            <Flex wrap="wrap" gap={2} role="radiogroup" aria-label="Choose a look">
+              {STYLE_OPTIONS.map((s2) => (
+                <Button key={s2} size="sm" borderRadius="full" role="radio" aria-checked={style === s2}
+                  bg={style === s2 ? '#5B5BF0' : '#FFFFFF'} color={style === s2 ? '#FFFFFF' : '#1E2233'}
+                  border="1px solid" borderColor={style === s2 ? '#5B5BF0' : '#E3DACF'} fontWeight={style === s2 ? 700 : 500}
+                  _hover={{ borderColor: '#5B5BF0', bg: style === s2 ? '#4747DB' : '#EEF0FF' }} onClick={() => setStyle(s2)}>
+                  {s2}
+                </Button>
+              ))}
+            </Flex>
+          </Box>
+
+          {/* MORE OPTIONS (hidden by default) */}
+          <Button mt={4} variant="link" color="#5B6277" size="sm" onClick={() => setShowMore((v) => !v)}
+            rightIcon={showMore ? <FiChevronUp /> : <FiChevronDown />} aria-expanded={showMore}>
+            More options (engine, quality, shape)
+          </Button>
+          <Collapse in={showMore} animateOpacity>
+            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4} mt={3} p={4} bg="#FFFFFF" border="1px solid #E3DACF" borderRadius="16px">
+              <Box>
+                <Text fontSize="xs" fontWeight="700" color="#5B6277" mb={1}>Engine</Text>
+                <Select size="sm" value={model} onChange={(e) => setModel(e.target.value)} aria-label="Engine">
+                  {(modelCatalogue.length > 0 ? modelCatalogue : [{
+                    id: 'sd_turbo', display_name: 'SD-Turbo', task: 'text-to-image', role: 'Quick generation', checkpoint: 'stabilityai/sd-turbo',
+                    license_reference: '', quality_modes: ['quick', 'balanced', 'best'], available: true, availability_reason: '', configured: true,
+                  }]).map((entry) => (
+                    <option key={entry.id} value={modelUiName(entry)} disabled={!entry.available}>
+                      {modelUiName(entry)}{entry.available ? '' : ' (not installed)'}
+                    </option>
+                  ))}
+                </Select>
+              </Box>
+              <Box>
+                <Text fontSize="xs" fontWeight="700" color="#5B6277" mb={1}>Quality</Text>
+                <Select size="sm" value={quality} onChange={(e) => setQuality(e.target.value)} aria-label="Quality">
+                  {QUALITY_OPTIONS.map((q) => <option key={q} value={q}>{q} ({QUALITY_HINT[q]})</option>)}
+                </Select>
+              </Box>
+              <Box>
+                <Text fontSize="xs" fontWeight="700" color="#5B6277" mb={1}>Shape</Text>
+                <Select size="sm" value={aspect} onChange={(e) => setAspect(e.target.value)} aria-label="Shape">
+                  {ASPECT_OPTIONS.map((a) => <option key={a} value={a}>{aspectLabel(a)}</option>)}
+                </Select>
+              </Box>
+            </SimpleGrid>
+          </Collapse>
+
+          {/* RESULT */}
+          <Box mt={8} bg="#FFFFFF" border="1px solid" borderColor={activeImage.isRecreation ? '#5B5BF0' : '#E3DACF'} borderRadius="20px" p={{ base: 3, md: 5 }}
+            boxShadow="0 1px 2px rgba(30,34,51,0.05), 0 8px 24px rgba(30,34,51,0.06)">
+            <Flex justify="space-between" align="center" mb={3} wrap="wrap" gap={2}>
+              <Box minW={0} flex={1}>
+                <Text fontSize="sm" fontWeight="700" color="#1E2233">Your image</Text>
+                <Text fontSize="sm" color="#5B6277" noOfLines={2}>{activeImage.prompt}</Text>
+              </Box>
+              {activeImage.isRecreation && <Badge bg="#EEF0FF" color="#4747DB" borderRadius="full" px={3} py={1} textTransform="none">{activeImage.recreationNote}</Badge>}
+            </Flex>
+
+            <Flex align="center" justify="center" bg="#FBF8F4" borderRadius="14px" border="1px solid #EFE8DF" minH={{ base: '260px', md: '380px' }} overflow="hidden">
+              {isGenerating ? (
+                <Flex direction="column" align="center" gap={3} p={10} role="status">
+                  <Spinner size="xl" color="#5B5BF0" thickness="4px" />
+                  <Text fontWeight="600" color="#1E2233">Drawing your image...</Text>
+                  <Text fontSize="sm" color="#5B6277">This usually takes a few seconds.</Text>
+                </Flex>
+              ) : (
+                <Image src={activeImage.imageUrl} alt={activeImage.prompt} maxW="100%" maxH={{ base: '360px', md: '520px' }} objectFit="contain" />
+              )}
+            </Flex>
+
+            <Flex mt={4} gap={2} wrap="wrap">
+              <Button leftIcon={<FiEdit3 />} variant="brand" onClick={handleOpenSelectiveRecreate} isDisabled={!inpaintAvailable || isGenerating}>
+                Change part of this image
+              </Button>
+              <Button leftIcon={<FiDownload />} variant="outline" isDisabled={isGenerating}
+                onClick={() => handleDownloadImage(activeImage.imageUrl, `imagineai-${activeImage.id || Date.now()}.png`)}>
+                Download
+              </Button>
+              <Button leftIcon={<FiRefreshCw />} variant="ghost" isDisabled={isGenerating}
+                onClick={() => { setPrompt(activeImage.prompt); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                Use this idea again
+              </Button>
+              <Button leftIcon={<FiInfo />} variant="ghost" onClick={toggleDetails} aria-expanded={showVisionAnalysis}>
+                {showVisionAnalysis ? 'Hide details' : 'About this image'}
+              </Button>
+            </Flex>
+
+            <Collapse in={showVisionAnalysis} animateOpacity>
+              <Box mt={4} p={4} bg="#F7F3EE" borderRadius="14px">
+                {analysing && <Flex align="center" gap={2}><Spinner size="sm" color="#5B5BF0" /><Text fontSize="sm" color="#5B6277">Measuring the image...</Text></Flex>}
+                {!analysing && !analysis && <Text fontSize="sm" color="#5B6277">Could not measure this image.</Text>}
+                {analysis && (
+                  <>
+                    <SimpleGrid columns={{ base: 2, md: 5 }} spacing={3}>
+                      {([['Sharpness', analysis.sharpness], ['Brightness', analysis.brightness], ['Contrast', analysis.contrast], ['Colour', analysis.colourfulness], ['Grain', analysis.noise]] as const).map(([k, v]) => (
+                        <Box key={k} bg="#FFFFFF" borderRadius="12px" p={3} border="1px solid #EFE8DF">
+                          <Text fontSize="11px" color="#8A90A2" fontWeight="700" textTransform="uppercase">{k}</Text>
+                          <Text fontWeight="700" color="#1E2233">{v.label}</Text>
+                        </Box>
+                      ))}
+                    </SimpleGrid>
+                    <Flex mt={3} align="center" gap={2} wrap="wrap">
+                      <Text fontSize="xs" color="#5B6277">Main colours:</Text>
+                      {analysis.palette.map((c) => (
+                        <Tooltip key={c.hex} label={`${c.hex} (${Math.round(c.share * 100)}%)`} hasArrow>
+                          <Box w="28px" h="28px" borderRadius="full" bg={c.hex} border="2px solid #FFFFFF" boxShadow="0 0 0 1px #E3DACF" />
+                        </Tooltip>
+                      ))}
+                      <Text fontSize="xs" color="#8A90A2" ml="auto">{activeImage.model} · {activeImage.steps ? `${activeImage.steps} steps · ` : ''}{analysis.width}x{analysis.height}px · measured with computer vision</Text>
+                    </Flex>
+                  </>
+                )}
+              </Box>
+            </Collapse>
+          </Box>
+
+          {/* RECENT */}
+          <Box mt={8}>
+            <Flex justify="space-between" align="center" mb={3}>
+              <Text fontSize="sm" fontWeight="700" color="#1E2233">Your recent creations</Text>
+              <Button as={Link} to="/gallery" size="sm" variant="ghost" color="#5B5BF0" rightIcon={<FiArrowRight />}>See all</Button>
+            </Flex>
+            <Flex gap={3} overflowX="auto" pb={2}>
+              {galleryItems.slice(0, 24).map((item) => {
+                const isSelected = item.id === activeImage.id;
+                return (
+                  <Box key={item.id} as="button" w="104px" h="104px" flexShrink={0} borderRadius="14px" overflow="hidden" border="3px solid"
+                    borderColor={isSelected ? '#5B5BF0' : 'transparent'} boxShadow="0 1px 4px rgba(30,34,51,0.12)"
+                    _hover={{ transform: 'scale(1.04)' }} transition="all 0.15s ease" onClick={() => setActiveImage(item)} aria-label={`Open: ${item.prompt}`}>
+                    <Image src={item.imageUrl} alt="" w="100%" h="100%" objectFit="cover" />
+                  </Box>
+                );
+              })}
+            </Flex>
+          </Box>
         </Box>
 
         {/* VOICE ASSISTANT & TRANSLATION MODAL */}
         <Modal isOpen={isVoiceOpen} onClose={() => setIsVoiceOpen(false)} isCentered size="lg">
-          <ModalOverlay bg="rgba(0,0,0,0.85)" backdropFilter="blur(6px)" />
-          <ModalContent bg="#111713" border="1px solid #2A3A2C" borderRadius="18px" color="#F4F7F0">
-            <ModalHeader borderBottom="1px solid #1A2A1C" py={4}>
+          <ModalOverlay bg="rgba(30,34,51,0.55)" backdropFilter="blur(6px)" />
+          <ModalContent bg="#FFFFFF" border="1px solid #E3DACF" borderRadius="18px" color="#1E2233">
+            <ModalHeader borderBottom="1px solid #EFE8DF" py={4}>
               <Flex align="center" gap={2}>
-                <Box w="28px" h="28px" borderRadius="full" bg="#B7FF35" display="flex" alignItems="center" justifyContent="center" color="#080B0A" fontSize="14px">
+                <Box w="28px" h="28px" borderRadius="full" bg="#5B5BF0" display="flex" alignItems="center" justifyContent="center" color="#FFFFFF" fontSize="14px">
                   🎤
                 </Box>
                 <Text fontSize="md" fontWeight="bold">
@@ -846,15 +712,15 @@ const CreateStudio: React.FC = () => {
                 </Text>
               </Flex>
             </ModalHeader>
-            <ModalCloseButton color="#A5B1A7" />
+            <ModalCloseButton color="#5B6277" />
 
             <ModalBody py={5}>
-              <Text fontSize="xs" color="#A5B1A7" mb={4}>
+              <Text fontSize="xs" color="#5B6277" mb={4}>
                 Speak your idea naturally in your preferred language. Imagine AI automatically transcribes and translates it into an optimized English image generation prompt!
               </Text>
 
               <Box mb={4}>
-                <Text fontSize="xs" color="#6B7B6D" mb={1.5} textTransform="uppercase" letterSpacing="0.05em">
+                <Text fontSize="xs" color="#8A90A2" mb={1.5} textTransform="uppercase" letterSpacing="0.05em">
                   Select Speaking Language
                 </Text>
                 <Select
@@ -864,14 +730,14 @@ const CreateStudio: React.FC = () => {
                     setVoiceLang(l);
                     setSpokenText(l.sample);
                   }}
-                  bg="#0F1A11"
-                  color="#F4F7F0"
-                  border="1px solid #2A3A2C"
+                  bg="#F7F3EE"
+                  color="#1E2233"
+                  border="1px solid #E3DACF"
                   borderRadius="10px"
                   size="sm"
                 >
                   {LANGUAGES.map((l) => (
-                    <option key={l.code} value={l.code} style={{ background: '#111713' }}>
+                    <option key={l.code} value={l.code} style={{ background: '#FFFFFF' }}>
                       {l.name}
                     </option>
                   ))}
@@ -883,45 +749,45 @@ const CreateStudio: React.FC = () => {
                   w="72px"
                   h="72px"
                   borderRadius="full"
-                  bg={isRecording ? '#FF4444' : '#182019'}
+                  bg={isRecording ? '#E5484D' : '#F5F0EA'}
                   border="2px solid"
-                  borderColor={isRecording ? '#FF4444' : '#B7FF35'}
+                  borderColor={isRecording ? '#E5484D' : '#5B5BF0'}
                   display="flex"
                   alignItems="center"
                   justifyContent="center"
                   cursor="pointer"
                   onClick={handleToggleRecord}
-                  boxShadow={isRecording ? '0 0 25px rgba(255,68,68,0.5)' : '0 0 20px rgba(183,255,53,0.3)'}
+                  boxShadow={isRecording ? '0 0 25px rgba(229,72,77,0.5)' : '0 0 20px rgba(91,91,240,0.14)'}
                 >
-                  <FiMic size={30} color={isRecording ? '#F4F7F0' : '#B7FF35'} />
+                  <FiMic size={30} color={isRecording ? '#1E2233' : '#5B5BF0'} />
                 </Box>
-                <Text fontSize="xs" color={isRecording ? '#FF4444' : '#B7FF35'} fontWeight="600" mt={2.5}>
+                <Text fontSize="xs" color={isRecording ? '#E5484D' : '#5B5BF0'} fontWeight="600" mt={2.5}>
                   {isRecording ? 'Listening... Speak now' : 'Tap microphone to speak'}
                 </Text>
               </Flex>
 
-              <Box bg="#0D120E" p={4} borderRadius="12px" border="1px solid #2A3A2C" mt={2}>
-                <Text fontSize="10px" color="#6B7B6D" textTransform="uppercase" fontWeight="bold">
+              <Box bg="#FFFFFF" p={4} borderRadius="12px" border="1px solid #E3DACF" mt={2}>
+                <Text fontSize="10px" color="#8A90A2" textTransform="uppercase" fontWeight="bold">
                   Transcribed ({voiceLang.name})
                 </Text>
-                <Text fontSize="sm" color="#F4F7F0" my={1}>
+                <Text fontSize="sm" color="#1E2233" my={1}>
                   "{spokenText}"
                 </Text>
-                <Box h="1px" bg="#1A2A1C" my={2} />
-                <Text fontSize="10px" color="#8DDB39" textTransform="uppercase" fontWeight="bold">
+                <Box h="1px" bg="#EFE8DF" my={2} />
+                <Text fontSize="10px" color="#4747DB" textTransform="uppercase" fontWeight="bold">
                   ✨ Translated & Enhanced Generation Prompt
                 </Text>
-                <Text fontSize="sm" color="#B7FF35" fontWeight="500">
+                <Text fontSize="sm" color="#5B5BF0" fontWeight="500">
                   {translatedPrompt}
                 </Text>
               </Box>
             </ModalBody>
 
-            <ModalFooter borderTop="1px solid #1A2A1C" py={3}>
-              <Button size="sm" variant="ghost" color="#A5B1A7" mr={3} onClick={() => setIsVoiceOpen(false)}>
+            <ModalFooter borderTop="1px solid #EFE8DF" py={3}>
+              <Button size="sm" variant="ghost" color="#5B6277" mr={3} onClick={() => setIsVoiceOpen(false)}>
                 Cancel
               </Button>
-              <Button size="sm" bg="#B7FF35" color="#080B0A" fontWeight="bold" onClick={handleApplyVoicePrompt}>
+              <Button size="sm" bg="#5B5BF0" color="#FFFFFF" fontWeight="bold" onClick={handleApplyVoicePrompt}>
                 Use This Prompt
               </Button>
             </ModalFooter>
@@ -930,24 +796,24 @@ const CreateStudio: React.FC = () => {
 
         {/* SELECTIVE RECREATION CANVAS CIRCLING MODAL */}
         <Modal isOpen={isRecreationOpen} onClose={() => setIsRecreationOpen(false)} isCentered size="2xl">
-          <ModalOverlay bg="rgba(0,0,0,0.88)" backdropFilter="blur(8px)" />
-          <ModalContent bg="#111713" border="1px solid #2A3A2C" borderRadius="20px" color="#F4F7F0" maxW="720px">
-            <ModalHeader borderBottom="1px solid #1A2A1C" py={4}>
+          <ModalOverlay bg="rgba(30,34,51,0.55)" backdropFilter="blur(8px)" />
+          <ModalContent bg="#FFFFFF" border="1px solid #E3DACF" borderRadius="20px" color="#1E2233" maxW="720px">
+            <ModalHeader borderBottom="1px solid #EFE8DF" py={4}>
               <Flex align="center" justify="space-between">
                 <Flex align="center" gap={2.5}>
-                  <Box w="30px" h="30px" borderRadius="full" bg="#B7FF35" display="flex" alignItems="center" justifyContent="center" color="#080B0A" fontSize="15px">
+                  <Box w="30px" h="30px" borderRadius="full" bg="#5B5BF0" display="flex" alignItems="center" justifyContent="center" color="#FFFFFF" fontSize="15px">
                     ⭕
                   </Box>
                   <Box>
                     <Text fontSize="md" fontWeight="bold">
                       Selective Recreate — Circle & Inpaint Region
                     </Text>
-                    <Text fontSize="xs" color="#A5B1A7" fontWeight="normal">
+                    <Text fontSize="xs" color="#5B6277" fontWeight="normal">
                       Click and drag on the image to circle the exact area you want recreated
                     </Text>
                   </Box>
                 </Flex>
-                <ModalCloseButton position="static" color="#A5B1A7" />
+                <ModalCloseButton position="static" color="#5B6277" />
               </Flex>
             </ModalHeader>
 
@@ -955,49 +821,67 @@ const CreateStudio: React.FC = () => {
               <Box mb={4}>
                 <InteractiveCanvasMask
                   imageUrl={activeImage.imageUrl}
-                  onMaskChange={(hasMask) => setHasMaskSelected(hasMask)}
+                  onMaskChange={handleMaskChange}
                 />
               </Box>
 
               <Box mb={3}>
-                <Text fontSize="xs" color="#A5B1A7" fontWeight="600" mb={1.5} textTransform="uppercase" letterSpacing="0.05em">
+                <Text fontSize="xs" color="#5B6277" fontWeight="600" mb={1.5} textTransform="uppercase" letterSpacing="0.05em">
                   What should appear in the circled region?
                 </Text>
                 <Input
                   value={recreationInstruction}
                   onChange={(e) => setRecreationInstruction(e.target.value)}
                   placeholder="e.g. Add a glowing golden visor with cyber reflections, or make flowers bloom"
-                  bg="#0F1A11"
-                  color="#F4F7F0"
-                  border="1px solid #2A3A2C"
+                  bg="#F7F3EE"
+                  color="#1E2233"
+                  border="1px solid #E3DACF"
                   borderRadius="10px"
                   size="sm"
-                  _focus={{ borderColor: '#B7FF35' }}
+                  _focus={{ borderColor: '#5B5BF0' }}
                 />
               </Box>
 
-              <Flex justify="space-between" align="center" bg="#0D120E" p={2.5} borderRadius="8px" border="1px solid #1A2A1C">
-                <Text fontSize="11px" color="#6B7B6D">
-                  Region targeted: <span style={{ color: hasMaskSelected ? '#B7FF35' : '#FFB800', fontWeight: 'bold' }}>{hasMaskSelected ? '✓ Active Canvas Circle / Mask' : '⚠️ No area circled yet (Full image will be varied)'}</span>
+              <Flex gap={5} mb={3} wrap="wrap">
+                <Tooltip label="GrabCut (classical computer vision) snaps your rough stroke to the object's boundary" hasArrow>
+                  <Checkbox size="sm" colorScheme="green" isChecked={snapToEdges} onChange={(e) => setSnapToEdges(e.target.checked)}>
+                    <Text fontSize="xs" color="#5B6277">Snap selection to object edges</Text>
+                  </Checkbox>
+                </Tooltip>
+                <Tooltip label="LAB colour matching + multiband (Laplacian pyramid) blending so the edit has no visible seam" hasArrow>
+                  <Checkbox size="sm" colorScheme="green" isChecked={blendSeamless} onChange={(e) => setBlendSeamless(e.target.checked)}>
+                    <Text fontSize="xs" color="#5B6277">Blend seamlessly</Text>
+                  </Checkbox>
+                </Tooltip>
+              </Flex>
+
+              <Flex justify="space-between" align="center" bg="#FFFFFF" p={2.5} borderRadius="8px" border="1px solid #EFE8DF">
+                <Text fontSize="11px" color="#8A90A2">
+                  Region targeted: <span style={{ color: hasMaskSelected ? '#5B5BF0' : '#C77700', fontWeight: 'bold' }}>{hasMaskSelected ? '✓ Active Canvas Circle / Mask' : '⚠️ No area circled yet (Please circle an area)'}</span>
                 </Text>
-                <Badge bg="rgba(183, 255, 53, 0.15)" color="#B7FF35" fontSize="10px">
-                  Inpaint Engine Ready
+                <Badge
+                  bg={inpaintAvailable ? "rgba(91,91,240, 0.15)" : "rgba(229,72,77, 0.15)"}
+                  color={inpaintAvailable ? "#5B5BF0" : "#E5484D"}
+                  fontSize="10px"
+                >
+                  {inpaintAvailable ? 'Inpaint Engine Ready (SD inpainting + CV blend)' : 'Inpainting Model Unavailable'}
                 </Badge>
               </Flex>
             </ModalBody>
 
-            <ModalFooter borderTop="1px solid #1A2A1C" py={3}>
-              <Button size="sm" variant="ghost" color="#A5B1A7" mr={3} onClick={() => setIsRecreationOpen(false)}>
+            <ModalFooter borderTop="1px solid #EFE8DF" py={3}>
+              <Button size="sm" variant="ghost" color="#5B6277" mr={3} onClick={() => setIsRecreationOpen(false)}>
                 Cancel
               </Button>
               <Button
                 size="sm"
-                bg="#B7FF35"
-                color="#080B0A"
+                bg="#5B5BF0"
+                color="#FFFFFF"
                 fontWeight="bold"
                 onClick={handleApplySelectiveRecreation}
+                isDisabled={!inpaintAvailable || !hasMaskSelected}
                 leftIcon={<Text>✨</Text>}
-                _hover={{ bg: '#8DDB39' }}
+                _hover={{ bg: '#4747DB' }}
               >
                 Recreate Circled Region
               </Button>

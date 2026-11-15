@@ -1,0 +1,15 @@
+.git
+.venv
+.idea
+**/node_modules
+**/__pycache__
+data_cache
+training_data
+generated_images
+adapters/*/checkpoint-*
+*.log
+*.err
+.env
+.modal-api-key
+android/app/build
+artifacts

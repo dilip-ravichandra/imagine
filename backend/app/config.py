@@ -85,6 +85,17 @@ class Settings:
     groq_model: str = "llama-3.1-8b-instant"
     gemini_api_key: str | None = field(default=None, repr=False)
     gemini_model: str = "gemini-3.8-flash"
+    # ---- security / accounts
+    data_dir: Path = REPO_ROOT / "data_cache"  # users.db and gallery records live here: mount a volume in production
+    cookie_secure: bool = False  # set COOKIE_SECURE=1 behind HTTPS so the session cookie is never sent over plain http
+    allowed_origins: tuple[str, ...] = ()  # extra browser origins allowed to call the API (CORS_ORIGINS); empty = same-origin only
+    enable_docs: bool = False  # /docs, /redoc and /openapi.json are OFF unless ENABLE_DOCS=1 (development only)
+    allow_signup: bool = True  # ALLOW_SIGNUP=0 closes self-service registration
+    admin_email: str | None = None  # bootstrap administrator, created on first start (ADMIN_EMAIL / ADMIN_PASSWORD)
+    admin_password: str | None = field(default=None, repr=False)
+    session_days: int = 7
+    trust_proxy: bool = False  # TRUST_PROXY=1 behind a load balancer so rate limits use X-Forwarded-For
+    gemini_fallback_models: tuple[str, ...] = ("gemini-2.5-flash", "gemini-2.0-flash")
 
 
 def _path(name: str) -> Path | None:
@@ -143,4 +154,13 @@ def load_settings() -> Settings:
         groq_model=os.getenv("GROQ_MODEL", "llama-3.1-8b-instant"),
         gemini_api_key=os.getenv("GEMINI_API_KEY") or None,
         gemini_model=os.getenv("GEMINI_MODEL", "gemini-3.8-flash"),
+        data_dir=Path(os.getenv("DATA_DIR") or REPO_ROOT / "data_cache"),
+        cookie_secure=_bool("COOKIE_SECURE", False),
+        allowed_origins=tuple(o.strip() for o in os.getenv("CORS_ORIGINS", "").split(",") if o.strip()),
+        enable_docs=_bool("ENABLE_DOCS", False),
+        allow_signup=_bool("ALLOW_SIGNUP", True),
+        admin_email=(os.getenv("ADMIN_EMAIL") or "").strip().lower() or None,
+        admin_password=os.getenv("ADMIN_PASSWORD") or None,
+        session_days=int(os.getenv("SESSION_DAYS", "7")),
+        trust_proxy=_bool("TRUST_PROXY", False),
     )

@@ -1,532 +1,137 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Flex,
-  Text,
-  Heading,
-  Button,
-  Input,
-  Image,
-  VStack,
-  HStack,
-  IconButton,
-  Avatar,
-} from '@chakra-ui/react';
-import {
-  FiUpload,
-  FiSend,
-  FiImage,
-  FiMessageCircle,
-  FiCopy,
-  FiThumbsUp,
-  FiRefreshCw,
-  FiZoomIn,
-} from 'react-icons/fi';
+import React, { useEffect, useRef, useState } from 'react';
+import { Box, Flex, Text, Heading, Button, Input, Image, Alert, AlertIcon, SimpleGrid, Spinner } from '@chakra-ui/react';
 import WorkspaceLayout from '../components/WorkspaceLayout';
+import { askAboutImage, getGalleryItems, GalleryItem, toSameOriginImageUrl } from '../lib/api';
 
-interface ChatMessage {
-  id: number;
-  role: 'user' | 'assistant';
-  text: string;
-  timestamp: string;
+interface Msg { role: 'user' | 'assistant'; text: string; note?: string }
+
+const SUGGESTIONS = ['What is in this picture?', 'What colours do you see?', 'Describe the mood in simple words', 'What could I change to make it better?'];
+
+/** Downscale to at most 1024px and re-encode as JPEG so uploads stay small and any format (PNG/WebP/HEIC-on-Safari) is accepted. */
+function toJpegBase64(src: Blob | string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    const url = typeof src === 'string' ? src : URL.createObjectURL(src);
+    img.onload = () => {
+      const k = Math.min(1, 1024 / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(img.naturalWidth * k));
+      c.height = Math.max(1, Math.round(img.naturalHeight * k));
+      c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
+      if (typeof src !== 'string') URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg', 0.88).split(',')[1]);
+    };
+    img.onerror = () => reject(new Error('That file could not be opened as an image.'));
+    img.src = url;
+  });
 }
 
 const AskYourImage: React.FC = () => {
-  const [inputValue, setInputValue] = useState('');
-  const [hasImage, setHasImage] = useState(true);
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 1,
-      role: 'user',
-      text: 'What is this insect? Explain simply.',
-      timestamp: '2:34 PM',
-    },
-    {
-      id: 2,
-      role: 'assistant',
-      text: 'This is a butterfly. Butterflies are insects with colorful wings. They help plants grow by spreading pollen from one flower to another. This particular one appears to be a Monarch butterfly, identifiable by its orange and black wing pattern. Monarchs are famous for their long migration journeys across continents.',
-      timestamp: '2:34 PM',
-    },
-    {
-      id: 3,
-      role: 'user',
-      text: 'What colors can you see in its wings?',
-      timestamp: '2:35 PM',
-    },
-    {
-      id: 4,
-      role: 'assistant',
-      text: 'The butterfly\'s wings display a striking combination of colors:\n\n• **Deep orange** — the primary color covering most of the wing surface\n• **Black** — bold veins and borders creating the distinctive pattern\n• **White** — small spots along the wing edges\n• **Yellow-gold** — subtle highlights near the wing bases\n\nThis vivid coloring serves as a warning to predators that the butterfly is toxic, a defense mechanism known as aposematism.',
-      timestamp: '2:35 PM',
-    },
-    {
-      id: 5,
-      role: 'user',
-      text: 'Is it endangered?',
-      timestamp: '2:36 PM',
-    },
-    {
-      id: 6,
-      role: 'assistant',
-      text: 'The Monarch butterfly is currently classified as **endangered** by the IUCN. Their population has declined significantly due to habitat loss, pesticide use, and climate change. Conservation efforts are underway globally, including planting milkweed (their primary food source) and protecting migration corridors.',
-      timestamp: '2:36 PM',
-    },
-  ]);
+  const [b64, setB64] = useState('');
+  const [preview, setPreview] = useState('');
+  const [palette, setPalette] = useState<string[]>([]);
+  const [question, setQuestion] = useState('');
+  const [msgs, setMsgs] = useState<Msg[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [recent, setRecent] = useState<GalleryItem[]>([]);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const endRef = useRef<HTMLDivElement>(null);
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
-    const newMsg: ChatMessage = {
-      id: messages.length + 1,
-      role: 'user',
-      text: inputValue,
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-    };
-    setMessages([...messages, newMsg]);
-    setInputValue('');
+  useEffect(() => { getGalleryItems().then((r) => setRecent(r.items.slice(0, 8))).catch(() => undefined); }, []);
+  useEffect(() => { endRef.current?.scrollIntoView({ block: 'nearest' }); }, [msgs, busy]);
+
+  const load = async (src: Blob | string) => {
+    setError('');
+    try {
+      const data = await toJpegBase64(src);
+      setB64(data); setPreview(`data:image/jpeg;base64,${data}`); setMsgs([]); setPalette([]);
+    } catch (e) { setError(e instanceof Error ? e.message : 'Could not load that image.'); }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
+  const ask = async (q: string) => {
+    const text = q.trim();
+    if (!text || !b64 || busy) return;
+    setQuestion(''); setError(''); setBusy(true);
+    setMsgs((m) => [...m, { role: 'user', text }]);
+    try {
+      const r = await askAboutImage(b64, text);
+      setPalette(r.palette.map((p) => p.hex));
+      setMsgs((m) => [...m, { role: 'assistant', text: r.answer, note: (r.source.startsWith('gemini') || r.source.startsWith('groq')) ? 'AI vision' : 'Measured from the pixels (AI vision is busy right now)' }]);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not answer just now.');
+    } finally { setBusy(false); }
   };
 
   return (
     <WorkspaceLayout>
-      <Box p={6} minH="100vh" bg="#080B0A">
-        {/* Header */}
-        <Flex align="center" justify="space-between" mb={6}>
-          <Box>
-            <Flex align="center" gap={3} mb={1}>
-              <Box
-                p={2}
-                bg="rgba(183, 255, 53, 0.1)"
-                borderRadius="lg"
-              >
-                <FiMessageCircle size={20} color="#B7FF35" />
-              </Box>
-              <Box>
-                <Heading size="lg" color="#F4F7F0" fontWeight="700">
-                  Ask Your Image
-                </Heading>
-                <Text color="#A5B1A7" fontSize="sm">
-                  Upload an image and ask anything about it
-                </Text>
-              </Box>
-            </Flex>
-          </Box>
-          <HStack spacing={2}>
-            <Button
-              size="sm"
-              variant="outline"
-              borderColor="#2A3A2C"
-              color="#A5B1A7"
-              _hover={{ bg: '#1A2A1C', borderColor: '#B7FF35', color: '#F4F7F0' }}
-              leftIcon={<FiRefreshCw size={14} />}
-              fontSize="xs"
-            >
-              New Session
-            </Button>
-          </HStack>
-        </Flex>
+      <Box px={{ base: 4, md: 8 }} py={8} maxW="1100px" mx="auto" bg="#FBF8F4" minH="100vh">
+        <Heading size="lg" color="#1E2233" fontWeight={700}>Ask about an image</Heading>
+        <Text color="#5B6277" mt={1} mb={6} fontSize="sm">Upload a picture, or choose one you created, then ask anything about it.</Text>
+        {error && <Alert status="error" borderRadius="12px" mb={4} role="alert"><AlertIcon />{error}</Alert>}
 
-        {/* Main Layout */}
-        <Flex gap={6} h="calc(100vh - 160px)">
-          {/* Left: Image Area */}
-          <Box
-            w="420px"
-            minW="420px"
-            display="flex"
-            flexDir="column"
-            gap={4}
-          >
-            {/* Upload Zone */}
-            {!hasImage ? (
-              <Box
-                flex={1}
-                bg="#111713"
-                border="2px dashed #2A3A2C"
-                borderRadius="xl"
-                display="flex"
-                flexDir="column"
-                alignItems="center"
-                justifyContent="center"
-                cursor="pointer"
-                _hover={{ borderColor: '#B7FF35', bg: '#182019' }}
-                transition="all 0.2s"
-                onClick={() => setHasImage(true)}
-              >
-                <Box
-                  p={4}
-                  bg="rgba(183,255,53,0.05)"
-                  borderRadius="full"
-                  mb={4}
-                >
-                  <FiUpload size={32} color="#B7FF35" />
-                </Box>
-                <Text color="#F4F7F0" fontSize="md" fontWeight="600" mb={1}>
-                  Drop your image here
-                </Text>
-                <Text color="#A5B1A7" fontSize="sm" mb={4}>
-                  or click to browse files
-                </Text>
-                <HStack spacing={2}>
-                  <Text
-                    bg="#0F1A11"
-                    px={3}
-                    py={1}
-                    borderRadius="full"
-                    color="#A5B1A7"
-                    fontSize="xs"
-                  >
-                    PNG
-                  </Text>
-                  <Text
-                    bg="#0F1A11"
-                    px={3}
-                    py={1}
-                    borderRadius="full"
-                    color="#A5B1A7"
-                    fontSize="xs"
-                  >
-                    JPG
-                  </Text>
-                  <Text
-                    bg="#0F1A11"
-                    px={3}
-                    py={1}
-                    borderRadius="full"
-                    color="#A5B1A7"
-                    fontSize="xs"
-                  >
-                    WEBP
-                  </Text>
-                  <Text
-                    bg="#0F1A11"
-                    px={3}
-                    py={1}
-                    borderRadius="full"
-                    color="#A5B1A7"
-                    fontSize="xs"
-                  >
-                    up to 20MB
-                  </Text>
-                </HStack>
-              </Box>
+        <Flex gap={6} direction={{ base: 'column', lg: 'row' }} align="stretch">
+          <Box flex="1" bg="#FFFFFF" border="1px solid #E3DACF" borderRadius="16px" p={4}>
+            {preview ? (
+              <Image src={preview} alt="The picture you are asking about" borderRadius="12px" maxH="420px" mx="auto" objectFit="contain" />
             ) : (
-              <Box
-                flex={1}
-                bg="#111713"
-                borderRadius="xl"
-                border="1px solid #2A3A2C"
-                overflow="hidden"
-                display="flex"
-                flexDir="column"
-              >
-                {/* Image Display */}
-                <Box flex={1} position="relative" overflow="hidden">
-                  <Image
-                    src="https://picsum.photos/seed/butterfly-nature/800/800"
-                    alt="Uploaded butterfly image"
-                    w="100%"
-                    h="100%"
-                    objectFit="cover"
-                  />
-                  {/* Overlay controls */}
-                  <Flex
-                    position="absolute"
-                    top={3}
-                    right={3}
-                    gap={2}
-                  >
-                    <IconButton
-                      aria-label="Zoom in"
-                      icon={<FiZoomIn size={14} />}
-                      size="sm"
-                      bg="rgba(8,11,10,0.7)"
-                      color="#F4F7F0"
-                      borderRadius="lg"
-                      backdropFilter="blur(10px)"
-                      _hover={{ bg: 'rgba(8,11,10,0.9)' }}
-                    />
-                  </Flex>
-                  {/* Image info bar */}
-                  <Flex
-                    position="absolute"
-                    bottom={0}
-                    left={0}
-                    right={0}
-                    bg="linear-gradient(transparent, rgba(8,11,10,0.9))"
-                    px={4}
-                    py={3}
-                    align="center"
-                    justify="space-between"
-                  >
-                    <HStack spacing={3}>
-                      <Text color="#A5B1A7" fontSize="xs">
-                        butterfly_monarch.jpg
-                      </Text>
-                      <Text color="#2A3A2C">•</Text>
-                      <Text color="#A5B1A7" fontSize="xs">
-                        2400 × 2400
-                      </Text>
-                    </HStack>
-                    <Button
-                      size="xs"
-                      variant="ghost"
-                      color="#B7FF35"
-                      _hover={{ bg: 'rgba(183,255,53,0.1)' }}
-                      fontSize="xs"
-                      onClick={() => setHasImage(false)}
-                    >
-                      Change
-                    </Button>
-                  </Flex>
-                </Box>
-
-                {/* Quick suggestions */}
-                <Box px={4} py={3} borderTop="1px solid #2A3A2C">
-                  <Text color="#A5B1A7" fontSize="10px" fontWeight="600" mb={2} textTransform="uppercase" letterSpacing="wider">
-                    Suggested Questions
-                  </Text>
-                  <Flex gap={2} flexWrap="wrap">
-                    {[
-                      'Describe this image',
-                      'What species is this?',
-                      'Extract text',
-                      'Identify objects',
-                    ].map((q) => (
-                      <Box
-                        key={q}
-                        px={3}
-                        py={1.5}
-                        bg="#0F1A11"
-                        border="1px solid #2A3A2C"
-                        borderRadius="full"
-                        cursor="pointer"
-                        _hover={{
-                          borderColor: '#B7FF35',
-                          bg: '#1A2A1C',
-                        }}
-                        transition="all 0.2s"
-                        onClick={() => setInputValue(q)}
-                      >
-                        <Text color="#A5B1A7" fontSize="xs" _hover={{ color: '#F4F7F0' }}>
-                          {q}
-                        </Text>
-                      </Box>
-                    ))}
-                  </Flex>
-                </Box>
+              <Flex minH="260px" align="center" justify="center" direction="column" gap={2} border="2px dashed #E3DACF" borderRadius="12px" color="#8A90A2"
+                onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) void load(f); }}>
+                <Text fontSize="sm">Drop an image here</Text>
+              </Flex>
+            )}
+            <Flex gap={2} mt={3} wrap="wrap">
+              <Button size="sm" bg="#5B5BF0" color="#FFFFFF" _hover={{ bg: '#4747DB' }} onClick={() => fileRef.current?.click()}>{preview ? 'Change image' : 'Upload image'}</Button>
+              <input ref={fileRef} type="file" accept="image/*" hidden aria-label="Upload an image" onChange={(e) => { const f = e.target.files?.[0]; if (f) void load(f); e.target.value = ''; }} />
+            </Flex>
+            {palette.length > 0 && (
+              <Flex gap={2} mt={3} align="center" aria-label="Main colours">
+                <Text fontSize="xs" color="#8A90A2">Main colours</Text>
+                {palette.slice(0, 5).map((h) => <Box key={h} title={h} w="22px" h="22px" borderRadius="full" border="1px solid #E3DACF" bg={h} />)}
+              </Flex>
+            )}
+            {recent.length > 0 && (
+              <Box mt={4}>
+                <Text fontSize="xs" color="#8A90A2" mb={2}>Or pick one you made</Text>
+                <SimpleGrid columns={{ base: 4, md: 4 }} spacing={2}>
+                  {recent.map((g) => (
+                    <Box as="button" type="button" key={g.id} onClick={() => void load(toSameOriginImageUrl(g.image_url))} aria-label={`Use image: ${g.prompt.slice(0, 40)}`}
+                      borderRadius="8px" overflow="hidden" border="1px solid #E3DACF" _hover={{ borderColor: '#5B5BF0' }}>
+                      <Image src={toSameOriginImageUrl(g.image_url)} alt="" h="64px" w="100%" objectFit="cover" />
+                    </Box>
+                  ))}
+                </SimpleGrid>
               </Box>
             )}
           </Box>
 
-          {/* Right: Chat Interface */}
-          <Box
-            flex={1}
-            bg="#111713"
-            borderRadius="xl"
-            border="1px solid #2A3A2C"
-            display="flex"
-            flexDir="column"
-            overflow="hidden"
-          >
-            {/* Chat Header */}
-            <Flex
-              align="center"
-              justify="space-between"
-              px={5}
-              py={3}
-              borderBottom="1px solid #2A3A2C"
-            >
-              <Flex align="center" gap={2}>
-                <Box
-                  w={2}
-                  h={2}
-                  bg="#B7FF35"
-                  borderRadius="full"
-                  boxShadow="0 0 6px #B7FF35"
-                />
-                <Text color="#F4F7F0" fontSize="sm" fontWeight="600">
-                  Visual Q&A
-                </Text>
-              </Flex>
-              <Text color="#A5B1A7" fontSize="xs">
-                {messages.length} messages
-              </Text>
+          <Flex flex="1" direction="column" bg="#FFFFFF" border="1px solid #E3DACF" borderRadius="16px" p={4} minH="420px">
+            <Box flex="1" overflowY="auto" maxH="420px" aria-live="polite">
+              {msgs.length === 0 && (
+                <Box color="#8A90A2" fontSize="sm">
+                  <Text mb={3}>{b64 ? 'Ask a question, or try one of these:' : 'Add an image first, then ask your question.'}</Text>
+                  {b64 && <Flex gap={2} wrap="wrap">{SUGGESTIONS.map((s) => (
+                    <Button key={s} size="xs" variant="outline" borderColor="#E3DACF" color="#5B6277" onClick={() => void ask(s)}>{s}</Button>
+                  ))}</Flex>}
+                </Box>
+              )}
+              {msgs.map((m, i) => (
+                <Box key={i} mb={3} textAlign={m.role === 'user' ? 'right' : 'left'}>
+                  <Box display="inline-block" maxW="90%" textAlign="left" px={3} py={2} borderRadius="12px" fontSize="sm" whiteSpace="pre-wrap"
+                    bg={m.role === 'user' ? '#5B5BF0' : '#F5F0EA'} color={m.role === 'user' ? '#FFFFFF' : '#1E2233'}>{m.text}</Box>
+                  {m.note && <Text fontSize="11px" color="#8A90A2" mt={1}>{m.note}</Text>}
+                </Box>
+              ))}
+              {busy && <Flex align="center" gap={2} color="#8A90A2" fontSize="sm"><Spinner size="sm" /> Looking at the picture…</Flex>}
+              <div ref={endRef} />
+            </Box>
+            <Flex gap={2} mt={3}>
+              <Input aria-label="Your question" value={question} onChange={(e) => setQuestion(e.target.value)} maxLength={500} isDisabled={!b64}
+                placeholder={b64 ? 'Ask about this image…' : 'Add an image first'} bg="#FFFFFF" borderColor="#E3DACF"
+                onKeyDown={(e) => { if (e.key === 'Enter') void ask(question); }} />
+              <Button bg="#5B5BF0" color="#FFFFFF" _hover={{ bg: '#4747DB' }} isDisabled={!b64 || !question.trim() || busy} onClick={() => void ask(question)}>Ask</Button>
             </Flex>
-
-            {/* Messages Area */}
-            <Box
-              flex={1}
-              overflowY="auto"
-              px={5}
-              py={4}
-              css={{
-                '&::-webkit-scrollbar': { width: '4px' },
-                '&::-webkit-scrollbar-track': { bg: 'transparent' },
-                '&::-webkit-scrollbar-thumb': {
-                  bg: '#2A3A2C',
-                  borderRadius: '4px',
-                },
-              }}
-            >
-              <VStack spacing={4} align="stretch">
-                {messages.map((msg) => (
-                  <Flex
-                    key={msg.id}
-                    justify={msg.role === 'user' ? 'flex-end' : 'flex-start'}
-                    gap={3}
-                  >
-                    {msg.role === 'assistant' && (
-                      <Box
-                        w={8}
-                        h={8}
-                        bg="rgba(183,255,53,0.1)"
-                        borderRadius="lg"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        flexShrink={0}
-                        mt={1}
-                      >
-                        <Text fontSize="sm">🤖</Text>
-                      </Box>
-                    )}
-                    <Box maxW="75%">
-                      <Box
-                        bg={msg.role === 'user' ? '#B7FF35' : '#182019'}
-                        color={msg.role === 'user' ? '#080B0A' : '#F4F7F0'}
-                        px={4}
-                        py={3}
-                        borderRadius={
-                          msg.role === 'user'
-                            ? '18px 18px 4px 18px'
-                            : '18px 18px 18px 4px'
-                        }
-                        border={
-                          msg.role === 'assistant'
-                            ? '1px solid #2A3A2C'
-                            : 'none'
-                        }
-                      >
-                        <Text
-                          fontSize="sm"
-                          lineHeight="1.7"
-                          fontWeight={msg.role === 'user' ? '600' : '400'}
-                          whiteSpace="pre-wrap"
-                        >
-                          {msg.text}
-                        </Text>
-                      </Box>
-                      <Flex
-                        mt={1.5}
-                        align="center"
-                        gap={2}
-                        justify={
-                          msg.role === 'user' ? 'flex-end' : 'flex-start'
-                        }
-                      >
-                        <Text color="#A5B1A7" fontSize="10px">
-                          {msg.timestamp}
-                        </Text>
-                        {msg.role === 'assistant' && (
-                          <HStack spacing={1}>
-                            <IconButton
-                              aria-label="Copy"
-                              icon={<FiCopy size={10} />}
-                              size="xs"
-                              variant="ghost"
-                              color="#A5B1A7"
-                              _hover={{ color: '#B7FF35' }}
-                              minW="auto"
-                              h="auto"
-                              p={1}
-                            />
-                            <IconButton
-                              aria-label="Like"
-                              icon={<FiThumbsUp size={10} />}
-                              size="xs"
-                              variant="ghost"
-                              color="#A5B1A7"
-                              _hover={{ color: '#B7FF35' }}
-                              minW="auto"
-                              h="auto"
-                              p={1}
-                            />
-                          </HStack>
-                        )}
-                      </Flex>
-                    </Box>
-                    {msg.role === 'user' && (
-                      <Avatar
-                        size="sm"
-                        name="User"
-                        bg="#2A3A2C"
-                        color="#F4F7F0"
-                        mt={1}
-                      />
-                    )}
-                  </Flex>
-                ))}
-              </VStack>
-            </Box>
-
-            {/* Input Area */}
-            <Box px={5} py={4} borderTop="1px solid #2A3A2C">
-              <Flex
-                bg="#0F1A11"
-                border="1px solid #2A3A2C"
-                borderRadius="xl"
-                px={4}
-                py={2}
-                align="center"
-                gap={3}
-                _focusWithin={{
-                  borderColor: '#B7FF35',
-                  boxShadow: '0 0 0 1px rgba(183,255,53,0.2)',
-                }}
-                transition="all 0.2s"
-              >
-                <Input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Ask a question about the image..."
-                  variant="unstyled"
-                  color="#F4F7F0"
-                  fontSize="sm"
-                  _placeholder={{ color: '#A5B1A7' }}
-                  flex={1}
-                />
-                <IconButton
-                  aria-label="Send message"
-                  icon={<FiSend size={16} />}
-                  size="sm"
-                  bg={inputValue.trim() ? '#B7FF35' : '#2A3A2C'}
-                  color={inputValue.trim() ? '#080B0A' : '#A5B1A7'}
-                  borderRadius="lg"
-                  _hover={{
-                    bg: inputValue.trim() ? '#8DDB39' : '#2A3A2C',
-                    transform: inputValue.trim()
-                      ? 'translateY(-1px)'
-                      : 'none',
-                  }}
-                  transition="all 0.2s"
-                  onClick={handleSend}
-                  isDisabled={!inputValue.trim()}
-                />
-              </Flex>
-              <Text color="#A5B1A7" fontSize="10px" mt={2} textAlign="center">
-                AI-powered visual analysis • Responses may not be 100% accurate
-              </Text>
-            </Box>
-          </Box>
+          </Flex>
         </Flex>
       </Box>
     </WorkspaceLayout>

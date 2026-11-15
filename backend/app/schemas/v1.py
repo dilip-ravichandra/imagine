@@ -90,4 +90,6 @@ class CapabilitiesResponse(BaseModel):
     min_resolution: int
     max_resolution: int
     generation_available: bool
+    inpainting_available: bool = True
+    img2img_available: bool = True
     deployment_mode: str  # truthful label: "hybrid/cloud" (server-side inference)

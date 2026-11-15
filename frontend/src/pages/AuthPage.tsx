@@ -20,35 +20,35 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const EyeIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A5B1A7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B6277" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
     <circle cx="12" cy="12" r="3" />
   </svg>
 );
 
 const EyeOffIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A5B1A7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B6277" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
     <line x1="1" y1="1" x2="23" y2="23" />
   </svg>
 );
 
 const MailIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A5B1A7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6277" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="4" width="20" height="16" rx="2" />
     <path d="M22 7l-10 7L2 7" />
   </svg>
 );
 
 const LockIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A5B1A7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6277" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="3" y="11" width="18" height="11" rx="2" />
     <path d="M7 11V7a5 5 0 0110 0v4" />
   </svg>
 );
 
 const UserIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A5B1A7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6277" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
     <circle cx="12" cy="7" r="4" />
   </svg>
@@ -64,21 +64,21 @@ const GoogleIcon = () => (
 );
 
 const GitHubIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="#F4F7F0">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="#1E2233">
     <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
   </svg>
 );
 
 const inputStyles = {
-  bg: '#0F1A11',
-  border: '1px solid #2A3A2C',
-  color: '#F4F7F0',
+  bg: '#F7F3EE',
+  border: '1px solid #E3DACF',
+  color: '#1E2233',
   fontSize: 'sm',
-  _placeholder: { color: '#5A6B5C' },
-  _hover: { borderColor: '#3A4A3C' },
+  _placeholder: { color: '#9AA0B2' },
+  _hover: { borderColor: '#CFC4B6' },
   _focus: {
-    borderColor: '#B7FF35',
-    boxShadow: '0 0 0 1px rgba(183,255,53,0.3)',
+    borderColor: '#5B5BF0',
+    boxShadow: '0 0 0 1px rgba(91,91,240,0.14)',
   },
   transition: 'all 0.2s',
 };
@@ -91,11 +91,13 @@ const AuthPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { login, signup } = useAuth();
+  const { login, signup, user: signedIn } = useAuth();
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
     try {
       if (mode === 'signin') {
@@ -105,18 +107,20 @@ const AuthPage: React.FC = () => {
       }
       navigate('/dashboard');
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  React.useEffect(() => { if (signedIn) navigate('/dashboard', { replace: true }); }, [signedIn, navigate]);
 
   return (
     <Flex
       minH="100vh"
       align="center"
       justify="center"
-      sx={{ bg: '#080B0A' }}
+      sx={{ bg: '#FBF8F4' }}
       px={4}
       py={10}
     >
@@ -130,7 +134,7 @@ const AuthPage: React.FC = () => {
         h="500px"
         borderRadius="50%"
         sx={{
-          bg: 'radial-gradient(circle, rgba(183,255,53,0.06) 0%, transparent 70%)',
+          bg: 'radial-gradient(circle, rgba(91,91,240,0.06) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       />
@@ -142,9 +146,9 @@ const AuthPage: React.FC = () => {
         borderRadius="16px"
         overflow="hidden"
         sx={{
-          bg: '#111713',
-          border: '1px solid #2A3A2C',
-          boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
+          bg: '#FFFFFF',
+          border: '1px solid #E3DACF',
+          boxShadow: '0 25px 60px rgba(30,34,51,0.12)',
         }}
       >
         <Box p={{ base: 6, md: 8 }}>
@@ -154,7 +158,7 @@ const AuthPage: React.FC = () => {
               <Heading
                 size="lg"
                 sx={{
-                  bgGradient: 'linear(to-r, #B7FF35, #8DDB39)',
+                  bgGradient: 'linear(to-r, #5B5BF0, #4747DB)',
                   bgClip: 'text',
                   fontWeight: 800,
                   letterSpacing: '-0.5px',
@@ -167,13 +171,16 @@ const AuthPage: React.FC = () => {
 
           {/* Heading */}
           <Box textAlign="center" mb={6}>
-            <Heading size="md" mb={2} sx={{ color: '#F4F7F0', fontWeight: 700 }}>
+            <Heading size="md" mb={2} sx={{ color: '#1E2233', fontWeight: 700 }}>
               {mode === 'signin' ? 'Welcome Back' : 'Create Account'}
             </Heading>
-            <Text fontSize="sm" sx={{ color: '#A5B1A7' }}>
+            <Text fontSize="sm" sx={{ color: '#5B6277' }}>
               {mode === 'signin'
                 ? 'Sign in to continue your creative journey'
                 : 'Start your creative journey with ImagineAI'}
+            </Text>
+            <Text fontSize="xs" mt={2} sx={{ color: '#8A90A2' }}>
+              Demo sign-in: this build does not verify passwords or store accounts. Any email opens the studio.
             </Text>
           </Box>
 
@@ -182,7 +189,7 @@ const AuthPage: React.FC = () => {
             mb={6}
             borderRadius="10px"
             p="3px"
-            sx={{ bg: '#0F1A11', border: '1px solid #2A3A2C' }}
+            sx={{ bg: '#F7F3EE', border: '1px solid #E3DACF' }}
           >
             {(['signin', 'signup'] as const).map((m) => (
               <Button
@@ -192,11 +199,11 @@ const AuthPage: React.FC = () => {
                 borderRadius="8px"
                 onClick={() => setMode(m)}
                 sx={{
-                  bg: mode === m ? '#1A2A1C' : 'transparent',
-                  color: mode === m ? '#F4F7F0' : '#A5B1A7',
+                  bg: mode === m ? '#EFE8DF' : 'transparent',
+                  color: mode === m ? '#1E2233' : '#5B6277',
                   fontWeight: 600,
                   fontSize: 'sm',
-                  _hover: { bg: mode === m ? '#1A2A1C' : 'rgba(255,255,255,0.03)' },
+                  _hover: { bg: mode === m ? '#EFE8DF' : 'rgba(255,255,255,0.03)' },
                   transition: 'all 0.2s',
                 }}
               >
@@ -210,7 +217,7 @@ const AuthPage: React.FC = () => {
             <VStack spacing={4}>
               {mode === 'signup' && (
                 <FormControl>
-                  <FormLabel fontSize="xs" fontWeight={600} sx={{ color: '#A5B1A7' }}>
+                  <FormLabel fontSize="xs" fontWeight={600} sx={{ color: '#5B6277' }}>
                     Full Name
                   </FormLabel>
                   <InputGroup>
@@ -229,7 +236,7 @@ const AuthPage: React.FC = () => {
               )}
 
               <FormControl>
-                <FormLabel fontSize="xs" fontWeight={600} sx={{ color: '#A5B1A7' }}>
+                <FormLabel fontSize="xs" fontWeight={600} sx={{ color: '#5B6277' }}>
                   Email
                 </FormLabel>
                 <InputGroup>
@@ -249,7 +256,7 @@ const AuthPage: React.FC = () => {
 
               <FormControl>
                 <Flex justify="space-between" align="center" mb={1}>
-                  <FormLabel fontSize="xs" fontWeight={600} mb={0} sx={{ color: '#A5B1A7' }}>
+                  <FormLabel fontSize="xs" fontWeight={600} mb={0} sx={{ color: '#5B6277' }}>
                     Password
                   </FormLabel>
                   {mode === 'signin' && (
@@ -258,7 +265,7 @@ const AuthPage: React.FC = () => {
                       href="#"
                       fontSize="xs"
                       sx={{
-                        color: '#B7FF35',
+                        color: '#5B5BF0',
                         _hover: { textDecoration: 'underline' },
                       }}
                     >
@@ -291,6 +298,15 @@ const AuthPage: React.FC = () => {
                 </InputGroup>
               </FormControl>
 
+              {error && (
+                <Text role="alert" fontSize="sm" w="100%" sx={{ color: '#B3261E', bg: '#FDECEA', border: '1px solid #F5C6C2', borderRadius: '8px', px: 3, py: 2 }}>
+                  {error}
+                </Text>
+              )}
+              {mode === 'signup' && (
+                <Text fontSize="xs" w="100%" sx={{ color: '#9AA0B2' }}>Use at least 10 characters and avoid common passwords.</Text>
+              )}
+
               <Button
                 type="submit"
                 w="100%"
@@ -298,15 +314,15 @@ const AuthPage: React.FC = () => {
                 isLoading={loading}
                 loadingText={mode === 'signin' ? 'Signing in...' : 'Creating account...'}
                 sx={{
-                  bg: '#B7FF35',
-                  color: '#080B0A',
+                  bg: '#5B5BF0',
+                  color: '#FFFFFF',
                   fontWeight: 700,
                   fontSize: 'sm',
                   mt: 2,
                   _hover: {
-                    bg: '#8DDB39',
+                    bg: '#4747DB',
                     transform: 'translateY(-1px)',
-                    boxShadow: '0 6px 20px rgba(183,255,53,0.25)',
+                    boxShadow: '0 6px 20px rgba(91,91,240,0.14)',
                   },
                   _active: { transform: 'translateY(0)' },
                   transition: 'all 0.2s',
@@ -317,50 +333,6 @@ const AuthPage: React.FC = () => {
             </VStack>
           </form>
 
-          {/* Divider */}
-          <Flex align="center" my={5} gap={3}>
-            <Divider sx={{ borderColor: '#2A3A2C' }} />
-            <Text fontSize="xs" sx={{ color: '#5A6B5C', whiteSpace: 'nowrap' }}>
-              or continue with
-            </Text>
-            <Divider sx={{ borderColor: '#2A3A2C' }} />
-          </Flex>
-
-          {/* Social */}
-          <HStack spacing={3}>
-            <Button
-              flex={1}
-              variant="outline"
-              size="md"
-              leftIcon={<GoogleIcon />}
-              sx={{
-                borderColor: '#2A3A2C',
-                color: '#A5B1A7',
-                bg: 'transparent',
-                fontSize: 'sm',
-                _hover: { bg: '#1A2A1C', borderColor: '#3A4A3C' },
-                transition: 'all 0.2s',
-              }}
-            >
-              Google
-            </Button>
-            <Button
-              flex={1}
-              variant="outline"
-              size="md"
-              leftIcon={<GitHubIcon />}
-              sx={{
-                borderColor: '#2A3A2C',
-                color: '#A5B1A7',
-                bg: 'transparent',
-                fontSize: 'sm',
-                _hover: { bg: '#1A2A1C', borderColor: '#3A4A3C' },
-                transition: 'all 0.2s',
-              }}
-            >
-              GitHub
-            </Button>
-          </HStack>
         </Box>
       </Box>
     </Flex>

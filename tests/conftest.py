@@ -75,3 +75,23 @@ def client(engine, settings):
 
 GOOD = {"prompt": "A red robot beside a blue submarine underwater",
         "quality_mode": "balanced", "resolution": 512, "seed": 42}
+
+
+@pytest.fixture(autouse=True)
+def _isolate_env(monkeypatch):
+    """Tests must not depend on the developer's local .env-style overrides."""
+    for k in ("CV_MODE", "ADAPTER_PATH", "ADAPTER_WEIGHT", "ADAPTIVE_PROFILE", "PRECISION", "ATTENTION_SLICING",
+              "VAE_SLICING", "OFFLOAD", "MODEL_ID", "MODEL_REVISION"):
+        monkeypatch.delenv(k, raising=False)
+
+
+@pytest.fixture(autouse=True)
+def _signed_in(request, monkeypatch):
+    """Every /api/v1 route now needs a signed-in user. Tests act as one by default; mark a test
+    @pytest.mark.real_auth to exercise the genuine sign-in gate instead."""
+    if request.node.get_closest_marker("real_auth"):
+        return
+    from backend.app import security
+    real = security.UserStore.user_for_token
+    monkeypatch.setattr(security.UserStore, "user_for_token",
+                        lambda self, token: real(self, token) or security.User(1, "test@example.com", "Test", "user"))

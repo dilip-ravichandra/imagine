@@ -1,213 +1,125 @@
-import React from 'react';
-import { Box, Flex, Grid, GridItem, Text, Heading, Stat, StatLabel, StatNumber, StatHelpText } from '@chakra-ui/react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Box, Flex, Grid, GridItem, Text, Heading, Button, Spinner } from '@chakra-ui/react';
 import WorkspaceLayout from '../components/WorkspaceLayout';
+import {
+  getCapabilities,
+  getModelCatalogue,
+  getGalleryItems,
+  CapabilitiesResponse,
+  ModelCatalogueEntry,
+} from '../lib/api';
 
-const statCards = [
-  { label: 'Total Users', value: '1,248', change: '+12%', icon: '👥' },
-  { label: 'Total Generations', value: '56,320', change: '+8%', icon: '🖼️' },
-  { label: 'Active Sessions', value: '312', change: '+5%', icon: '📊' },
-  { label: 'Uptime', value: '99.9%', change: 'Stable', icon: '✅' },
-];
-
-const recentActivity = [
-  { user: 'dilip@email.com', action: 'Generated 3 images', time: '2 min ago', status: 'success' },
-  { user: 'sarah@email.com', action: 'Started training job', time: '15 min ago', status: 'active' },
-  { user: 'mike@email.com', action: 'Uploaded dataset', time: '1 hour ago', status: 'success' },
-  { user: 'anna@email.com', action: 'Reported issue', time: '2 hours ago', status: 'warning' },
-  { user: 'john@email.com', action: 'Signed up', time: '3 hours ago', status: 'success' },
-];
-
-const quickActions = [
-  { label: 'User Management', icon: '👥', desc: 'Manage users and roles' },
-  { label: 'Model Registry', icon: '🤖', desc: 'Deploy and manage models' },
-  { label: 'System Health', icon: '💚', desc: 'Monitor services' },
-  { label: 'Service Control', icon: '⚙️', desc: 'Feature flags and config' },
-];
+interface Snapshot {
+  health: string;
+  latencyMs: number;
+  capabilities: CapabilitiesResponse | null;
+  models: ModelCatalogueEntry[];
+  galleryCount: number | null;
+  checkedAt: string;
+}
 
 const AdminDashboard: React.FC = () => {
+  const [snap, setSnap] = useState<Snapshot | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const t0 = performance.now();
+      const healthRes = await fetch('/health');
+      const health = healthRes.ok ? 'ok' : `HTTP ${healthRes.status}`;
+      const latencyMs = Math.round(performance.now() - t0);
+      const [capabilities, cat, gallery] = await Promise.all([
+        getCapabilities().catch(() => null),
+        getModelCatalogue().catch(() => ({ models: [] as ModelCatalogueEntry[] })),
+        (getGalleryItems() as Promise<{ items?: unknown[]; total?: number }>).catch(() => null),
+      ]);
+      setSnap({
+        health,
+        latencyMs,
+        capabilities,
+        models: cat.models,
+        galleryCount: gallery ? (gallery.total ?? gallery.items?.length ?? 0) : null,
+        checkedAt: new Date().toLocaleTimeString(),
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not reach the backend.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  const cards = snap
+    ? [
+        { label: 'API health', value: snap.health === 'ok' ? 'Online' : snap.health, sub: `${snap.latencyMs} ms round trip`, ok: snap.health === 'ok' },
+        {
+          label: 'Generation',
+          value: snap.capabilities?.generation_available ? 'Available' : 'Unavailable',
+          sub: snap.capabilities ? `mode: ${snap.capabilities.deployment_mode}` : 'capabilities unreachable',
+          ok: !!snap.capabilities?.generation_available,
+        },
+        { label: 'Models available', value: `${snap.models.filter((m) => m.available).length} / ${snap.models.length}`, sub: 'from the model catalogue', ok: snap.models.some((m) => m.available) },
+        { label: 'Gallery items', value: snap.galleryCount ?? '-', sub: 'stored on this server', ok: snap.galleryCount !== null },
+      ]
+    : [];
+
   return (
     <WorkspaceLayout>
-      <Box p={8} maxW="1400px">
-        {/* Header */}
-        <Flex justify="space-between" align="center" mb={8}>
+      <Box p={{ base: 4, md: 8 }} maxW="1400px">
+        <Flex justify="space-between" align="center" mb={8} wrap="wrap" gap={3}>
           <Box>
-            <Heading size="lg" color="#F4F7F0" fontWeight="700">
-              Admin Dashboard
-            </Heading>
-            <Text color="#A5B1A7" fontSize="14px" mt={1}>
-              System overview and management
+            <Heading size="lg" color="#1E2233" fontWeight="700">System Status</Heading>
+            <Text color="#5B6277" fontSize="14px" mt={1}>
+              Live checks against this server. No placeholder users or activity: only what the backend reports right now.
             </Text>
           </Box>
-          <Flex gap={2}>
-            <Text fontSize="12px" color="#6B7B6D" bg="#111713" px={3} py={1.5} borderRadius="8px" border="1px solid #2A3A2C">
-              Last 7 Days
-            </Text>
+          <Flex align="center" gap={3}>
+            {snap && <Text fontSize="12px" color="#8A90A2">checked {snap.checkedAt}</Text>}
+            <Button size="sm" onClick={refresh} isLoading={loading} bg="#5B5BF0" color="#FFFFFF" fontWeight={700}>Refresh</Button>
           </Flex>
         </Flex>
 
-        {/* Stats Cards */}
-        <Grid templateColumns="repeat(4, 1fr)" gap={5} mb={8}>
-          {statCards.map((stat, i) => (
-            <GridItem key={i}>
-              <Box
-                bg="#111713"
-                border="1px solid #2A3A2C"
-                borderRadius="14px"
-                p={5}
-                _hover={{ borderColor: '#3A4A3C' }}
-                transition="all 0.2s ease"
-              >
-                <Flex justify="space-between" align="flex-start" mb={3}>
-                  <Text fontSize="13px" color="#A5B1A7" fontWeight="500">{stat.label}</Text>
-                  <Text fontSize="20px">{stat.icon}</Text>
-                </Flex>
-                <Text fontSize="28px" fontWeight="700" color="#F4F7F0" mb={1}>
-                  {stat.value}
-                </Text>
-                <Text fontSize="12px" color="#B7FF35" fontWeight="500">
-                  {stat.change}
-                </Text>
-              </Box>
-            </GridItem>
-          ))}
-        </Grid>
+        {loading && !snap && <Flex align="center" gap={3} color="#5B6277"><Spinner size="sm" /> Checking services...</Flex>}
+        {error && <Text color="#E5484D" role="alert">{error}</Text>}
 
-        <Grid templateColumns="2fr 1fr" gap={6}>
-          {/* Recent Activity */}
-          <GridItem>
-            <Box
-              bg="#111713"
-              border="1px solid #2A3A2C"
-              borderRadius="14px"
-              overflow="hidden"
-            >
-              <Flex
-                px={5}
-                py={4}
-                borderBottom="1px solid #2A3A2C"
-                align="center"
-                justify="space-between"
-              >
-                <Text fontWeight="600" color="#F4F7F0" fontSize="15px">Recent Activity</Text>
-                <Text fontSize="12px" color="#B7FF35" cursor="pointer" _hover={{ textDecoration: 'underline' }}>
-                  View All
-                </Text>
-              </Flex>
-              {recentActivity.map((item, i) => (
-                <Flex
-                  key={i}
-                  px={5}
-                  py={3.5}
-                  align="center"
-                  justify="space-between"
-                  borderBottom={i < recentActivity.length - 1 ? '1px solid #1A2A1C' : 'none'}
-                  _hover={{ bg: '#0D120E' }}
-                  transition="bg 0.15s ease"
-                >
-                  <Flex align="center" gap={3}>
-                    <Box
-                      w="32px"
-                      h="32px"
-                      borderRadius="full"
-                      bg="#182019"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      fontSize="12px"
-                      color="#A5B1A7"
-                      fontWeight="600"
-                    >
-                      {item.user.charAt(0).toUpperCase()}
-                    </Box>
+        {snap && (
+          <>
+            <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', xl: 'repeat(4, 1fr)' }} gap={5} mb={8}>
+              {cards.map((c) => (
+                <GridItem key={c.label}>
+                  <Box bg="#FFFFFF" border="1px solid #E3DACF" borderRadius="14px" p={5}>
+                    <Text color="#5B6277" fontSize="12px" textTransform="uppercase" letterSpacing="0.08em">{c.label}</Text>
+                    <Text color={c.ok ? '#5B5BF0' : '#E5484D'} fontSize="2xl" fontWeight={700} mt={2}>{c.value}</Text>
+                    <Text color="#8A90A2" fontSize="12px" mt={1}>{c.sub}</Text>
+                  </Box>
+                </GridItem>
+              ))}
+            </Grid>
+
+            <Box bg="#FFFFFF" border="1px solid #E3DACF" borderRadius="14px" p={5}>
+              <Text color="#1E2233" fontWeight={600} mb={4}>Model registry</Text>
+              <Flex direction="column" gap={3}>
+                {snap.models.length === 0 && <Text color="#5B6277" fontSize="sm">The catalogue endpoint returned no models.</Text>}
+                {snap.models.map((m) => (
+                  <Flex key={m.id} justify="space-between" align="flex-start" gap={4} borderTop="1px solid #EFE8DF" pt={3} wrap="wrap">
                     <Box>
-                      <Text fontSize="13px" color="#F4F7F0" fontWeight="500">{item.action}</Text>
-                      <Text fontSize="11px" color="#6B7B6D">{item.user}</Text>
+                      <Text color="#1E2233" fontSize="sm" fontWeight={600}>{m.display_name}</Text>
+                      <Text color="#8A90A2" fontSize="xs">{m.checkpoint} · {m.role}</Text>
+                      {!m.available && <Text color="#C77700" fontSize="xs">{m.availability_reason}</Text>}
                     </Box>
+                    <Text color={m.available ? '#4747DB' : '#E5484D'} fontSize="sm" fontWeight={600}>{m.available ? 'available' : 'unavailable'}</Text>
                   </Flex>
-                  <Flex align="center" gap={3}>
-                    <Box
-                      w="8px"
-                      h="8px"
-                      borderRadius="full"
-                      bg={item.status === 'success' ? '#B7FF35' : item.status === 'active' ? '#4FC3F7' : '#FFB800'}
-                    />
-                    <Text fontSize="11px" color="#6B7B6D">{item.time}</Text>
-                  </Flex>
-                </Flex>
-              ))}
+                ))}
+              </Flex>
             </Box>
-          </GridItem>
-
-          {/* Quick Actions */}
-          <GridItem>
-            <Box
-              bg="#111713"
-              border="1px solid #2A3A2C"
-              borderRadius="14px"
-              overflow="hidden"
-            >
-              <Box px={5} py={4} borderBottom="1px solid #2A3A2C">
-                <Text fontWeight="600" color="#F4F7F0" fontSize="15px">Quick Actions</Text>
-              </Box>
-              {quickActions.map((action, i) => (
-                <Flex
-                  key={i}
-                  px={5}
-                  py={4}
-                  align="center"
-                  gap={3}
-                  cursor="pointer"
-                  borderBottom={i < quickActions.length - 1 ? '1px solid #1A2A1C' : 'none'}
-                  _hover={{ bg: '#182019' }}
-                  transition="all 0.15s ease"
-                >
-                  <Box
-                    w="36px"
-                    h="36px"
-                    borderRadius="10px"
-                    bg="#182019"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    fontSize="18px"
-                    border="1px solid #2A3A2C"
-                  >
-                    {action.icon}
-                  </Box>
-                  <Box>
-                    <Text fontSize="13px" color="#F4F7F0" fontWeight="500">{action.label}</Text>
-                    <Text fontSize="11px" color="#6B7B6D">{action.desc}</Text>
-                  </Box>
-                </Flex>
-              ))}
-            </Box>
-
-            {/* System Status */}
-            <Box
-              bg="#111713"
-              border="1px solid #2A3A2C"
-              borderRadius="14px"
-              p={5}
-              mt={5}
-            >
-              <Text fontWeight="600" color="#F4F7F0" fontSize="15px" mb={4}>System Status</Text>
-              {[
-                { name: 'API Server', status: 'Operational', color: '#B7FF35' },
-                { name: 'GPU Cluster', status: 'Operational', color: '#B7FF35' },
-                { name: 'Database', status: 'Operational', color: '#B7FF35' },
-                { name: 'CDN', status: 'Degraded', color: '#FFB800' },
-              ].map((svc, i) => (
-                <Flex key={i} justify="space-between" align="center" mb={i < 3 ? 3 : 0}>
-                  <Text fontSize="13px" color="#A5B1A7">{svc.name}</Text>
-                  <Flex align="center" gap={2}>
-                    <Box w="6px" h="6px" borderRadius="full" bg={svc.color} />
-                    <Text fontSize="11px" color={svc.color}>{svc.status}</Text>
-                  </Flex>
-                </Flex>
-              ))}
-            </Box>
-          </GridItem>
-        </Grid>
+          </>
+        )}
       </Box>
     </WorkspaceLayout>
   );
