@@ -82,6 +82,18 @@ def _clean_learn(d: dict, topic: str) -> dict:
             "image_prompt": txt(d.get("image_prompt"), 300), "quiz": quiz}
 
 
+def post_with_retry(url: str, attempts: int = 3, **kw) -> httpx.Response:
+    """httpx.post that retries rate limits (429) and transient 5xx answers with a short backoff."""
+    r = None
+    for i in range(attempts):
+        r = httpx.post(url, **kw)
+        if r.status_code not in (429, 500, 502, 503, 504):
+            return r
+        log.warning("%s answered %s (attempt %d)", url.split("/")[2], r.status_code, i + 1)
+        time.sleep(1.5 * (i + 1))
+    return r
+
+
 def _groq_chat(settings, payload: dict, timeout: float = 45.0) -> str:
     """One Groq chat completion with a short retry on rate limits / transient server errors. Returns the message text."""
     last = None

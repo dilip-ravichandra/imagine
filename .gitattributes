@@ -1,2 +1,7 @@
 # Vendored upstream sources are hash-verified: never rewrite their line endings.
 ai_engine/training/third_party/*.py -text
+
+# scripts must keep their line endings on every OS
+*.sh text eol=lf
+*.bat text eol=crlf
+docker/Dockerfile text eol=lf

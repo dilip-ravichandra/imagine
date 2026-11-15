@@ -1,5 +1,8 @@
 # Imagine AI — resource-efficient text-to-image for mobile (Problem Statement P3)
 
+> **Run it on any laptop with Docker:** see [`docker/README.md`](docker/README.md). Double-click `docker/start.bat` (Windows) or run `./docker/start.sh`; the site opens at http://localhost:8000.
+
+
 > *Your imagination. Our intelligence.* A hybrid edge-server text-to-image system: lightweight clients (web, dashboard,
 > Android) talk to a GPU server that runs an **optimised, budget-aware** diffusion pipeline, compared quantitatively with an
 > unoptimised Stable Diffusion 1.5 baseline.

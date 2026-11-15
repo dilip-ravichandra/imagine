@@ -43,7 +43,7 @@ def shot(name):
 
 
 def goto(path, wait_s=3.5):
-    call("Page.navigate", url="http://localhost:8000" + path)
+    call("Page.navigate", url=os.environ.get("QA_BASE", "http://localhost:8000") + path)
     time.sleep(wait_s)
 
 
@@ -83,7 +83,7 @@ def text():
 
 def brightness(sel):
     return js("""(()=>{const i=document.querySelector(%s);if(!i)return -1;const c=document.createElement('canvas');c.width=64;c.height=64;const x=c.getContext('2d');x.drawImage(i,0,0,64,64);
-      const d=x.getImageData(0,0,64,64).data;let t=0,mn=255,mx=0;for(let k=0;k<d.length;k+=4){const v=(d[k]+d[k+1]+d[k+2])/3;t+=v;mn=Math.min(mn,v);mx=Math.max(mx,v)}return Math.round(t/4096)+'/'+(mx-mn)})()""" % json.dumps(sel))
+      const d=x.getImageData(0,0,64,64).data;let t=0,mn=255,mx=0;for(let k=0;k<d.length;k+=4){const v=(d[k]+d[k+1]+d[k+2])/3;t+=v;mn=Math.min(mn,v);mx=Math.max(mx,v)}return Math.round(t/4096)+'/'+Math.round(mx-mn)})()""" % json.dumps(sel))
 
 
 def alert():

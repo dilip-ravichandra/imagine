@@ -19,7 +19,21 @@ _CURRENT_MODEL_ON_GPU = None
 
 def _local_files_only() -> bool:
     """Keep local deployments offline; ZeroGPU Spaces can fetch gated weights at runtime."""
-    return os.getenv("HF_SPACE_RUNTIME", "").strip().lower() not in {"1", "true", "yes", "on"}
+    on = {"1", "true", "yes", "on"}
+    if os.getenv("IMAGINEAI_ALLOW_DOWNLOAD", "").strip().lower() in on:  # Docker / fresh laptops: fetch missing weights from the Hugging Face Hub once
+        return False
+    return os.getenv("HF_SPACE_RUNTIME", "").strip().lower() not in on
+
+
+def _dtype():
+    """fp16 on a GPU; fp32 on CPU (fp16 is unsupported or very slow there)."""
+    import torch
+    return torch.float16 if torch.cuda.is_available() else torch.float32
+
+
+def _prec() -> str:
+    import torch
+    return "fp16" if torch.cuda.is_available() else "fp32"
 
 
 def _offload_current_if_needed(target_key: str):
@@ -61,7 +75,7 @@ def get_pipeline(model_choice: str, settings=None):
             log.info("Loading SD-Turbo into memory...")
             pipe = AutoPipelineForText2Image.from_pretrained(
                 "stabilityai/sd-turbo",
-                torch_dtype=torch.float16,
+                torch_dtype=_dtype(),
                 variant="fp16",
                 local_files_only=_local_files_only(),
                 safety_checker=None
@@ -69,14 +83,14 @@ def get_pipeline(model_choice: str, settings=None):
             _PIPELINES["sd_turbo"] = pipe
         pipe = _PIPELINES["sd_turbo"].to(device)
         _CURRENT_MODEL_ON_GPU = "sd_turbo"
-        return pipe, device, "fp16", 1, 0.0
+        return pipe, device, _prec(), 1, 0.0
 
     elif model_choice == "sd15_optimized":
         if "sd15_optimized" not in _PIPELINES:
             log.info("Loading SD 1.5 Final Optimized (LCM-LoRA + fp16)...")
             pipe = StableDiffusionPipeline.from_pretrained(
                 "stable-diffusion-v1-5/stable-diffusion-v1-5",
-                torch_dtype=torch.float16,
+                torch_dtype=_dtype(),
                 revision="451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
                 use_safetensors=True,
                 variant="fp16",
@@ -92,7 +106,7 @@ def get_pipeline(model_choice: str, settings=None):
             _PIPELINES["sd15_optimized"] = pipe
         pipe = _PIPELINES["sd15_optimized"].to(device)
         _CURRENT_MODEL_ON_GPU = "sd15_optimized"
-        return pipe, device, "fp16", 4, 1.0
+        return pipe, device, _prec(), 4, 1.0
 
     elif model_choice == "imagineai_lcm":
         # Our own warm-started LCM-LoRA (adapters/lcm_coco_warmstart), benchmark variant D4. Same settings as O4.
@@ -103,7 +117,7 @@ def get_pipeline(model_choice: str, settings=None):
             log.info("Loading SD 1.5 + ImagineAI LCM-LoRA (ours, fp16)...")
             pipe = StableDiffusionPipeline.from_pretrained(
                 "stable-diffusion-v1-5/stable-diffusion-v1-5",
-                torch_dtype=torch.float16,
+                torch_dtype=_dtype(),
                 revision="451f4fe16113bff5a5d2269ed5ad43b0592e9a14",
                 use_safetensors=True,
                 variant="fp16",
@@ -115,7 +129,7 @@ def get_pipeline(model_choice: str, settings=None):
             _PIPELINES["imagineai_lcm"] = pipe
         pipe = _PIPELINES["imagineai_lcm"].to(device)
         _CURRENT_MODEL_ON_GPU = "imagineai_lcm"
-        return pipe, device, "fp16", 4, 1.0
+        return pipe, device, _prec(), 4, 1.0
 
     elif model_choice == "sd15_adapted":
         from ..config import load_settings
@@ -133,7 +147,7 @@ def get_pipeline(model_choice: str, settings=None):
             pipe = AutoPipelineForText2Image.from_pretrained(
                 settings.model_id,
                 revision=settings.model_revision,
-                torch_dtype=torch.float16,
+                torch_dtype=_dtype(),
                 variant="fp16",
                 local_files_only=_local_files_only(),
             )
@@ -142,7 +156,7 @@ def get_pipeline(model_choice: str, settings=None):
             _PIPELINES[cache_key] = pipe
         pipe = _PIPELINES[cache_key].to(device)
         _CURRENT_MODEL_ON_GPU = cache_key
-        return pipe, device, "fp16", 30, 7.5
+        return pipe, device, _prec(), 30, 7.5
 
     else:  # sd15_baseline
         if "sd15_baseline" not in _PIPELINES:
@@ -176,7 +190,7 @@ def get_inpaint_pipeline(model_choice: str = "sd_turbo", settings=None):
         if "sd15" in model_choice:
             pipe = AutoPipelineForInpainting.from_pretrained(
                 "runwayml/stable-diffusion-v1-5",
-                torch_dtype=torch.float16 if device == "cuda" else torch.float32,
+                torch_dtype=_dtype() if device == "cuda" else torch.float32,
                 variant="fp16" if device == "cuda" else None,
                 local_files_only=_local_files_only(),
                 safety_checker=None
@@ -186,7 +200,7 @@ def get_inpaint_pipeline(model_choice: str = "sd_turbo", settings=None):
         else:
             pipe = AutoPipelineForInpainting.from_pretrained(
                 "stabilityai/sd-turbo",
-                torch_dtype=torch.float16 if device == "cuda" else torch.float32,
+                torch_dtype=_dtype() if device == "cuda" else torch.float32,
                 variant="fp16" if device == "cuda" else None,
                 local_files_only=_local_files_only(),
                 safety_checker=None
@@ -216,7 +230,7 @@ def get_img2img_pipeline(model_choice: str = "sd_turbo", settings=None):
         log.info("Loading img2img pipeline for %s...", model_choice)
         pipe = AutoPipelineForImage2Image.from_pretrained(
             "stabilityai/sd-turbo",
-            torch_dtype=torch.float16 if device == "cuda" else torch.float32,
+            torch_dtype=_dtype() if device == "cuda" else torch.float32,
             variant="fp16" if device == "cuda" else None,
             local_files_only=_local_files_only(),
             safety_checker=None

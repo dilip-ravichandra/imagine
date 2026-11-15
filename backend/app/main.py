@@ -22,6 +22,7 @@ from pydantic import BaseModel, Field
 
 from .auth_routes import AuthKit, current_user_var, register_auth
 from .config import Settings, load_settings
+from .features_routes import post_with_retry
 from .security import (COOKIE_NAME, BodySizeLimitMiddleware, OriginCheckMiddleware, SecurityHeadersMiddleware)
 from .schemas.model import AdapterStatus, ModelInfoResponse
 from .schemas.registry import ModelCatalogueEntry, ModelCatalogueResponse
@@ -416,7 +417,7 @@ def create_app(engine: Optional[DiffusionEngine] = None, settings: Optional[Sett
             {"role": "user", "content": req.prompt.strip()},
         ]
         try:
-            response = httpx.post(
+            response = post_with_retry(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers={
                     "Authorization": f"Bearer {settings.groq_api_key}",
@@ -472,7 +473,7 @@ def create_app(engine: Optional[DiffusionEngine] = None, settings: Optional[Sett
             *req.messages,
         ]
         try:
-            response = httpx.post(
+            response = post_with_retry(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers={
                     "Authorization": f"Bearer {settings.groq_api_key}",

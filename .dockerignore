@@ -1,15 +1,42 @@
+# Keep the build context small: weights, datasets, logs and evaluation images stay out of the image.
 .git
+.gitattributes
 .venv
 .idea
+.pytest_cache
 **/node_modules
 **/__pycache__
+**/*.pyc
 data_cache
 training_data
+datasets
 generated_images
-adapters/*/checkpoint-*
+colab_upload
+model_artifacts
+artifacts
+android
+mobile
+hf_space
+ai_handoff
+docs
+tests
 *.log
 *.err
+*.err.log
+*.out.log
 .env
+docker/.env
 .modal-api-key
-android/app/build
-artifacts
+# only our distilled LCM-LoRA ships; checkpoints and experiments (12 GB) do not
+adapters/*
+!adapters/lcm_coco_warmstart
+adapters/lcm_coco_warmstart/checkpoint-*
+# evaluation: keep result JSON/markdown and the 26 MB catalogue images, drop the ~2.3 GB of sample images
+evaluation/results/**/*.png
+evaluation/results/**/*.jpg
+evaluation/results/**/*.jpeg
+evaluation/results/**/*.webp
+!evaluation/results/p7/images/V4/**
+evaluation/results/**/*.pt
+evaluation/results/**/*.safetensors
+docker/*.tar

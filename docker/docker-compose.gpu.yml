@@ -1,0 +1,14 @@
+# NVIDIA laptops: docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
+# Needs Docker Desktop with WSL2 + a current NVIDIA driver (Linux: NVIDIA Container Toolkit).
+services:
+  imagineai:
+    build:
+      args:
+        TORCH_INDEX: https://download.pytorch.org/whl/cu128
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

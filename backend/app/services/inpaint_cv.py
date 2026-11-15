@@ -43,7 +43,7 @@ def _get_pipe(local_only: bool):
     from diffusers import DPMSolverMultistepScheduler, StableDiffusionInpaintPipeline
     if _PIPE is None:
         log.info("Loading %s (fp16)...", REPO_ID)
-        p = StableDiffusionInpaintPipeline.from_pretrained(REPO_ID, torch_dtype=torch.float16, variant="fp16", safety_checker=None,
+        p = StableDiffusionInpaintPipeline.from_pretrained(REPO_ID, torch_dtype=(torch.float16 if torch.cuda.is_available() else torch.float32), variant="fp16", safety_checker=None,
                                                            local_files_only=local_only)
         p.scheduler = DPMSolverMultistepScheduler.from_config(p.scheduler.config, use_karras_sigmas=True)
         p.set_progress_bar_config(disable=True)
