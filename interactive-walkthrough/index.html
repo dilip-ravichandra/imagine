@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Imagine AI — Interactive Technical Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- Progress Bar -->
+<div id="progress-bar"></div>
+
+<!-- Navigation -->
+<nav id="navbar">
+  <a href="#hero" class="nav-brand">Imagine<span>AI</span></a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#cv-pipeline">Enhancement</a></li>
+    <li><a href="#models">Models</a></li>
+    <li><a href="#backend">Backend</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#metrics">Results</a></li>
+    <li><a href="#tech">Tech Stack</a></li>
+    <li><a href="#limitations">Limitations</a></li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Info Panel (slides in from right on node click) -->
+<div id="info-panel">
+  <button id="info-panel-close" aria-label="Close">✕</button>
+  <div class="info-panel-tag" id="ip-tag">Component</div>
+  <div class="info-panel-title" id="ip-title">—</div>
+  <div class="info-row"><div class="info-label">Purpose</div><div class="info-value" id="ip-purpose">—</div></div>
+  <div class="info-row"><div class="info-label">Technology</div><div class="info-value" id="ip-tech">—</div></div>
+  <div class="info-row"><div class="info-label">Input</div><div class="info-value" id="ip-input">—</div></div>
+  <div class="info-row"><div class="info-label">Output</div><div class="info-value" id="ip-output">—</div></div>
+  <div class="info-row"><div class="info-label">Source File</div><div class="info-value info-code" id="ip-file">—</div></div>
+  <div class="info-row" id="ip-note-row" style="display:none">
+    <div class="info-label">Note</div>
+    <div class="info-value" id="ip-note">—</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SECTION A — HERO
+════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-bg-shapes">
+    <div class="hero-shape hero-shape-1"></div>
+    <div class="hero-shape hero-shape-2"></div>
+    <div class="hero-shape hero-shape-3"></div>
+  </div>
+  <div class="container-xl">
+    <div class="row align-items-center g-5" style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center">
+      <div class="hero-content aos-fade">
+        <div class="hero-eyebrow">Problem Statement No. 3 &nbsp;·&nbsp; Resource-Efficient Text-to-Image</div>
+        <h1 class="hero-title">
+          Text → Image<br/>
+          <span class="gradient-text">in 247 ms.</span>
+        </h1>
+        <p class="hero-subtitle">
+          Imagine AI is a full-stack generative vision system: a React web app + Android app + FastAPI backend
+          that turns words into pictures <strong>43× faster</strong> than the SD 1.5 baseline — using distillation,
+          consistency models, and an adaptive resource controller.
+        </p>
+        <div class="stat-pills">
+          <div class="stat-pill"><span class="dot dot-pink"></span>43× speed-up vs baseline</div>
+          <div class="stat-pill"><span class="dot dot-purple"></span>56% less VRAM</div>
+          <div class="stat-pill"><span class="dot dot-green"></span>755 automated tests</div>
+        </div>
+        <div class="hero-actions">
+          <a href="#architecture" class="btn-primary">↓ Explore Architecture</a>
+          <a href="#demo" class="btn-outline">▶ Interactive Demo</a>
+        </div>
+      </div>
+      <div class="aos-slide-right" style="display:flex;flex-direction:column;gap:1rem;">
+        <!-- Animated mini-flow preview -->
+        <div class="card-glass" style="text-align:center;padding:2rem;">
+          <div id="hero-anim" style="display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;min-height:120px;">
+            <div class="stage-box" id="ha-1" style="opacity:0.3">
+              <div class="stage-box-icon">✍️</div>
+              <div class="stage-box-label">Prompt</div>
+            </div>
+            <div class="stage-arrow">→</div>
+            <div class="stage-box" id="ha-2" style="opacity:0.3">
+              <div class="stage-box-icon">🧠</div>
+              <div class="stage-box-label">NLP Parse</div>
+            </div>
+            <div class="stage-arrow">→</div>
+            <div class="stage-box" id="ha-3" style="opacity:0.3">
+              <div class="stage-box-icon">🎨</div>
+              <div class="stage-box-label">Diffusion</div>
+            </div>
+            <div class="stage-arrow">→</div>
+            <div class="stage-box" id="ha-4" style="opacity:0.3">
+              <div class="stage-box-icon">🔬</div>
+              <div class="stage-box-label">CV Gate</div>
+            </div>
+            <div class="stage-arrow">→</div>
+            <div class="stage-box" id="ha-5" style="opacity:0.3">
+              <div class="stage-box-icon">🖼️</div>
+              <div class="stage-box-label">Image</div>
+            </div>
+          </div>
+          <div id="hero-anim-label" style="font-size:.8rem;color:var(--muted);margin-top:1rem;">Initialising…</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="card-glass card-pink" style="text-align:center;">
+            <div style="font-size:2rem;font-weight:900;color:var(--accent1)">247ms</div>
+            <div style="font-size:.8rem;color:var(--muted)">SD-Turbo, 1 step</div>
+          </div>
+          <div class="card-glass card-purple" style="text-align:center;">
+            <div style="font-size:2rem;font-weight:900;color:var(--accent2)">0.321</div>
+            <div style="font-size:.8rem;color:var(--muted)">CLIP Score ↑</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SECTION B — SYSTEM ARCHITECTURE
+════════════════════════════════════════ -->
+<section id="architecture">
+  <div class="container-xl">
+    <div class="aos-fade">
+      <span class="section-badge badge-purple">System Design</span>
+      <h2 class="section-title">Complete System Architecture</h2>
+      <p class="section-sub">Click any component to inspect its purpose, technology, inputs, outputs, and source files.</p>
+    </div>
+
+    <div id="arch-svg-container" class="aos-fade" style="margin-bottom:2rem;">
+      <svg id="arch-svg" viewBox="0 0 960 540" width="100%" style="max-height:540px;display:block;">
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#7C3AED" opacity=".7"/>
+          </marker>
+          <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#10B981" opacity=".7"/>
+          </marker>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- Background regions -->
+        <rect x="10" y="10" width="940" height="520" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+
+        <!-- CLIENT zone -->
+        <rect x="30" y="30" width="180" height="480" rx="12" fill="#FCE7F3" stroke="#FBCFE8" stroke-width="1.5" stroke-dasharray="6,3"/>
+        <text x="120" y="52" text-anchor="middle" font-size="11" font-weight="700" fill="#EC4899">CLIENT</text>
+
+        <!-- SERVER zone -->
+        <rect x="240" y="30" width="490" height="480" rx="12" fill="#EDE9FE" stroke="#DDD6FE" stroke-width="1.5" stroke-dasharray="6,3"/>
+        <text x="485" y="52" text-anchor="middle" font-size="11" font-weight="700" fill="#7C3AED">SERVER (FastAPI + GPU)</text>
+
+        <!-- EXTERNAL zone -->
+        <rect x="760" y="30" width="185" height="480" rx="12" fill="#DCFCE7" stroke="#BBF7D0" stroke-width="1.5" stroke-dasharray="6,3"/>
+        <text x="852" y="52" text-anchor="middle" font-size="11" font-weight="700" fill="#10B981">EXTERNAL</text>
+
+        <!-- ===== CLIENT NODES ===== -->
+        <!-- React Web App -->
+        <g class="arch-node" data-node="react" transform="translate(40,70)">
+          <rect width="160" height="70" rx="10" fill="white" stroke="#E2E8F0" stroke-width="1.5"/>
+          <text x="80" y="22" text-anchor="middle" font-size="18">🌐</text>
+          <text x="80" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#273047">React Web App</text>
+          <text x="80" y="55" text-anchor="middle" font-size="9" fill="#64748B">React 18 + Chakra UI</text>
+          <text x="80" y="67" text-anchor="middle" font-size="9" fill="#64748B">17 pages</text>
+        </g>
+
+        <!-- Android App -->
+        <g class="arch-node" data-node="android" transform="translate(40,170)">
+          <rect width="160" height="70" rx="10" fill="white" stroke="#E2E8F0" stroke-width="1.5"/>
+          <text x="80" y="22" text-anchor="middle" font-size="18">📱</text>
+          <text x="80" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#273047">Android App</text>
+          <text x="80" y="55" text-anchor="middle" font-size="9" fill="#64748B">Jetpack Compose</text>
+          <text x="80" y="67" text-anchor="middle" font-size="9" fill="#64748B">android/</text>
+        </g>
+
+        <!-- ===== GATEWAY ===== -->
+        <!-- FastAPI Gateway -->
+        <g class="arch-node" data-node="fastapi" transform="translate(255,210)">
+          <rect width="160" height="80" rx="10" fill="white" stroke="#DDD6FE" stroke-width="2"/>
+          <text x="80" y="22" text-anchor="middle" font-size="18">⚡</text>
+          <text x="80" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#273047">FastAPI Gateway</text>
+          <text x="80" y="54" text-anchor="middle" font-size="9" fill="#64748B">Auth · Rate Limits</text>
+          <text x="80" y="66" text-anchor="middle" font-size="9" fill="#64748B">CSP / HSTS</text>
+          <text x="80" y="78" text-anchor="middle" font-size="9" fill="#64748B">backend/app/</text>
+        </g>
+
+        <!-- ===== AI ENGINE ===== -->
+        <!-- SD-Turbo -->
+        <g class="arch-node" data-node="sdturbo" transform="translate(450,70)">
+          <rect width="150" height="70" rx="10" fill="#FCE7F3" stroke="#FBCFE8" stroke-width="1.5"/>
+          <text x="75" y="22" text-anchor="middle" font-size="16">🚀</text>
+          <text x="75" y="38" text-anchor="middle" font-size="10" font-weight="700" fill="#273047">SD-Turbo (1 step)</text>
+          <text x="75" y="51" text-anchor="middle" font-size="9" fill="#64748B">ADD Distilled · FP16</text>
+          <text x="75" y="63" text-anchor="middle" font-size="9" fill="#64748B">247 ms · 3,098 MB</text>
+        </g>
+
+        <!-- LCM-LoRA -->
+        <g class="arch-node" data-node="lcmlora" transform="translate(450,165)">
+          <rect width="150" height="70" rx="10" fill="#EDE9FE" stroke="#DDD6FE" stroke-width="1.5"/>
+          <text x="75" y="22" text-anchor="middle" font-size="16">🧪</text>
+          <text x="75" y="38" text-anchor="middle" font-size="10" font-weight="700" fill="#273047">SD 1.5 + LCM-LoRA</text>
+          <text x="75" y="51" text-anchor="middle" font-size="9" fill="#64748B">Consistency · 4 steps</text>
+          <text x="75" y="63" text-anchor="middle" font-size="9" fill="#64748B">451 ms · 2,816 MB</text>
+        </g>
+
+        <!-- Inpainting -->
+        <g class="arch-node" data-node="inpaint" transform="translate(450,260)">
+          <rect width="150" height="70" rx="10" fill="#DCFCE7" stroke="#BBF7D0" stroke-width="1.5"/>
+          <text x="75" y="22" text-anchor="middle" font-size="16">✂️</text>
+          <text x="75" y="38" text-anchor="middle" font-size="10" font-weight="700" fill="#273047">SD Inpainting</text>
+          <text x="75" y="51" text-anchor="middle" font-size="9" fill="#64748B">Mask-guided · GrabCut</text>
+          <text x="75" y="63" text-anchor="middle" font-size="9" fill="#64748B">backend/app/services/</text>
+        </g>
+
+        <!-- Best-of-N Verifier -->
+        <g class="arch-node" data-node="verifier" transform="translate(450,355)">
+          <rect width="150" height="70" rx="10" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1.5"/>
+          <text x="75" y="22" text-anchor="middle" font-size="16">🔍</text>
+          <text x="75" y="38" text-anchor="middle" font-size="10" font-weight="700" fill="#273047">Best-of-N Verifier</text>
+          <text x="75" y="51" text-anchor="middle" font-size="9" fill="#64748B">DETR + OWL-ViT</text>
+          <text x="75" y="63" text-anchor="middle" font-size="9" fill="#64748B">62%→75% correctness</text>
+        </g>
+
+        <!-- Classical CV -->
+        <g class="arch-node" data-node="cv" transform="translate(450,450)">
+          <rect width="150" height="65" rx="10" fill="white" stroke="#E2E8F0" stroke-width="1.5"/>
+          <text x="75" y="20" text-anchor="middle" font-size="16">🔬</text>
+          <text x="75" y="36" text-anchor="middle" font-size="10" font-weight="700" fill="#273047">Classical CV Pipeline</text>
+          <text x="75" y="49" text-anchor="middle" font-size="9" fill="#64748B">Laplacian · Immerkaer</text>
+          <text x="75" y="61" text-anchor="middle" font-size="9" fill="#64748B">computer_vision/</text>
+        </g>
+
+        <!-- Adaptive Controller -->
+        <g class="arch-node" data-node="adaptive" transform="translate(630,210)">
+          <rect width="100" height="80" rx="10" fill="white" stroke="#E2E8F0" stroke-width="1.5"/>
+          <text x="50" y="22" text-anchor="middle" font-size="16">🎛️</text>
+          <text x="50" y="38" text-anchor="middle" font-size="9" font-weight="700" fill="#273047">Adaptive</text>
+          <text x="50" y="49" text-anchor="middle" font-size="9" font-weight="700" fill="#273047">Controller</text>
+          <text x="50" y="62" text-anchor="middle" font-size="9" fill="#64748B">4-rung ladder</text>
+          <text x="50" y="74" text-anchor="middle" font-size="9" fill="#64748B">ai_engine/</text>
+        </g>
+
+        <!-- SQLite DB -->
+        <g class="arch-node" data-node="sqlite" transform="translate(630,330)">
+          <rect width="100" height="65" rx="10" fill="white" stroke="#E2E8F0" stroke-width="1.5"/>
+          <text x="50" y="20" text-anchor="middle" font-size="16">🗄️</text>
+          <text x="50" y="36" text-anchor="middle" font-size="9" font-weight="700" fill="#273047">SQLite DB</text>
+          <text x="50" y="48" text-anchor="middle" font-size="9" fill="#64748B">Accounts</text>
+          <text x="50" y="60" text-anchor="middle" font-size="9" fill="#64748B">Gallery</text>
+        </g>
+
+        <!-- NLP Parser -->
+        <g class="arch-node" data-node="nlp" transform="translate(630,430)">
+          <rect width="100" height="65" rx="10" fill="white" stroke="#E2E8F0" stroke-width="1.5"/>
+          <text x="50" y="20" text-anchor="middle" font-size="16">🔤</text>
+          <text x="50" y="36" text-anchor="middle" font-size="9" font-weight="700" fill="#273047">NLP Parser</text>
+          <text x="50" y="48" text-anchor="middle" font-size="9" fill="#64748B">&lt;1ms · 0 VRAM</text>
+          <text x="50" y="60" text-anchor="middle" font-size="9" fill="#64748B">ai_engine/prompt/</text>
+        </g>
+
+        <!-- ===== EXTERNAL ===== -->
+        <!-- Groq AI -->
+        <g class="arch-node" data-node="groq" transform="translate(775,70)">
+          <rect width="155" height="80" rx="10" fill="white" stroke="#BBF7D0" stroke-width="1.5"/>
+          <text x="77" y="22" text-anchor="middle" font-size="16">🤖</text>
+          <text x="77" y="40" text-anchor="middle" font-size="10" font-weight="700" fill="#273047">Groq Cloud API</text>
+          <text x="77" y="53" text-anchor="middle" font-size="9" fill="#64748B">Whisper · Chat · Translate</text>
+          <text x="77" y="66" text-anchor="middle" font-size="9" fill="#64748B">Vision · Lessons</text>
+          <text x="77" y="78" text-anchor="middle" font-size="9" fill="#10B981">Server-side keys only</text>
+        </g>
+
+        <!-- Modal Cloud -->
+        <g class="arch-node" data-node="modal" transform="translate(775,195)">
+          <rect width="155" height="65" rx="10" fill="white" stroke="#BBF7D0" stroke-width="1.5"/>
+          <text x="77" y="20" text-anchor="middle" font-size="16">☁️</text>
+          <text x="77" y="36" text-anchor="middle" font-size="10" font-weight="700" fill="#273047">Modal A10G (Cloud)</text>
+          <text x="77" y="49" text-anchor="middle" font-size="9" fill="#64748B">Public demo deploy</text>
+          <text x="77" y="61" text-anchor="middle" font-size="9" fill="#64748B">modal_deploy.py</text>
+        </g>
+
+        <!-- Docker -->
+        <g class="arch-node" data-node="docker" transform="translate(775,305)">
+          <rect width="155" height="65" rx="10" fill="white" stroke="#BBF7D0" stroke-width="1.5"/>
+          <text x="77" y="20" text-anchor="middle" font-size="16">🐳</text>
+          <text x="77" y="36" text-anchor="middle" font-size="10" font-weight="700" fill="#273047">Docker Container</text>
+          <text x="77" y="49" text-anchor="middle" font-size="9" fill="#64748B">One-command local run</text>
+          <text x="77" y="61" text-anchor="middle" font-size="9" fill="#64748B">docker/</text>
+        </g>
+
+        <!-- COCO Dataset -->
+        <g class="arch-node" data-node="coco" transform="translate(775,415)">
+          <rect width="155" height="65" rx="10" fill="white" stroke="#BBF7D0" stroke-width="1.5"/>
+          <text x="77" y="20" text-anchor="middle" font-size="16">📊</text>
+          <text x="77" y="36" text-anchor="middle" font-size="10" font-weight="700" fill="#273047">COCO Dataset</text>
+          <text x="77" y="49" text-anchor="middle" font-size="9" fill="#64748B">Training prompts</text>
+          <text x="77" y="61" text-anchor="middle" font-size="9" fill="#64748B">Evaluation (300 prompts)</text>
+        </g>
+
+        <!-- ===== CONNECTIONS ===== -->
+        <!-- Client → FastAPI -->
+        <line x1="200" y1="105" x2="255" y2="250" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)" opacity=".6"/>
+        <line x1="200" y1="205" x2="255" y2="250" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)" opacity=".6"/>
+
+        <!-- FastAPI → Engines -->
+        <line x1="415" y1="235" x2="450" y2="105" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrow)" opacity=".6"/>
+        <line x1="415" y1="250" x2="450" y2="200" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrow)" opacity=".6"/>
+        <line x1="415" y1="260" x2="450" y2="295" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrow)" opacity=".6"/>
+        <line x1="415" y1="270" x2="450" y2="390" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)" opacity=".5"/>
+        <line x1="415" y1="280" x2="450" y2="480" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrow)" opacity=".6"/>
+
+        <!-- FastAPI → Adaptive -->
+        <line x1="415" y1="250" x2="630" y2="250" stroke="#EC4899" stroke-width="1.5" marker-end="url(#arrow)" opacity=".6"/>
+        <!-- FastAPI → DB -->
+        <line x1="415" y1="265" x2="630" y2="360" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow)" opacity=".5"/>
+        <!-- FastAPI → NLP -->
+        <line x1="415" y1="275" x2="630" y2="460" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow)" opacity=".5"/>
+
+        <!-- Server → External -->
+        <line x1="740" y1="250" x2="775" y2="110" stroke="#10B981" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-green)" opacity=".6"/>
+        <line x1="740" y1="260" x2="775" y2="228" stroke="#10B981" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-green)" opacity=".5"/>
+        <line x1="730" y1="275" x2="775" y2="338" stroke="#10B981" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-green)" opacity=".5"/>
+
+        <!-- Legend -->
+        <g transform="translate(265,500)">
+          <line x1="0" y1="8" x2="30" y2="8" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <text x="35" y="12" font-size="9" fill="#64748B">Internal request</text>
+          <line x1="120" y1="8" x2="150" y2="8" stroke="#10B981" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-green)"/>
+          <text x="155" y="12" font-size="9" fill="#64748B">External API</text>
+          <line x1="250" y1="8" x2="280" y2="8" stroke="#EC4899" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <text x="285" y="12" font-size="9" fill="#64748B">Adaptive control</text>
+        </g>
+      </svg>
+    </div>
+    <p style="text-align:center;font-size:.85rem;color:var(--muted)">👆 Click any component above for detailed technical information</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SECTION C — IMAGE GENERATION PIPELINE
+════════════════════════════════════════ -->
+<section id="pipeline">
+  <div class="container-xl">
+    <div class="aos-fade">
+      <span class="section-badge badge-pink">Core Engine</span>
+      <h2 class="section-title">Image Generation Pipeline</h2>
+      <p class="section-sub">Every stage from prompt entry to final PNG — verified against the source code. Click a stage to explore it; use the controls to animate the flow.</p>
+    </div>
+
+    <!-- Example prompt -->
+    <div class="card-glass" style="margin-bottom:2rem;padding:1.25rem 1.75rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;" id="example-prompt-box">
+      <span style="font-size:1.3rem">✍️</span>
+      <div>
+        <div style="font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Example Prompt Being Traced</div>
+        <div style="font-size:1rem;font-weight:600;color:var(--dark)" id="traced-prompt">"A vintage leather hat resting on a mossy wooden log, soft golden hour lighting"</div>
+      </div>
+    </div>
+
+    <!-- Pipeline scroll track -->
+    <div class="pipeline-wrapper aos-fade" id="pipeline-wrapper">
+      <div class="pipeline-track" id="pipeline-track">
+
+        <!-- Stage 1 -->
+        <div class="pipeline-step" data-stage="1" id="pstep-1">
+          <div class="step-num">1</div>
+          <div class="step-icon">🌐</div>
+          <h4 class="step-title">Client Request</h4>
+          <p class="step-desc">React / Android sends HTTP POST to <code>/api/v1/generate</code> with the prompt, quality mode, resolution (512 or 768), and optional seed. Server validates resolution and prompt length (&le; 1000 chars).</p>
+          <span class="step-tech-pill">FastAPI · Pydantic</span>
+        </div>
+
+        <!-- Stage 2 -->
+        <div class="pipeline-step" data-stage="2" id="pstep-2">
+          <div class="step-num">2</div>
+          <div class="step-icon">🔒</div>
+          <h4 class="step-title">Single-Flight Guard</h4>
+          <p class="step-desc">A non-blocking mutex (<code>threading.Lock</code>) serialises GPU work. Concurrent requests instantly receive HTTP 429 (Busy). Prevents multi-job CUDA OOM collisions on the 8 GB laptop GPU.</p>
+          <span class="step-tech-pill">Python threading · FastAPI</span>
+        </div>
+
+        <!-- Stage 3 -->
+        <div class="pipeline-step" data-stage="3" id="pstep-3">
+          <div class="step-num">3</div>
+          <div class="step-icon">🔤</div>
+          <h4 class="step-title">Semantic NLP Analysis</h4>
+          <p class="step-desc">Pure-Python rule-based parser extracts: objects ("hat", "log"), spatial relations ("resting on" → <em>on_top</em>), attributes ("vintage leather", "mossy"), lighting ("golden hour"). Runs in &lt; 0.8 ms, zero VRAM.</p>
+          <span class="step-tech-pill">ai_engine/prompt/parser.py</span>
+        </div>
+
+        <!-- Stage 4 -->
+        <div class="pipeline-step" data-stage="4" id="pstep-4">
+          <div class="step-num">4</div>
+          <div class="step-icon">🎛️</div>
+          <h4 class="step-title">Adaptive Controller</h4>
+          <p class="step-desc">Reads live GPU budget (VRAM). Scores benchmarked profile entries. Selects the best-fitting config. If preferred config is unsafe, walks the 4-rung fallback ladder: Resolution → Precision → Steps → Model. Fully deterministic — same inputs always yield same decision.</p>
+          <span class="step-tech-pill">ai_engine/adaptive/controller.py</span>
+        </div>
+
+        <!-- Stage 5 -->
+        <div class="pipeline-step" data-stage="5" id="pstep-5">
+          <div class="step-num">5</div>
+          <div class="step-icon">🔄</div>
+          <h4 class="step-title">GPU Lease &amp; Model Load</h4>
+          <p class="step-desc">Evicts any dormant pipeline from VRAM (<code>pipe.to("cpu")</code> + <code>torch.cuda.empty_cache()</code>). Loads the selected model in FP16. The model is cached after first load — subsequent requests skip the 3-6 s load step entirely.</p>
+          <span class="step-tech-pill">backend/app/services/multi_model.py</span>
+        </div>
+
+        <!-- Stage 6 -->
+        <div class="pipeline-step" data-stage="6" id="pstep-6">
+          <div class="step-num">6</div>
+          <div class="step-icon">📝</div>
+          <h4 class="step-title">CLIP Text Encoding</h4>
+          <p class="step-desc">The raw prompt is tokenised (BPE, 77 tokens) and encoded by the frozen CLIP ViT-L/14 text encoder into a tensor of shape <strong>(1, 77, 768)</strong>. SD-Turbo uses CFG = 0.0 so only the conditional pass runs — 50% fewer UNet evaluations than SD 1.5's CFG = 7.5.</p>
+          <span class="step-tech-pill">CLIP ViT-L/14 · diffusers</span>
+        </div>
+
+        <!-- Stage 7 -->
+        <div class="pipeline-step" data-stage="7" id="pstep-7">
+          <div class="step-num">7</div>
+          <div class="step-icon">🌀</div>
+          <h4 class="step-title">Latent Denoising (UNet)</h4>
+          <p class="step-desc">A seed-fixed Gaussian noise tensor <strong>(1, 4, 64, 64)</strong> is denoised in latent space via EulerDiscreteScheduler (SD-Turbo) or LCMScheduler. Each step: cross-attention with text embeddings steers structure. 1-2 steps for Turbo; 4-8 steps for LCM-LoRA.</p>
+          <span class="step-tech-pill">Time-conditioned UNet · Cross-attention</span>
+        </div>
+
+        <!-- Stage 8 -->
+        <div class="pipeline-step" data-stage="8" id="pstep-8">
+          <div class="step-num">8</div>
+          <div class="step-icon">🖼️</div>
+          <h4 class="step-title">VAE Decoding</h4>
+          <p class="step-desc">The 64×64×4 latent is decoded to a full-resolution 512×512×3 RGB image. Standard <strong>AutoencoderKL</strong> takes ~52 ms. Optional <strong>TAESD</strong> (1.8M params, distilled) decodes in ~18 ms — 65% faster — cutting end-to-end to 340 ms.</p>
+          <span class="step-tech-pill">AutoencoderKL / TAESD</span>
+        </div>
+
+        <!-- Stage 9 -->
+        <div class="pipeline-step" data-stage="9" id="pstep-9">
+          <div class="step-num">9</div>
+          <div class="step-icon">🔬</div>
+          <h4 class="step-title">CV Quality Gate</h4>
+          <p class="step-desc">Classical CV measures sharpness (Laplacian), noise (Immerkaer MAD), brightness, contrast, halo/ringing (Sobel plateau). 38% of images are clean and bypass correction entirely (dead-band). "Golden hour" prompt intent suppresses the warm colour-cast alarm.</p>
+          <span class="step-tech-pill">computer_vision/pipeline.py</span>
+        </div>
+
+      </div><!-- end pipeline-track -->
+    </div>
+
+    <!-- Controls -->
+    <div class="pipeline-controls">
+      <button class="ctrl-btn ctrl-play" id="btn-play">▶ Play</button>
+      <button class="ctrl-btn ctrl-pause" id="btn-pause">⏸ Pause</button>
+      <button class="ctrl-btn ctrl-replay" id="btn-replay">↺ Restart</button>
+      <button class="ctrl-btn ctrl-step" id="btn-prev">← Prev</button>
+      <button class="ctrl-btn ctrl-step" id="btn-next">Next →</button>
+      <div class="step-indicators" id="step-indicators"></div>
+    </div>
+
+    <!-- Active stage detail card -->
+    <div class="card-glass card-purple" style="margin-top:2rem;" id="stage-detail">
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <span style="font-size:3rem" id="sd-icon">🌐</span>
+        <div>
+          <div style="font-size:.7rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.08em">Stage 1 of 9</div>
+          <h3 id="sd-title" style="margin-bottom:.25rem">Client Request</h3>
+          <p id="sd-latency" style="font-size:.88rem;color:var(--muted)">Latency: &lt; 1 ms (network + validation)</p>
+        </div>
+      </div>
+      <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div><div style="font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:.25rem">Input</div>
+               <div id="sd-input" style="font-size:.88rem">Prompt string, quality_mode, resolution, seed</div></div>
+          <div><div style="font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:.25rem">Output</div>
+               <div id="sd-output" style="font-size:.88rem">Validated GenerateRequest object</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SECTION D — CLIP & IMAGE ENHANCEMENT WORKFLOW
+════════════════════════════════════════ -->
+<section id="cv-pipeline">
+  <div class="container-xl">
+    <div class="aos-fade">
+      <span class="section-badge badge-green">Enhancement Engine</span>
+      <h2 class="section-title">Clip &amp; Image Enhancement Workflow</h2>
+      <p class="section-sub">Comprehensive view of enhancement in ImagineAI: verified classical computer vision processing, audio clip speech-to-text translation, and architectural specification for video frame enhancement.</p>
+    </div>
+
+    <!-- 3 Implementation Tiers Tabs/Overview -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2.5rem;" class="aos-fade">
+      <div class="card-glass card-green" style="padding:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;">
+          <span style="font-size:1.8rem">🖼️</span>
+          <span class="status-badge status-impl">Fully Implemented</span>
+        </div>
+        <h4 style="margin-bottom:.5rem;color:var(--accent3)">Image Enhancement</h4>
+        <p style="font-size:.85rem;color:var(--muted)">Guarded CLAHE, gray-world white balance, gamma exposure, bilateral smoothing, and edge-preserving sharpening in <code>computer_vision/</code>.</p>
+      </div>
+
+      <div class="card-glass card-purple" style="padding:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;">
+          <span style="font-size:1.8rem">🎙️</span>
+          <span class="status-badge status-impl">Fully Implemented</span>
+        </div>
+        <h4 style="margin-bottom:.5rem;color:var(--accent2)">Audio Clip Pipeline</h4>
+        <p style="font-size:.85rem;color:var(--muted)">Spoken audio clip → Whisper transcription → multilingual translation (24 languages) → text-to-speech audio playback in <code>/api/v1/transcribe</code>.</p>
+      </div>
+
+      <div class="card-glass card-pink" style="padding:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;">
+          <span style="font-size:1.8rem">🎬</span>
+          <span class="status-badge status-plan">Future Scope</span>
+        </div>
+        <h4 style="margin-bottom:.5rem;color:var(--accent1)">Video Clip Enhancement</h4>
+        <p style="font-size:.85rem;color:var(--muted)">Frame extraction → per-frame SD-Turbo img2img / super-res → temporal smoothing → video reassembly. Fully designed in architecture; awaiting NPU compilation.</p>
+      </div>
+    </div>
+
+    <!-- Sub-section 1: Classical Image Enhancement & Quality Pipeline -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;margin-bottom:3rem;" class="aos-fade">
+      <!-- Left: flow -->
+      <div>
+        <h4 style="margin-bottom:1.5rem;color:var(--accent3)">📐 Classical CV Image Enhancement Pipeline</h4>
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+
+          <div class="card-glass" style="display:flex;align-items:flex-start;gap:1rem;padding:1.25rem;">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent3);flex-shrink:0">1</div>
+            <div>
+              <h4 style="margin-bottom:.25rem">No-Reference Quality Assessment</h4>
+              <p style="font-size:.85rem;color:var(--muted)">Measures 13 objective pixel metrics: Laplacian variance, Crete re-blur ratio, Immerkaer noise σ, luminance mean/std, Gray-World color deviation, and Sobel edge halo ringing.</p>
+            </div>
+          </div>
+
+          <div class="card-glass" style="display:flex;align-items:flex-start;gap:1rem;padding:1.25rem;">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent3);flex-shrink:0">2</div>
+            <div>
+              <h4 style="margin-bottom:.25rem">Dead-band Gate (38% Bypass)</h4>
+              <p style="font-size:.85rem;color:var(--muted)">Images falling inside conservative tolerance thresholds skip filtering entirely, protecting visual fidelity and reducing compute overhead to ~18 ms.</p>
+            </div>
+          </div>
+
+          <div class="card-glass" style="display:flex;align-items:flex-start;gap:1rem;padding:1.25rem;">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent3);flex-shrink:0">3</div>
+            <div>
+              <h4 style="margin-bottom:.25rem">Guarded Auto-Enhancement</h4>
+              <p style="font-size:.85rem;color:var(--muted)">Runs conservative corrections only on flagged defects: Gray-world white balance (color cast), logarithmic gamma (exposure), and mild CLAHE on lightness (contrast).</p>
+            </div>
+          </div>
+
+          <div class="card-glass" style="display:flex;align-items:flex-start;gap:1rem;padding:1.25rem;">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent3);flex-shrink:0">4</div>
+            <div>
+              <h4 style="margin-bottom:.25rem">Edge-Aware Smoothing &amp; Sharpening</h4>
+              <p style="font-size:.85rem;color:var(--muted)">Bilateral filtering suppresses high-frequency noise without blurring edges. Edge-preserving unsharp masking restores fine surface textures.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right: Interactive Filter Visualizer -->
+      <div>
+        <h4 style="margin-bottom:1.5rem;color:var(--accent3)">🎛️ Interactive Filter Demonstration</h4>
+        <div class="card-glass" style="padding:1.5rem;">
+          <div class="filter-tabs" id="filter-tabs">
+            <button class="filter-tab active" onclick="applySimFilter('raw', this)">Original Raw Output</button>
+            <button class="filter-tab" onclick="applySimFilter('clahe', this)">CLAHE Contrast</button>
+            <button class="filter-tab" onclick="applySimFilter('wb', this)">Gray-World White Balance</button>
+            <button class="filter-tab" onclick="applySimFilter('bilateral', this)">Bilateral Smooth</button>
+            <button class="filter-tab" onclick="applySimFilter('all', this)">Auto-Enhance Combined</button>
+          </div>
+
+          <div class="ba-compare-box" id="sim-filter-box" style="display:flex;align-items:center;justify-content:center;color:white;position:relative;background:linear-gradient(135deg,#1e293b,#0f172a);">
+            <div id="sim-filter-preview" style="text-align:center;padding:2rem;">
+              <div style="font-size:3.5rem;margin-bottom:1rem;" id="sim-icon">🖼️</div>
+              <h4 id="sim-title" style="color:white;margin-bottom:.5rem;">Raw Generated Image</h4>
+              <p id="sim-desc" style="font-size:.85rem;color:rgba(255,255,255,.7);max-width:320px;margin:0 auto;">Output directly from SD-Turbo UNet &amp; VAE decode. Sharpness: 1420.5 | Noise σ: 2.8 | Brightness: 0.58.</p>
+            </div>
+            <div id="sim-tag" style="position:absolute;bottom:1rem;right:1rem;background:rgba(0,0,0,.6);padding:.3rem .75rem;border-radius:6px;font-size:.75rem;color:#4ade80;">Active: RAW</div>
+          </div>
+
+          <div style="margin-top:1.25rem;font-size:.82rem;color:var(--muted);line-height:1.6;">
+            <strong>Intent Protection:</strong> If prompt analysis contains <code style="color:var(--accent2)">"golden hour"</code>, the warm color temperature is classified as artistic intent and the white balance stage is suppressed.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-section 2: Video Clip Enhancement Architecture (Specification) -->
+    <div class="card-glass aos-fade" style="padding:2rem;margin-bottom:2rem;border-top:4px solid var(--accent1);">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
+        <div>
+          <span class="section-badge badge-pink">Architectural Specification</span>
+          <h3 style="margin-bottom:.25rem;">Video Clip Frame Enhancement Workflow</h3>
+          <p style="font-size:.85rem;color:var(--muted);">Designed for edge deployment: processing video clips frame-by-frame while maintaining temporal coherence.</p>
+        </div>
+        <span class="status-badge status-plan" style="font-size:.8rem;padding:.3rem .8rem;">Status: Planned / Future Scope</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin:1.5rem 0;">
+        <div class="clip-flow-step">
+          <div style="font-size:2rem;margin-bottom:.5rem;">📹</div>
+          <div style="font-weight:700;font-size:.85rem;margin-bottom:.25rem;">1. Video Input</div>
+          <div style="font-size:.75rem;color:var(--muted)">MP4/WebM video stream uploaded via client</div>
+        </div>
+        <div class="clip-flow-step">
+          <div style="font-size:2rem;margin-bottom:.5rem;">🎞️</div>
+          <div style="font-weight:700;font-size:.85rem;margin-bottom:.25rem;">2. Frame Extraction</div>
+          <div style="font-size:.75rem;color:var(--muted)">FFmpeg demuxing into raw RGB frame batches</div>
+        </div>
+        <div class="clip-flow-step">
+          <div style="font-size:2rem;margin-bottom:.5rem;">⚡</div>
+          <div style="font-weight:700;font-size:.85rem;margin-bottom:.25rem;">3. AI Enhancement</div>
+          <div style="font-size:.75rem;color:var(--muted)">SD-Turbo img2img / super-resolution at 1-step latency</div>
+        </div>
+        <div class="clip-flow-step">
+          <div style="font-size:2rem;margin-bottom:.5rem;">🌊</div>
+          <div style="font-weight:700;font-size:.85rem;margin-bottom:.25rem;">4. Temporal Smoothing</div>
+          <div style="font-size:.75rem;color:var(--muted)">Farneback optical flow prevents frame-to-frame flicker</div>
+        </div>
+        <div class="clip-flow-step">
+          <div style="font-size:2rem;margin-bottom:.5rem;">🎬</div>
+          <div style="font-weight:700;font-size:.85rem;margin-bottom:.25rem;">5. Reassembly</div>
+          <div style="font-size:.75rem;color:var(--muted)">H.264/H.265 encoding &amp; audio track remux</div>
+        </div>
+      </div>
+
+      <div class="code-block" style="font-size:.8rem;"><span class="cmt"># Architectural Blueprint for Video-to-Video Edge Enhancement (docs/09_MOBILE_DEPLOYMENT.md)</span>
+<span class="kw">def</span> <span class="fn">enhance_video_clip</span>(video_path: <span class="str">str</span>, prompt: <span class="str">str</span>, strength: <span class="num">0.3</span>):
+    frames = ffmpeg_extract_frames(video_path)        <span class="cmt"># Step 1: Decode stream</span>
+    enhanced_frames = []
+    <span class="kw">for</span> idx, frame <span class="kw">in</span> enumerate(frames):
+        enhanced = sd_turbo_img2img(frame, prompt, steps=<span class="num">1</span>)  <span class="cmt"># Step 2: 125ms per frame</span>
+        smooth = optical_flow_blend(enhanced, prev_frame)   <span class="cmt"># Step 3: Enforce temporal consistency</span>
+        enhanced_frames.append(smooth)
+    <span class="kw">return</span> ffmpeg_mux(enhanced_frames, original_audio)    <span class="cmt"># Step 4: Re-encode output</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SECTION E — AI MODELS
+════════════════════════════════════════ -->
+<section id="models">
+  <div class="container-xl">
+    <div class="aos-fade">
+      <span class="section-badge badge-purple">Model Explorer</span>
+      <h2 class="section-title">AI Models — Interactive Explorer</h2>
+      <p class="section-sub">Every model confirmed in the repository. Click a card to expand full technical details.</p>
+    </div>
+
+    <div class="model-grid">
+      <!-- SD-Turbo -->
+      <div class="model-card model-card-1" id="mc-turbo" onclick="expandModel('turbo')">
+        <div class="model-logo">🚀</div>
+        <div class="model-name">SD-Turbo</div>
+        <div class="model-category">ADD Distilled Diffusion · Default Model</div>
+        <div class="model-desc">Adversarial Diffusion Distillation combines score distillation (from SD 2.1 teacher) with a discriminator adversarial loss to enable 1-step inference with sharp, coherent outputs. No CFG needed → single UNet pass per step.</div>
+        <div class="model-badges">
+          <span class="model-badge badge-steps">1–2 Steps</span>
+          <span class="model-badge badge-vram">3,098 MB VRAM</span>
+          <span class="model-badge badge-clip">CLIP 0.321</span>
+          <span class="model-badge badge-speed">247 ms (1 step)</span>
+        </div>
+      </div>
+
+      <!-- LCM-LoRA -->
+      <div class="model-card model-card-2" id="mc-lcm" onclick="expandModel('lcm')">
+        <div class="model-logo">🧪</div>
+        <div class="model-name">SD 1.5 + LCM-LoRA</div>
+        <div class="model-category">Consistency Distillation · Balanced Mode</div>
+        <div class="model-desc">Consistency distillation trains a function f(z_t, t) = z_0 mapping any PF-ODE trajectory point directly to the clean origin. LoRA rank-decomposition injects adapter weights into cross-attention layers without retraining the full 860M UNet.</div>
+        <div class="model-badges">
+          <span class="model-badge badge-steps">4–8 Steps</span>
+          <span class="model-badge badge-vram">2,816 MB VRAM</span>
+          <span class="model-badge badge-clip">CLIP 0.303</span>
+          <span class="model-badge badge-speed">451 ms (4 steps)</span>
+        </div>
+      </div>
+
+      <!-- TAESD -->
+      <div class="model-card model-card-3" id="mc-taesd" onclick="expandModel('taesd')">
+        <div class="model-logo">⚡</div>
+        <div class="model-name">TAESD</div>
+        <div class="model-category">Tiny Autoencoder · VAE Accelerator</div>
+        <div class="model-desc">Tiny AutoEncoder for Stable Diffusion replaces the 83.7M parameter AutoencoderKL with a 1.8M parameter distilled convolutional decoder. Drops VAE decode from 52 ms to 18 ms (65% faster). Pairs with LCM-LoRA to reach 340 ms total.</div>
+        <div class="model-badges">
+          <span class="model-badge badge-steps">1.8M params</span>
+          <span class="model-badge badge-vram">2,207 MB</span>
+          <span class="model-badge badge-clip">CLIP 0.303</span>
+          <span class="model-badge badge-speed">340 ms total</span>
+        </div>
+      </div>
+
+      <!-- DETR + OWL-ViT -->
+      <div class="model-card model-card-4" id="mc-verify" onclick="expandModel('verify')">
+        <div class="model-logo">🔍</div>
+        <div class="model-name">DETR + OWL-ViT</div>
+        <div class="model-category">Object Detection · Best-of-N Verifier</div>
+        <div class="model-desc">Generate N candidates with SD-Turbo, let DETR (Facebook ResNet-50 detector) select the best by detecting required objects and colours, then have OWL-ViT (Google open-vocabulary detector) independently verify — grading by a different model prevents self-grading.</div>
+        <div class="model-badges">
+          <span class="model-badge badge-steps">N=1→8</span>
+          <span class="model-badge badge-clip">62%→75% correct</span>
+          <span class="model-badge badge-speed">Compositional prompts</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expandable Model Detail Panel -->
+    <div id="model-detail-panel" style="display:none;margin-top:2rem;" class="card-glass">
+      <div style="display:flex;justify-content:space-between;align-items:start">
+        <div>
+          <div class="info-panel-tag" id="mdp-tag">Model</div>
+          <h3 id="mdp-title">—</h3>
+        </div>
+        <button onclick="document.getElementById('model-detail-panel').style.display='none'" style="background:var(--pink);border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;color:var(--accent1);font-size:1.1rem;">✕</button>
+      </div>
+      <div id="mdp-content" style="margin-top:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;"></div>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="card-glass" style="margin-top:2rem;padding:0;overflow:hidden;" id="model-comparison">
+      <div style="padding:1.5rem;border-bottom:1px solid var(--border)">
+        <h4>📊 Full Model Comparison (Empirical Data — NVIDIA RTX 5050, 512×512)</h4>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:.85rem;">
+          <thead><tr style="background:var(--purple);">
+            <th style="padding:.85rem 1rem;text-align:left;color:var(--accent2)">Model</th>
+            <th style="padding:.85rem 1rem;text-align:right;color:var(--accent2)">Precision</th>
+            <th style="padding:.85rem 1rem;text-align:right;color:var(--accent2)">Steps</th>
+            <th style="padding:.85rem 1rem;text-align:right;color:var(--accent2)">Latency</th>
+            <th style="padding:.85rem 1rem;text-align:right;color:var(--accent2)">Peak VRAM</th>
+            <th style="padding:.85rem 1rem;text-align:right;color:var(--accent2)">Model Size</th>
+            <th style="padding:.85rem 1rem;text-align:right;color:var(--accent2)">CLIP ↑</th>
+            <th style="padding:.85rem 1rem;text-align:right;color:var(--accent2)">Speed-up</th>
+          </tr></thead>
+          <tbody id="model-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SECTION F — BACKEND & DATA FLOW
+════════════════════════════════════════ -->
+<section id="backend">
+  <div class="container-xl">
+    <div class="aos-fade">
+      <span class="section-badge badge-pink">Backend</span>
+      <h2 class="section-title">Backend &amp; API Data Flow</h2>
+      <p class="section-sub">How a request travels from browser to GPU and back. Hover a node to see its role.</p>
+    </div>
+
+    <!-- Animated request flow -->
+    <div class="card-glass aos-fade" style="padding:2rem;margin-bottom:2rem;">
+      <div class="flow-diagram" style="display:grid;grid-template-columns:repeat(7,auto);align-items:center;gap:.5rem;overflow-x:auto;padding:.5rem 0;">
+        <div class="flow-node" data-tip="React 18 + Chakra UI. 17 pages." onclick="showFlowDetail('client')">
+          <div class="flow-node-icon">🌐</div>
+          <div class="flow-node-title">Browser</div>
+          <div class="flow-node-tech">React 18</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" data-tip="HTTPS with session cookies. CSP + HSTS headers." onclick="showFlowDetail('auth')">
+          <div class="flow-node-icon">🔐</div>
+          <div class="flow-node-title">Auth Layer</div>
+          <div class="flow-node-tech">scrypt · rate-limit</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" data-tip="Orchestrates: NLP → Controller → Engine → CV → Storage." onclick="showFlowDetail('generation')">
+          <div class="flow-node-icon">⚡</div>
+          <div class="flow-node-title">GenerationService</div>
+          <div class="flow-node-tech">generation.py</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" data-tip="Diffusion model runs here. Result includes peak_gpu_mb." onclick="showFlowDetail('engine')">
+          <div class="flow-node-icon">🎨</div>
+          <div class="flow-node-title">DiffusionEngine</div>
+          <div class="flow-node-tech">engine.py</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin:1rem 0;color:var(--muted);font-size:.85rem">↓ response assembled with performance telemetry</div>
+      <div class="flow-diagram" style="display:grid;grid-template-columns:repeat(7,auto);align-items:center;gap:.5rem;overflow-x:auto;padding:.5rem 0;">
+        <div class="flow-node" onclick="showFlowDetail('storage')">
+          <div class="flow-node-icon">🗄️</div>
+          <div class="flow-node-title">ImageStore</div>
+          <div class="flow-node-tech">PNG on disk</div>
+        </div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-node" onclick="showFlowDetail('cv2')">
+          <div class="flow-node-icon">🔬</div>
+          <div class="flow-node-title">CV Pipeline</div>
+          <div class="flow-node-tech">OpenCV · NumPy</div>
+        </div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-node" onclick="showFlowDetail('vae')">
+          <div class="flow-node-icon">🖼️</div>
+          <div class="flow-node-title">VAE Decode</div>
+          <div class="flow-node-tech">AutoencoderKL / TAESD</div>
+        </div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-node" onclick="showFlowDetail('unet')">
+          <div class="flow-node-icon">🌀</div>
+          <div class="flow-node-title">UNet Denoiser</div>
+          <div class="flow-node-tech">1–8 steps</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Endpoints -->
+    <div class="aos-fade">
+      <h4 style="margin-bottom:1.25rem">🛣️ Key API Endpoints</h4>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;">
+        <div class="card-glass" style="padding:1.25rem">
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+            <span style="background:var(--pink);color:var(--accent1);font-size:.7rem;font-weight:800;padding:.2rem .6rem;border-radius:4px">POST</span>
+            <code style="font-size:.85rem">/api/v1/generate</code>
+          </div>
+          <p style="font-size:.82rem;color:var(--muted)">Main generation endpoint. Body: prompt, quality_mode, resolution, seed. Returns: image_url, generation info, performance telemetry, quality metrics.</p>
+        </div>
+        <div class="card-glass" style="padding:1.25rem">
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+            <span style="background:var(--green);color:var(--accent3);font-size:.7rem;font-weight:800;padding:.2rem .6rem;border-radius:4px">POST</span>
+            <code style="font-size:.85rem">/api/v1/inpaint</code>
+          </div>
+          <p style="font-size:.82rem;color:var(--muted)">Mask-guided inpainting. Accepts source image + binary mask + prompt. Areas outside mask stay pixel-perfect identical.</p>
+        </div>
+        <div class="card-glass" style="padding:1.25rem">
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+            <span style="background:var(--purple);color:var(--accent2);font-size:.7rem;font-weight:800;padding:.2rem .6rem;border-radius:4px">GET</span>
+            <code style="font-size:.85rem">/api/v1/adapter/status</code>
+          </div>
+          <p style="font-size:.82rem;color:var(--muted)">Returns the adapter state: configured, active, adapter SHA-256 hash, base revision. Never exposes paths or secrets.</p>
+        </div>
+        <div class="card-glass" style="padding:1.25rem">
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+            <span style="background:var(--pink);color:var(--accent1);font-size:.7rem;font-weight:800;padding:.2rem .6rem;border-radius:4px">POST</span>
+            <code style="font-size:.85rem">/api/v1/chat</code>
+          </div>
+          <p style="font-size:.82rem;color:var(--muted)">Floating assistant. Routes to Groq LLM with conversation memory. API key stored server-side — never sent to browser.</p>
+        </div>
+        <div class="card-glass" style="padding:1.25rem">
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+            <span style="background:var(--green);color:var(--accent3);font-size:.7rem;font-weight:800;padding:.2rem .6rem;border-radius:4px">POST</span>
+            <code style="font-size:.85rem">/api/v1/transcribe</code>
+          </div>
+          <p style="font-size:.82rem;color:var(--muted)">Audio → text via Groq Whisper. 24 languages. Used by the voice-to-prompt feature.</p>
+        </div>
+        <div class="card-glass" style="padding:1.25rem">
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+            <span style="background:var(--purple);color:var(--accent2);font-size:.7rem;font-weight:800;padding:.2rem .6rem;border-radius:4px">GET</span>
+            <code style="font-size:.85rem">/images/{id}.png</code>
+          </div>
+          <p style="font-size:.82rem;color:var(--muted)">Serves generated images. Requires signed-in session — gallery images are not publicly accessible by default.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Response JSON example -->
+    <div class="aos-fade" style="margin-top:2rem;">
+      <h4 style="margin-bottom:1rem">📦 Sample Generation Response</h4>
+      <div class="code-block"><span class="cmt">// POST /api/v1/generate → 200 OK</span>
+{
+  <span class="kw">"request_id"</span>: <span class="str">"c89b2f42-..."</span>,
+  <span class="kw">"image_url"</span>: <span class="str">"http://localhost:8000/images/c89b2f42-....png"</span>,
+  <span class="kw">"generation"</span>: {
+    <span class="kw">"model"</span>: <span class="str">"stabilityai/sd-turbo"</span>,
+    <span class="kw">"precision"</span>: <span class="str">"fp16"</span>,
+    <span class="kw">"steps"</span>: <span class="num">2</span>,
+    <span class="kw">"width"</span>: <span class="num">512</span>, <span class="kw">"height"</span>: <span class="num">512</span>, <span class="kw">"seed"</span>: <span class="num">42</span>
+  },
+  <span class="kw">"performance"</span>: {
+    <span class="kw">"model_load_ms"</span>: <span class="num">null</span>,   <span class="cmt">// null = already loaded</span>
+    <span class="kw">"cv_ms"</span>: <span class="num">17.9</span>,
+    <span class="kw">"end_to_end_ms"</span>: <span class="num">289.6</span>,
+    <span class="kw">"peak_gpu_mb"</span>: <span class="num">3677.56</span>,
+    <span class="kw">"peak_process_ram_mb"</span>: <span class="num">2470.1</span>
+  },
+  <span class="kw">"quality"</span>: {
+    <span class="kw">"sharpness"</span>: <span class="num">1420.5</span>, <span class="kw">"brightness"</span>: <span class="num">0.58</span>,
+    <span class="kw">"contrast"</span>: <span class="num">0.22</span>, <span class="kw">"artifact_flags"</span>: []
+  },
+  <span class="kw">"resource_decision"</span>: {
+    <span class="kw">"fallback_used"</span>: <span class="num">false</span>, <span class="kw">"reason"</span>: <span class="num">null</span>
+  }
+}</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SECTION G — INTERACTIVE DEMO
+════════════════════════════════════════ -->
+<section id="demo">
+  <div class="container-xl">
+    <div class="aos-fade">
+      <span class="section-badge badge-purple">Interactive</span>
+      <h2 class="section-title">Step-Through Pipeline Simulator</h2>
+      <p class="section-sub">Select a prompt style and watch how the pipeline processes it — stage by stage. This is a visual simulation; actual inference runs on the backend server.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:2rem;align-items:start" class="aos-fade">
+      <!-- Left: Prompt builder -->
+      <div>
+        <h4 style="margin-bottom:1rem">1. Choose your prompt</h4>
+        <div class="demo-prompt-area">
+          <textarea class="demo-input" id="demo-prompt-input" placeholder="Type a prompt or select a preset below…">A vintage leather hat resting on a mossy wooden log, soft golden hour lighting</textarea>
+        </div>
+        <div class="demo-chips" id="demo-presets">
+          <div class="demo-chip active" onclick="selectPreset(this,'A vintage leather hat resting on a mossy wooden log, soft golden hour lighting')">🎩 Leather Hat</div>
+          <div class="demo-chip" onclick="selectPreset(this,'A red fox sitting on a snow-covered rock in a pine forest at dusk')">🦊 Red Fox</div>
+          <div class="demo-chip" onclick="selectPreset(this,'A neon-lit Tokyo street at night with reflections in puddles, cinematic, 35mm')">🌃 Tokyo Night</div>
+          <div class="demo-chip" onclick="selectPreset(this,'Watercolour painting of a lighthouse on a rocky cliff, stormy sea')">🏮 Lighthouse</div>
+          <div class="demo-chip" onclick="selectPreset(this,'Two cats playing with a ball of yarn on a window sill')">🐱 Two Cats</div>
+        </div>
+
+        <h4 style="margin:1.5rem 0 1rem">2. Select model &amp; quality mode</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+          <div>
+            <label style="font-size:.8rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.5rem">MODEL</label>
+            <select id="demo-model" style="width:100%;padding:.6rem;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;color:var(--dark)">
+              <option value="sdturbo">SD-Turbo (Default)</option>
+              <option value="lcmlora">SD 1.5 + LCM-LoRA</option>
+              <option value="sd15base">SD 1.5 Baseline</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:.8rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.5rem">QUALITY MODE</label>
+            <select id="demo-quality" style="width:100%;padding:.6rem;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;color:var(--dark)">
+              <option value="quick">Quick (1 step)</option>
+              <option value="balanced" selected>Balanced (2 steps)</option>
+              <option value="best">Best (4 steps)</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn-primary" style="margin-top:1.5rem;width:100%" onclick="runDemoSimulation()">▶ Simulate Pipeline</button>
+
+        <div id="demo-nlp-result" style="display:none;margin-top:1.25rem;" class="card-glass card-green">
+          <h4 style="color:var(--accent3);margin-bottom:.75rem">🔤 NLP Parser Output</h4>
+          <div id="demo-nlp-content" style="font-size:.85rem;color:var(--dark)"></div>
+        </div>
+      </div>
+
+      <!-- Right: Stage visualiser -->
+      <div>
+        <h4 style="margin-bottom:1rem">3. Watch the stages</h4>
+        <div class="stage-viewer" id="demo-stage-viewer">
+          <div id="demo-stage-visual" class="stage-visual">
+            <div style="text-align:center;color:rgba(255,255,255,.7)">
+              <div style="font-size:3rem;margin-bottom:1rem">▶</div>
+              <div>Click <strong>Simulate Pipeline</strong> to begin</div>
+            </div>
+          </div>
+          <div class="stage-status" id="demo-stage-status">Ready</div>
+        </div>
+
+        <div class="step-indicators" id="demo-step-dots" style="justify-content:center;margin-top:1rem;"></div>
+
+        <!-- Resource readout -->
+        <div class="card-glass" style="margin-top:1.25rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;text-align:center;padding:1.25rem;" id="demo-resources">
+          <div>
+            <div style="font-size:1.5rem;font-weight:900;color:var(--accent1)" id="dr-latency">—</div>
+            <div style="font-size:.75rem;color:var(--muted)">Est. Latency</div>
+          </div>
+          <div>
+            <div style="font-size:1.5rem;font-weight:900;color:var(--accent2)" id="dr-vram">—</div>
+            <div style="font-size:.75rem;color:var(--muted)">Peak VRAM</div>
+          </div>
+          <div>
+            <div style="font-size:1.5rem;font-weight:900;color:var(--accent3)" id="dr-clip">—</div>
+            <div style="font-size:.75rem;color:var(--muted)">CLIP Score</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SECTION H — PERFORMANCE METRICS
+════════════════════════════════════════ -->
+<section id="metrics">
+  <div class="container-xl">
+    <div class="aos-fade">
+      <span class="section-badge badge-green">Results</span>
+      <h2 class="section-title">Performance Evaluation</h2>
+      <p class="section-sub">All numbers measured on NVIDIA RTX 5050 Laptop GPU (8 GB), 512×512, batch 1 — from <code>evaluation/reports/</code>.</p>
+    </div>
+
+    <!-- Big numbers -->
+    <div class="metrics-grid aos-fade">
+      <div class="metric-card" style="border-top:4px solid var(--accent1)">
+        <div class="metric-value text-pink" id="m-speedup" data-target="43">0</div>
+        <div class="metric-label">× Speed-up (SD-Turbo vs SD 1.5 Baseline)</div>
+        <div class="metric-delta delta-pos">247 ms vs 10,545 ms</div>
+      </div>
+      <div class="metric-card" style="border-top:4px solid var(--accent2)">
+        <div class="metric-value text-purple" id="m-vram" data-target="56">0</div>
+        <div class="metric-label">% VRAM Reduction (O4T vs B0)</div>
+        <div class="metric-delta delta-pos">2,207 MB vs 5,066 MB</div>
+      </div>
+      <div class="metric-card" style="border-top:4px solid var(--accent3)">
+        <div class="metric-value text-green">0.321</div>
+        <div class="metric-label">CLIP Score (SD-Turbo 1 step)</div>
+        <div class="metric-delta delta-pos">↑ vs 0.316 baseline</div>
+      </div>
+      <div class="metric-card" style="border-top:4px solid var(--accent4)">
+        <div class="metric-value" style="color:var(--accent4)">75%</div>
+        <div class="metric-label">Best-of-N=8 Compositional Accuracy</div>
+        <div class="metric-delta delta-pos">↑ from 62% at N=1</div>
+      </div>
+    </div>
+
+    <!-- Bar chart -->
+    <div class="card-glass aos-fade" style="padding:2rem;margin-bottom:2rem;">
+      <h4 style="margin-bottom:1.5rem">⏱️ Latency Comparison (ms, lower is better)</h4>
+      <div class="bar-chart" id="latency-bars"></div>
+    </div>
+
+    <!-- P7 Ablation -->
+    <div class="card-glass aos-fade" style="padding:2rem;margin-bottom:2rem;">
+      <h4 style="margin-bottom:.5rem">🔬 P7 Ablation Study (SD-Turbo Variants, Measured)</h4>
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:1.5rem">20-prompt holdout set · 3 seeds · 120 timed generations per variant · RTX 5050 Laptop GPU</p>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:.83rem;">
+          <thead><tr style="background:var(--pink)">
+            <th style="padding:.7rem 1rem;text-align:left;color:var(--accent1)">Variant</th>
+            <th style="padding:.7rem 1rem;text-align:right;color:var(--accent1)">CLIP</th>
+            <th style="padding:.7rem 1rem;text-align:right;color:var(--accent1)">Median e2e ms</th>
+            <th style="padding:.7rem 1rem;text-align:right;color:var(--accent1)">Peak Alloc MB</th>
+            <th style="padding:.7rem 1rem;text-align:right;color:var(--accent1)">Load ms</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid var(--border)"><td style="padding:.6rem 1rem">V0 — Baseline (fp32, 4 steps)</td><td style="text-align:right;padding:.6rem 1rem">0.327</td><td style="text-align:right;padding:.6rem 1rem">856.1</td><td style="text-align:right;padding:.6rem 1rem">6,500</td><td style="text-align:right;padding:.6rem 1rem">4,596</td></tr>
+            <tr style="border-top:1px solid var(--border);background:#f8fafc"><td style="padding:.6rem 1rem">V1 — + fp16</td><td style="text-align:right;padding:.6rem 1rem">0.330</td><td style="text-align:right;padding:.6rem 1rem">413.8</td><td style="text-align:right;padding:.6rem 1rem">3,678</td><td style="text-align:right;padding:.6rem 1rem">3,643</td></tr>
+            <tr style="border-top:1px solid var(--border)"><td style="padding:.6rem 1rem">V2 — Reduced steps: 2</td><td style="text-align:right;padding:.6rem 1rem">0.332</td><td style="text-align:right;padding:.6rem 1rem">575.4</td><td style="text-align:right;padding:.6rem 1rem">6,500</td><td style="text-align:right;padding:.6rem 1rem">5,914</td></tr>
+            <tr style="border-top:1px solid var(--border);background:#f8fafc"><td style="padding:.6rem 1rem">V3 — Reduced steps: 1</td><td style="text-align:right;padding:.6rem 1rem">0.336</td><td style="text-align:right;padding:.6rem 1rem">432.5</td><td style="text-align:right;padding:.6rem 1rem">6,500</td><td style="text-align:right;padding:.6rem 1rem">3,767</td></tr>
+            <tr style="border-top:1px solid var(--border);background:var(--pink)"><td style="padding:.6rem 1rem;font-weight:700">V4 — fp16 + 2 steps ⭐</td><td style="text-align:right;padding:.6rem 1rem;font-weight:700">0.333</td><td style="text-align:right;padding:.6rem 1rem;font-weight:700;color:var(--accent1)">289.6</td><td style="text-align:right;padding:.6rem 1rem;font-weight:700">3,678</td><td style="text-align:right;padding:.6rem 1rem;font-weight:700">3,407</td></tr>
+            <tr style="border-top:1px solid var(--border)"><td style="padding:.6rem 1rem">V5 — CV on (auto-enhance)</td><td style="text-align:right;padding:.6rem 1rem">0.326</td><td style="text-align:right;padding:.6rem 1rem">874.1</td><td style="text-align:right;padding:.6rem 1rem">6,500</td><td style="text-align:right;padding:.6rem 1rem">5,707</td></tr>
+            <tr style="border-top:1px solid var(--border);background:#f8fafc;color:var(--muted)"><td style="padding:.6rem 1rem" colspan="5">V6 (Adapted LoRA) — NOT RUN: No approved adapter trained. Code exists, training not completed.</td></tr>
+            <tr style="border-top:1px solid var(--border);color:var(--muted)"><td style="padding:.6rem 1rem" colspan="5">V7 (Adaptive Controller) — NOT RUN: Controller not wired into P7 harness. No measured profile exists.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Best-of-N -->
+    <div class="card-glass aos-fade" style="padding:2rem;">
+      <h4 style="margin-bottom:1rem">🎯 Best-of-N Accuracy (Compositional Prompts, N=100)</h4>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+        <div style="text-align:center;padding:1rem 2rem;background:var(--pink);border-radius:var(--radius-sm)"><div style="font-size:1.8rem;font-weight:900;color:var(--accent1)">62%</div><div style="font-size:.8rem;color:var(--muted)">N = 1</div></div>
+        <div style="text-align:center;padding:1rem 2rem;background:#EDE9FE55;border-radius:var(--radius-sm)"><div style="font-size:1.8rem;font-weight:900;color:var(--accent2)">63%</div><div style="font-size:.8rem;color:var(--muted)">N = 2</div></div>
+        <div style="text-align:center;padding:1rem 2rem;background:var(--purple);border-radius:var(--radius-sm)"><div style="font-size:1.8rem;font-weight:900;color:var(--accent2)">70%</div><div style="font-size:.8rem;color:var(--muted)">N = 4</div></div>
+        <div style="text-align:center;padding:1rem 2rem;background:var(--green);border-radius:var(--radius-sm)"><div style="font-size:1.8rem;font-weight:900;color:var(--accent3)">75%</div><div style="font-size:.8rem;color:var(--muted)">N = 8 ⭐</div></div>
+      </div>
+      <p style="font-size:.82rem;color:var(--muted);margin-top:1rem">Independent verifier (OWL-ViT) judges the DETR-selected best — different model grades to prevent self-grading.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SECTION I — TECH STACK
+════════════════════════════════════════ -->
+<section id="tech">
+  <div class="container-xl">
+    <div class="aos-fade">
+      <span class="section-badge badge-purple">Technology</span>
+      <h2 class="section-title">Full Technology Stack</h2>
+      <p class="section-sub">Every confirmed library, framework, and tool found in the repository.</p>
+    </div>
+    <div class="tech-grid aos-fade" id="tech-grid"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SECTION J — LIMITATIONS & STATUS
+════════════════════════════════════════ -->
+<section id="limitations">
+  <div class="container-xl">
+    <div class="aos-fade">
+      <span class="section-badge badge-amber">Honest Assessment</span>
+      <h2 class="section-title">Implementation Status &amp; Limitations</h2>
+      <p class="section-sub">We kept every negative result. Good engineering requires honesty about what works, what partially works, and what is planned.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;" class="aos-fade">
+      <!-- Status Timeline -->
+      <div>
+        <h4 style="margin-bottom:1.5rem;color:var(--accent3)">✅ Implementation Status</h4>
+        <div class="timeline" id="status-timeline"></div>
+      </div>
+
+      <!-- Negative Results -->
+      <div>
+        <h4 style="margin-bottom:1.5rem;color:var(--accent1)">⚠️ Honest Negative Results</h4>
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          <div class="card-glass" style="padding:1.25rem;border-left:4px solid var(--accent4)">
+            <h4 style="margin-bottom:.5rem;font-size:.95rem">🐛 LoRA Scale Bug (Found &amp; Fixed)</h4>
+            <p style="font-size:.85rem;color:var(--muted)">First distillation run used alpha=64 while public adapter uses alpha=8. 8× too strong → FID 253 (garbage output). Root cause documented in <code>evaluation/reports/distillation_scale_bug.md</code>. Guard added to trainer to prevent recurrence.</p>
+          </div>
+          <div class="card-glass" style="padding:1.25rem;border-left:4px solid var(--accent1)">
+            <h4 style="margin-bottom:.5rem;font-size:.95rem">🐢 INT8 Quantization Was Slower</h4>
+            <p style="font-size:.85rem;color:var(--muted)">PyTorch dynamic INT8 quantization: 495 ms vs 451 ms (FP16). Without dedicated TensorRT INT8 GEMM kernels, dequantize overhead on memory bandwidth outweighs weight size savings. Documented and left off by default.</p>
+          </div>
+          <div class="card-glass" style="padding:1.25rem;border-left:4px solid var(--accent2)">
+            <h4 style="margin-bottom:.5rem;font-size:.95rem">🎓 Project LoRA Ties Public, Doesn't Beat It</h4>
+            <p style="font-size:.85rem;color:var(--muted)">Custom trained LCM-LoRA (500 COCO steps): FID 120.4. Public adapter: FID 121.2. Difference is within noise (KID 0.010 ± 0.003 for both). Longer training (500 → 2000 steps) drifted slightly worse.</p>
+          </div>
+          <div class="card-glass" style="padding:1.25rem;border-left:4px solid var(--accent3)">
+            <h4 style="margin-bottom:.5rem;font-size:.95rem">🔬 Classical CV Barely Moves FID/CLIP</h4>
+            <p style="font-size:.85rem;color:var(--muted)">Mean CLIP Δ = −0.0009 (CV on vs off). SD-Turbo output is already clean — the CV quality gate rarely finds correctable issues. Functions as a safety net, not an enhancer. 38% of images bypass correction in the dead-band.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SECTION K — SUMMARY
+════════════════════════════════════════ -->
+<section id="summary">
+  <div class="container-xl" style="text-align:center;">
+    <div class="aos-fade">
+      <span class="section-badge" style="background:rgba(255,255,255,.15);color:white;">Complete Overview</span>
+      <h2 style="margin-bottom:1rem;">From Prompt to Picture — The Complete Story</h2>
+      <p class="section-sub" style="margin:0 auto 3rem;">Every stage, every model, every millisecond — in one view.</p>
+    </div>
+
+    <div class="summary-flow aos-fade">
+      <div class="summary-step"><div class="summary-step-icon">✍️</div><div class="summary-step-label">User Prompt</div></div>
+      <div class="summary-arrow">→</div>
+      <div class="summary-step"><div class="summary-step-icon">🔤</div><div class="summary-step-label">NLP Parse &lt;1ms</div></div>
+      <div class="summary-arrow">→</div>
+      <div class="summary-step"><div class="summary-step-icon">🎛️</div><div class="summary-step-label">Adaptive Select</div></div>
+      <div class="summary-arrow">→</div>
+      <div class="summary-step"><div class="summary-step-icon">🌀</div><div class="summary-step-label">UNet Denoise</div></div>
+      <div class="summary-arrow">→</div>
+      <div class="summary-step"><div class="summary-step-icon">🖼️</div><div class="summary-step-label">VAE Decode</div></div>
+      <div class="summary-arrow">→</div>
+      <div class="summary-step"><div class="summary-step-icon">🔬</div><div class="summary-step-label">CV Gate</div></div>
+      <div class="summary-arrow">→</div>
+      <div class="summary-step"><div class="summary-step-icon">🎨</div><div class="summary-step-label">247 ms ⭐</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;margin-top:3rem;" class="aos-fade">
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);padding:1.5rem;">
+        <div style="font-size:2rem;font-weight:900;color:var(--accent1)">43×</div>
+        <div style="color:rgba(255,255,255,.75);font-size:.9rem">Faster than SD 1.5 Baseline</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);padding:1.5rem;">
+        <div style="font-size:2rem;font-weight:900;color:var(--accent2)">755</div>
+        <div style="color:rgba(255,255,255,.75);font-size:.9rem">Automated Tests Passing</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);padding:1.5rem;">
+        <div style="font-size:2rem;font-weight:900;color:var(--accent3)">9</div>
+        <div style="color:rgba(255,255,255,.75);font-size:.9rem">Pipeline Stages Implemented</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);padding:1.5rem;">
+        <div style="font-size:2rem;font-weight:900" style="color:#F59E0B">4</div>
+        <div style="color:rgba(255,255,255,.75);font-size:.9rem">Model Distillation Variants</div>
+      </div>
+    </div>
+
+    <div style="margin-top:3rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,.1);" class="aos-fade">
+      <h4 style="color:rgba(255,255,255,.85);margin-bottom:1rem">🔮 Future Roadmap (Planned, Not Implemented)</h4>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+        <span style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);padding:.4rem 1rem;border-radius:99px;font-size:.85rem;color:rgba(255,255,255,.75)">On-device Snapdragon NPU compilation</span>
+        <span style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);padding:.4rem 1rem;border-radius:99px;font-size:.85rem;color:rgba(255,255,255,.75)">TensorRT INT8 SmoothQuant</span>
+        <span style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);padding:.4rem 1rem;border-radius:99px;font-size:.85rem;color:rgba(255,255,255,.75)">Longer LoRA fine-tuning</span>
+        <span style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);padding:.4rem 1rem;border-radius:99px;font-size:.85rem;color:rgba(255,255,255,.75)">P6 controller profile sweep</span>
+        <span style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);padding:.4rem 1rem;border-radius:99px;font-size:.85rem;color:rgba(255,255,255,.75)">Human eval study</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container-xl">
+    <p>Imagine AI · Problem Statement No. 3: Resource-Efficient Text-to-Image Generation ·
+    <a href="https://github.com/dilip-ravichandra/imagine" target="_blank">GitHub Repository</a> ·
+    755 tests · RTX 5050 · Python 3.12 · PyTorch 2.11 · Diffusers 0.42</p>
+    <p style="margin-top:.5rem;font-size:.75rem">This interactive walkthrough explains only features verified in the source code. Simulations are clearly labelled as simulations.</p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
