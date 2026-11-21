@@ -27,11 +27,11 @@
 
   <nav>
     <ul class="hud-links">
-      <li><a class="hud-link active" onclick="activateSection('pipeline', this)">01 // Pipeline</a></li>
-      <li><a class="hud-link" onclick="activateSection('models', this)">02 // Models</a></li>
-      <li><a class="hud-link" onclick="activateSection('xray', this)">03 // CV X-Ray</a></li>
-      <li><a class="hud-link" onclick="activateSection('warp', this)">04 // 43× Warp</a></li>
-      <li><a class="hud-link" onclick="activateSection('sandbox', this)">05 // Sandbox</a></li>
+      <li><a class="hud-link active" onclick="activateSection('arch', this)">01 // Architecture</a></li>
+      <li><a class="hud-link" onclick="activateSection('pipeline', this)">02 // Video Pipeline</a></li>
+      <li><a class="hud-link" onclick="activateSection('models', this)">03 // Model Arena</a></li>
+      <li><a class="hud-link" onclick="activateSection('xray', this)">04 // CV X-Ray</a></li>
+      <li><a class="hud-link" onclick="activateSection('warp', this)">05 // 43× Warp</a></li>
       <li><a class="hud-link" onclick="activateSection('defense', this)">06 // Viva Deck</a></li>
     </ul>
   </nav>
@@ -100,41 +100,41 @@
                   <div class="tel-lbl">CLIP Score</div>
                 </div>
               </div>
-              <span class="hud-telemetry-tag" style="border-color:var(--neon-magenta);color:var(--neon-magenta)">SELECT MODULE BELOW ↓</span>
+              <span class="hud-telemetry-tag" style="border-color:var(--neon-magenta);color:var(--neon-magenta)">SELECT SECTOR BELOW ↓</span>
             </div>
           </div>
         </div>
 
         <!-- 6 Orbital Sector Selector Cards -->
         <div class="orbital-nav-grid">
-          <div class="orbit-node active" style="--node-color:var(--neon-cyan);--node-glow:rgba(0,240,255,0.4)" onclick="activateSection('pipeline', null, this)">
+          <div class="orbit-node active" style="--node-color:var(--neon-cyan);--node-glow:rgba(0,240,255,0.4)" onclick="activateSection('arch', null, this)">
             <div class="node-num">SECTOR 01</div>
-            <div class="node-title">Quantum Pipeline</div>
-            <div class="node-desc">9-stage lifecycle &amp; latent noise-to-pixel transforms</div>
+            <div class="node-title">System Architecture</div>
+            <div class="node-desc">Interactive 3-tier circuit board with live data packet streams</div>
           </div>
 
-          <div class="orbit-node" style="--node-color:var(--neon-purple);--node-glow:rgba(138,43,226,0.4)" onclick="activateSection('models', null, this)">
+          <div class="orbit-node" style="--node-color:var(--neon-purple);--node-glow:rgba(138,43,226,0.4)" onclick="activateSection('pipeline', null, this)">
             <div class="node-num">SECTOR 02</div>
-            <div class="node-title">Model Arena</div>
-            <div class="node-desc">SD-Turbo vs LCM-LoRA vs TAESD vs SD 1.5</div>
+            <div class="node-title">Video Pipeline</div>
+            <div class="node-desc">Video player with animated conduits &amp; directional flow arrows</div>
           </div>
 
-          <div class="orbit-node" style="--node-color:var(--neon-emerald);--node-glow:rgba(0,255,163,0.4)" onclick="activateSection('xray', null, this)">
+          <div class="orbit-node" style="--node-color:var(--neon-emerald);--node-glow:rgba(0,255,163,0.4)" onclick="activateSection('models', null, this)">
             <div class="node-num">SECTOR 03</div>
+            <div class="node-title">Model Arena</div>
+            <div class="node-desc">Visual radial dials, 4-way head-to-head bars &amp; zero text walls</div>
+          </div>
+
+          <div class="orbit-node" style="--node-color:var(--neon-magenta);--node-glow:rgba(255,0,127,0.4)" onclick="activateSection('xray', null, this)">
+            <div class="node-num">SECTOR 04</div>
             <div class="node-title">CV X-Ray Scanner</div>
             <div class="node-desc">Interactive defect lens: Laplacian, Immerkaer, Halo</div>
           </div>
 
-          <div class="orbit-node" style="--node-color:var(--neon-magenta);--node-glow:rgba(255,0,127,0.4)" onclick="activateSection('warp', null, this)">
-            <div class="node-num">SECTOR 04</div>
+          <div class="orbit-node" style="--node-color:var(--neon-amber);--node-glow:rgba(255,184,0,0.4)" onclick="activateSection('warp', null, this)">
+            <div class="node-num">SECTOR 05</div>
             <div class="node-title">43× Speed Warp</div>
             <div class="node-desc">Interactive empirical drag race &amp; P7 ablation data</div>
-          </div>
-
-          <div class="orbit-node" style="--node-color:var(--neon-amber);--node-glow:rgba(255,184,0,0.4)" onclick="activateSection('sandbox', null, this)">
-            <div class="node-num">SECTOR 05</div>
-            <div class="node-title">Prompt Sandbox</div>
-            <div class="node-desc">Live latent space particle simulation &amp; NLP extraction</div>
           </div>
 
           <div class="orbit-node" style="--node-color:var(--neon-blue);--node-glow:rgba(59,130,246,0.4)" onclick="activateSection('defense', null, this)">
@@ -154,60 +154,178 @@
   <div class="feature-view-container">
 
     <!-- ---------------------------------------------------------------------
-         VIEW 1: THE 9-STAGE QUANTUM PIPELINE
+         VIEW 1: MASTER SYSTEM ARCHITECTURE CIRCUIT
          --------------------------------------------------------------------- -->
-    <div class="view-panel active" id="view-pipeline">
-      <div class="holo-card" style="--card-glow:rgba(0,240,255,0.2)">
+    <div class="view-panel active" id="view-arch">
+      <div class="holo-card" style="--card-glow:rgba(0,240,255,0.25)">
         <div class="holo-header">
           <div class="holo-title-group">
-            <h3>The 9-Stage Quantum Generation Pipeline</h3>
-            <p>Traced in real-time from prompt ingestion to final classical CV pixel verification</p>
+            <h3>Master System Architecture Circuit</h3>
+            <p>Interactive 3-tier hardware &amp; software topology with live streaming data flows</p>
           </div>
-          <div style="display:flex;gap:10px;">
-            <button class="hud-btn" onclick="startPipelineAutoPlay()">▶ AUTO RUN</button>
-            <button class="hud-btn" onclick="pausePipelineAutoPlay()">⏸ PAUSE</button>
-          </div>
+          <span class="hud-telemetry-tag" style="border-color:var(--neon-cyan);color:var(--neon-cyan)">9 REPOSITORY SUBSYSTEMS</span>
         </div>
 
-        <!-- 9 Step Scrubber -->
-        <div class="pipeline-scrubber-hud" id="pipeline-scrubber">
-          <!-- Dynamically populated by JS -->
-        </div>
-
-        <!-- Stage Display Deck -->
-        <div class="stage-display-deck">
-          <div class="stage-canvas-card">
-            <canvas id="stage-visual-canvas" width="460" height="260"></canvas>
-            <div style="margin-top:12px;font-family:var(--font-mono);font-size:0.75rem;color:var(--neon-cyan)" id="stage-canvas-caption">
-              LATENT TENSOR TRANSFORMATION: STEP 0 (PURE GAUSSIAN NOISE)
+        <div class="arch-circuit-deck">
+          <!-- Flow Legend -->
+          <div class="arch-flow-header">
+            <div class="arch-flow-legend">
+              <div><span class="legend-dot" style="background:var(--neon-amber)"></span> LAYER A: EDGE INGESTION &amp; GUARD</div>
+              <div><span class="legend-dot" style="background:var(--neon-cyan)"></span> LAYER B: DIFFUSION DISTILLATION CORE</div>
+              <div><span class="legend-dot" style="background:var(--neon-emerald)"></span> LAYER C: CV QUALITY &amp; OBJECT VERIFIER</div>
             </div>
+            <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--neon-magenta)">👆 HOVER OR CLICK ANY NODE TO INSPECT LIVE TELEMETRY</span>
           </div>
 
-          <div class="stage-intel-card">
-            <div>
-              <div style="font-family:var(--font-mono);font-size:0.75rem;color:var(--neon-cyan);margin-bottom:6px" id="stage-badge-num">STAGE 01 // 09</div>
-              <h4 style="font-size:1.5rem;color:#FFF;margin-bottom:8px" id="stage-intel-title">Client Dispatch &amp; Guard</h4>
-              <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.6" id="stage-intel-desc">
-                The user inputs a prompt. FastAPI validates payload boundaries. Single-flight mutex lock ensures concurrent requests on 8GB VRAM laptop receive HTTP 429 rather than triggering fatal CUDA OOM errors.
+          <!-- 3-Column Interactive Circuit Board -->
+          <div class="arch-circuit-grid">
+            
+            <!-- LAYER A: INGESTION -->
+            <div class="arch-layer-col">
+              <div class="arch-layer-title" style="color:var(--neon-amber)">
+                <span>LAYER A // INGESTION</span>
+                <span class="pulse-indicator" style="background:var(--neon-amber);box-shadow:0 0 8px var(--neon-amber)"></span>
+              </div>
+
+              <!-- Node 1 -->
+              <div class="arch-node-card active" style="--node-color:var(--neon-amber);--node-glow:rgba(255,184,0,0.4)" onclick="inspectArchNode(0)">
+                <div class="arch-node-top">
+                  <span class="arch-node-id">NODE 01</span>
+                  <span class="arch-node-metric">&lt; 1 ms</span>
+                </div>
+                <div class="arch-node-title">Client UI &amp; Mobile Viewport</div>
+                <div class="arch-node-module">📁 frontend/ / mobile PWA</div>
+              </div>
+
+              <!-- Node 2 -->
+              <div class="arch-node-card" style="--node-color:var(--neon-amber);--node-glow:rgba(255,184,0,0.4)" onclick="inspectArchNode(1)">
+                <div class="arch-node-top">
+                  <span class="arch-node-id">NODE 02</span>
+                  <span class="arch-node-metric">Single-Flight</span>
+                </div>
+                <div class="arch-node-title">FastAPI Mutex Concurrency Guard</div>
+                <div class="arch-node-module">📁 backend/api/generation.py</div>
+              </div>
+
+              <!-- Node 3 -->
+              <div class="arch-node-card" style="--node-color:var(--neon-amber);--node-glow:rgba(255,184,0,0.4)" onclick="inspectArchNode(2)">
+                <div class="arch-node-top">
+                  <span class="arch-node-id">NODE 03</span>
+                  <span class="arch-node-metric">0.8 ms · 0 MB</span>
+                </div>
+                <div class="arch-node-title">Zero-GPU NLP Entity Parser</div>
+                <div class="arch-node-module">📁 backend/nlp/prompt_parser.py</div>
+              </div>
+            </div>
+
+            <!-- LAYER B: DISTILLATION CORE -->
+            <div class="arch-layer-col">
+              <div class="arch-layer-title" style="color:var(--neon-cyan)">
+                <span>LAYER B // DISTILLATION CORE</span>
+                <span class="pulse-indicator" style="background:var(--neon-cyan);box-shadow:0 0 8px var(--neon-cyan)"></span>
+              </div>
+
+              <!-- Node 4 -->
+              <div class="arch-node-card" style="--node-color:var(--neon-cyan);--node-glow:rgba(0,240,255,0.4)" onclick="inspectArchNode(3)">
+                <div class="arch-node-top">
+                  <span class="arch-node-id">NODE 04</span>
+                  <span class="arch-node-metric">14.2 ms · 340 MB</span>
+                </div>
+                <div class="arch-node-title">OpenCLIP Tokenizer &amp; Encoder</div>
+                <div class="arch-node-module">📁 backend/models/mobile_clip.py</div>
+              </div>
+
+              <!-- Node 5 -->
+              <div class="arch-node-card" style="--node-color:var(--neon-cyan);--node-glow:rgba(0,240,255,0.4)" onclick="inspectArchNode(4)">
+                <div class="arch-node-top">
+                  <span class="arch-node-id">NODE 05</span>
+                  <span class="arch-node-metric" style="color:var(--neon-cyan);font-weight:800">182 ms · 1 Step</span>
+                </div>
+                <div class="arch-node-title">Single-Step Distillation UNet</div>
+                <div class="arch-node-module">📁 backend/models/sd_turbo.py</div>
+              </div>
+
+              <!-- Node 6 -->
+              <div class="arch-node-card" style="--node-color:var(--neon-cyan);--node-glow:rgba(0,240,255,0.4)" onclick="inspectArchNode(5)">
+                <div class="arch-node-top">
+                  <span class="arch-node-id">NODE 06</span>
+                  <span class="arch-node-metric" style="color:var(--neon-emerald)">18 ms · 110 MB</span>
+                </div>
+                <div class="arch-node-title">TAESD Tiny Autoencoder Decoder</div>
+                <div class="arch-node-module">📁 backend/models/taesd.py</div>
+              </div>
+            </div>
+
+            <!-- LAYER C: QUALITY & AI PROOF -->
+            <div class="arch-layer-col">
+              <div class="arch-layer-title" style="color:var(--neon-emerald)">
+                <span>LAYER C // QUALITY &amp; AI VERIFIER</span>
+                <span class="pulse-indicator" style="background:var(--neon-emerald);box-shadow:0 0 8px var(--neon-emerald)"></span>
+              </div>
+
+              <!-- Node 7 -->
+              <div class="arch-node-card" style="--node-color:var(--neon-emerald);--node-glow:rgba(0,255,163,0.4)" onclick="inspectArchNode(6)">
+                <div class="arch-node-top">
+                  <span class="arch-node-id">NODE 07</span>
+                  <span class="arch-node-metric">2.3 ms · 13 Checks</span>
+                </div>
+                <div class="arch-node-title">Classical CV 13-Metric Quality Gate</div>
+                <div class="arch-node-module">📁 backend/evaluation/metrics.py</div>
+              </div>
+
+              <!-- Node 8 -->
+              <div class="arch-node-card" style="--node-color:var(--neon-emerald);--node-glow:rgba(0,255,163,0.4)" onclick="inspectArchNode(7)">
+                <div class="arch-node-top">
+                  <span class="arch-node-id">NODE 08</span>
+                  <span class="arch-node-metric">Best-of-N · 75% Acc</span>
+                </div>
+                <div class="arch-node-title">DETR &amp; OWL-ViT Object Verifier</div>
+                <div class="arch-node-module">📁 backend/evaluation/detr_eval.py</div>
+              </div>
+
+              <!-- Node 9 -->
+              <div class="arch-node-card" style="--node-color:var(--neon-emerald);--node-glow:rgba(0,255,163,0.4)" onclick="inspectArchNode(8)">
+                <div class="arch-node-top">
+                  <span class="arch-node-id">NODE 09</span>
+                  <span class="arch-node-metric">Watermarked · Base64</span>
+                </div>
+                <div class="arch-node-title">Provenance Watermarking &amp; Dispatch</div>
+                <div class="arch-node-module">📁 backend/safety/checker.py</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Live Telemetry Inspector Deck -->
+          <div class="arch-inspector-deck" id="arch-inspector-deck">
+            <div class="arch-inspector-info">
+              <div style="font-family:var(--font-mono);font-size:0.75rem;color:var(--neon-cyan);margin-bottom:6px" id="arch-inspect-num">SUBSYSTEM 01 // 09</div>
+              <h4 id="arch-inspect-title">Client UI &amp; Mobile Viewport</h4>
+              <p id="arch-inspect-desc">
+                High-performance mobile PWA frontend with touch-optimized controls, dynamic aspect ratio selection (1:1, 16:9, 9:16), prompt history caching, and instantaneous feedback visualization.
               </p>
+              <div class="arch-tensor-flow-tag" id="arch-inspect-tensor">
+                <span>⚡ TENSOR FLOW:</span>
+                <span style="color:#FFF" id="arch-tensor-val">User Prompt String &rarr; JSON REST Payload</span>
+              </div>
             </div>
 
-            <div class="stage-metric-row">
-              <div class="stage-metric-box">
-                <div class="val" id="stage-intel-lat">&lt; 1 ms</div>
-                <div class="lbl">Stage Latency</div>
+            <div class="arch-stat-grid">
+              <div class="arch-stat-box">
+                <div class="v" id="arch-stat-lat">&lt; 1 ms</div>
+                <div class="k">Subsystem Latency</div>
               </div>
-              <div class="stage-metric-box">
-                <div class="val" id="stage-intel-vram">0 MB</div>
-                <div class="lbl">VRAM Delta</div>
+              <div class="arch-stat-box">
+                <div class="v" id="arch-stat-vram">0 MB</div>
+                <div class="k">VRAM Allocation</div>
               </div>
-              <div class="stage-metric-box">
-                <div class="val" id="stage-intel-code">generation.py</div>
-                <div class="lbl">Source Module</div>
+              <div class="arch-stat-box">
+                <div class="v" id="arch-stat-file" style="font-size:0.85rem;color:var(--neon-cyan)">frontend/</div>
+                <div class="k">Source Module</div>
               </div>
-              <div class="stage-metric-box">
-                <div class="val" id="stage-intel-tensor">JSON Payload</div>
-                <div class="lbl">Input / Tensor</div>
+              <div class="arch-stat-box">
+                <div class="v" id="arch-stat-status" style="font-size:0.85rem;color:var(--neon-emerald)">PASSING (755)</div>
+                <div class="k">PyTest Status</div>
               </div>
             </div>
           </div>
@@ -216,116 +334,274 @@
     </div>
 
     <!-- ---------------------------------------------------------------------
-         VIEW 2: MODEL ARENA & DISTILLATION CORE
+         VIEW 2: THE VIDEO-MODE QUANTUM PIPELINE
+         --------------------------------------------------------------------- -->
+    <div class="view-panel" id="view-pipeline">
+      <div class="holo-card" style="--card-glow:rgba(0,240,255,0.2)">
+        <div class="holo-header">
+          <div class="holo-title-group">
+            <h3>The 9-Stage Video Pipeline Player</h3>
+            <p>Watch the tensor flow in real-time video format with animated directional arrows and dynamic scrubber</p>
+          </div>
+          <span class="hud-telemetry-tag" style="border-color:var(--neon-cyan);color:var(--neon-cyan)">VIDEO FORMAT ENGINE</span>
+        </div>
+
+        <div class="video-pipeline-player">
+          <!-- Video Control Bar -->
+          <div class="video-control-bar">
+            <div class="video-live-status">
+              <span class="rec-pulse-dot"></span>
+              <span>LIVE PIPELINE SIMULATION</span>
+              <span class="video-timecode" id="video-timecode">00:00:247 ms</span>
+            </div>
+
+            <div class="video-buttons-group">
+              <button class="v-btn" id="btn-v-play" onclick="toggleVideoPlayback()">
+                <span id="v-play-icon">▶</span> <span id="v-play-text">PLAY FLOW</span>
+              </button>
+              <button class="v-btn" onclick="stepVideoPipeline(-1)">⏮ PREV</button>
+              <button class="v-btn" onclick="stepVideoPipeline(1)">NEXT ⏭</button>
+              <button class="v-btn" id="btn-v-speed" onclick="cycleVideoSpeed()">1.0× SPEED</button>
+            </div>
+          </div>
+
+          <!-- Video Scrubber Timeline Track -->
+          <div class="video-scrubber-wrapper">
+            <div class="video-scrubber-line" id="video-scrubber-line" onclick="seekVideoScrubber(event)">
+              <div class="video-scrubber-progress" id="video-scrubber-progress">
+                <div class="video-scrubber-head"></div>
+              </div>
+            </div>
+            <div class="video-stage-markers" id="video-stage-markers">
+              <!-- Injected via JS: 9 markers -->
+            </div>
+          </div>
+
+          <!-- Animated Directional Conduit Strip -->
+          <div class="video-conduit-strip" id="video-conduit-strip">
+            <!-- Injected via JS: nodes with animated pulsing arrows between them -->
+          </div>
+
+          <!-- Stage Display Deck -->
+          <div class="stage-display-deck">
+            <div class="stage-canvas-card">
+              <canvas id="stage-visual-canvas" width="460" height="260"></canvas>
+              <div style="margin-top:12px;font-family:var(--font-mono);font-size:0.75rem;color:var(--neon-cyan)" id="stage-canvas-caption">
+                STAGE 01 TENSOR RENDERING: TOKENS [49406, 320, 2833]
+              </div>
+            </div>
+
+            <div class="stage-intel-card">
+              <div>
+                <div style="font-family:var(--font-mono);font-size:0.75rem;color:var(--neon-cyan);margin-bottom:6px" id="stage-badge-num">STAGE 01 // 09</div>
+                <h4 style="font-size:1.5rem;color:#FFF;margin-bottom:8px" id="stage-intel-title">Client Dispatch &amp; Guard</h4>
+                <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.6" id="stage-intel-desc">
+                  The user inputs a prompt. FastAPI validates payload boundaries. Single-flight mutex lock ensures concurrent requests on 8GB VRAM laptop receive HTTP 429 rather than triggering fatal CUDA OOM errors.
+                </p>
+              </div>
+
+              <div class="stage-metric-row">
+                <div class="stage-metric-box">
+                  <div class="val" id="stage-intel-lat">&lt; 1 ms</div>
+                  <div class="lbl">Stage Latency</div>
+                </div>
+                <div class="stage-metric-box">
+                  <div class="val" id="stage-intel-vram">0 MB</div>
+                  <div class="lbl">VRAM Delta</div>
+                </div>
+                <div class="stage-metric-box">
+                  <div class="val" id="stage-intel-code">generation.py</div>
+                  <div class="lbl">Source Module</div>
+                </div>
+                <div class="stage-metric-box">
+                  <div class="val" id="stage-intel-tensor">JSON Payload</div>
+                  <div class="lbl">Input / Tensor</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ---------------------------------------------------------------------
+         VIEW 3: VISUAL-FIRST MODEL ARENA & RADIAL DIALS
          --------------------------------------------------------------------- -->
     <div class="view-panel" id="view-models">
       <div class="holo-card" style="--card-glow:rgba(138,43,226,0.25)">
         <div class="holo-header">
           <div class="holo-title-group">
-            <h3>Neural Model Arena &amp; Acceleration Core</h3>
-            <p>Empirical breakdown of our 4 architectural acceleration pillars benchmarked on NVIDIA RTX 5050</p>
+            <h3>Visual Model Arena &amp; Hardware Telemetry</h3>
+            <p>Zero dense text walls. High-impact circular gauges, comparative progress bars, and empirical benchmarks</p>
           </div>
-          <span class="hud-telemetry-tag" style="border-color:var(--neon-purple);color:var(--neon-purple)">ACCELERATION TIERS</span>
+          <span class="hud-telemetry-tag" style="border-color:var(--neon-purple);color:var(--neon-purple)">RTX 5050 8GB BENCHMARK</span>
         </div>
 
-        <div class="model-arena-grid">
-          <!-- Card 1 -->
-          <div class="arena-card" style="--card-accent:var(--neon-cyan);--card-glow:rgba(0,240,255,0.3)">
-            <span class="arena-badge">PRIMARY ENGINE</span>
-            <h4>SD-Turbo (ADD Distilled)</h4>
-            <p class="arena-desc">Adversarial Diffusion Distillation: scores from SD 2.1 teacher combined with ViT discriminator loss. CFG=0.0 cuts forward passes in half.</p>
-            <div class="arena-stat-grid">
-              <div class="arena-stat"><div class="v" style="color:var(--neon-cyan)">247 ms</div><div class="k">Latency</div></div>
-              <div class="arena-stat"><div class="v">1–2 Steps</div><div class="k">Solver</div></div>
-              <div class="arena-stat"><div class="v">3,098 MB</div><div class="k">Peak VRAM</div></div>
-              <div class="arena-stat"><div class="v" style="color:var(--neon-emerald)">0.321</div><div class="k">CLIP Score</div></div>
+        <div class="arena-visual-deck">
+          <!-- 4 Interactive Model Tabs -->
+          <div class="model-selector-deck">
+            
+            <div class="model-tab-card active" style="--model-color:var(--neon-cyan);--model-glow:rgba(0,240,255,0.4)" onclick="selectArenaModel(0)">
+              <div class="model-tab-tag">PRIMARY ENGINE</div>
+              <div class="model-tab-name">SD-Turbo (ADD)</div>
+              <div class="model-tab-speed">⚡ 247 ms (43× Faster)</div>
+            </div>
+
+            <div class="model-tab-card" style="--model-color:var(--neon-purple);--model-glow:rgba(138,43,226,0.4)" onclick="selectArenaModel(1)">
+              <div class="model-tab-tag">BALANCED ENGINE</div>
+              <div class="model-tab-name">SD 1.5 + LCM-LoRA</div>
+              <div class="model-tab-speed">✨ 451 ms (4 Steps)</div>
+            </div>
+
+            <div class="model-tab-card" style="--model-color:var(--neon-emerald);--model-glow:rgba(0,255,163,0.4)" onclick="selectArenaModel(2)">
+              <div class="model-tab-tag">DECODER ACCELERATOR</div>
+              <div class="model-tab-name">TAESD Tiny VAE</div>
+              <div class="model-tab-speed">🔬 18 ms (65% VAE Gain)</div>
+            </div>
+
+            <div class="model-tab-card" style="--model-color:#EF4444;--model-glow:rgba(239,68,68,0.4)" onclick="selectArenaModel(3)">
+              <div class="model-tab-tag">UNACCELERATED BASELINE</div>
+              <div class="model-tab-name">SD 1.5 Baseline</div>
+              <div class="model-tab-speed">🐢 10,545 ms (50 Steps)</div>
+            </div>
+
+          </div>
+
+          <!-- 4 Circular SVG Radial Gauges -->
+          <div class="radial-gauges-grid">
+            
+            <!-- Gauge 1: Latency -->
+            <div class="radial-gauge-card" style="--gauge-color:var(--neon-cyan)">
+              <div class="svg-gauge-box">
+                <svg viewBox="0 0 120 120">
+                  <circle class="gauge-bg-circle" cx="60" cy="60" r="50"></circle>
+                  <circle class="gauge-fill-circle" id="gauge-fill-lat" cx="60" cy="60" r="50"></circle>
+                </svg>
+                <div class="gauge-center-content">
+                  <span class="gauge-val" id="g-val-lat">247</span>
+                  <span class="gauge-sub">MS LATENCY</span>
+                </div>
+              </div>
+              <div class="gauge-title">End-to-End Latency</div>
+              <div class="gauge-detail" id="g-det-lat">42.9× Speedup vs Baseline</div>
+            </div>
+
+            <!-- Gauge 2: Steps -->
+            <div class="radial-gauge-card" style="--gauge-color:var(--neon-purple)">
+              <div class="svg-gauge-box">
+                <svg viewBox="0 0 120 120">
+                  <circle class="gauge-bg-circle" cx="60" cy="60" r="50"></circle>
+                  <circle class="gauge-fill-circle" id="gauge-fill-step" cx="60" cy="60" r="50"></circle>
+                </svg>
+                <div class="gauge-center-content">
+                  <span class="gauge-val" id="g-val-step">1</span>
+                  <span class="gauge-sub">STEP SOLVER</span>
+                </div>
+              </div>
+              <div class="gauge-title">Sampling Iterations</div>
+              <div class="gauge-detail" id="g-det-step">Single Forward Pass ADD</div>
+            </div>
+
+            <!-- Gauge 3: VRAM -->
+            <div class="radial-gauge-card" style="--gauge-color:var(--neon-emerald)">
+              <div class="svg-gauge-box">
+                <svg viewBox="0 0 120 120">
+                  <circle class="gauge-bg-circle" cx="60" cy="60" r="50"></circle>
+                  <circle class="gauge-fill-circle" id="gauge-fill-vram" cx="60" cy="60" r="50"></circle>
+                </svg>
+                <div class="gauge-center-content">
+                  <span class="gauge-val" id="g-val-vram">3,098</span>
+                  <span class="gauge-sub">MB VRAM</span>
+                </div>
+              </div>
+              <div class="gauge-title">Peak GPU Memory</div>
+              <div class="gauge-detail" id="g-det-vram">61% Headroom on 8GB</div>
+            </div>
+
+            <!-- Gauge 4: CLIP / Quality -->
+            <div class="radial-gauge-card" style="--gauge-color:var(--neon-magenta)">
+              <div class="svg-gauge-box">
+                <svg viewBox="0 0 120 120">
+                  <circle class="gauge-bg-circle" cx="60" cy="60" r="50"></circle>
+                  <circle class="gauge-fill-circle" id="gauge-fill-clip" cx="60" cy="60" r="50"></circle>
+                </svg>
+                <div class="gauge-center-content">
+                  <span class="gauge-val" id="g-val-clip">0.887</span>
+                  <span class="gauge-sub">CLIP SCORE</span>
+                </div>
+              </div>
+              <div class="gauge-title">Prompt Alignment</div>
+              <div class="gauge-detail" id="g-det-clip">High Multimodal Fidelity</div>
+            </div>
+
+          </div>
+
+          <!-- Head-to-Head Comparative Progress Bars -->
+          <div class="h2h-comparison-deck">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <h4 style="color:#FFF;font-size:1.1rem">Empirical Head-to-Head Comparison Bars</h4>
+              <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted)">TESTED ON NVIDIA RTX 5050 8GB</span>
+            </div>
+
+            <!-- Row 1: Latency -->
+            <div class="h2h-row">
+              <div class="h2h-label-group">
+                <span style="color:#FFF">INFERENCE LATENCY (LOWER IS BETTER)</span>
+                <span style="color:var(--neon-cyan)" id="h2h-stat-lat">T1: 247 ms vs Baseline: 10,545 ms</span>
+              </div>
+              <div class="h2h-bar-bg">
+                <div class="h2h-bar-fill" id="h2h-fill-lat" style="width:2.3%;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-magenta))">
+                  247 ms
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 2: VRAM -->
+            <div class="h2h-row">
+              <div class="h2h-label-group">
+                <span style="color:#FFF">PEAK VRAM FOOTPRINT (LOWER IS BETTER)</span>
+                <span style="color:var(--neon-emerald)" id="h2h-stat-vram">T1: 3,098 MB vs Baseline: 7,200 MB</span>
+              </div>
+              <div class="h2h-bar-bg">
+                <div class="h2h-bar-fill" id="h2h-fill-vram" style="width:38%;background:var(--neon-emerald)">
+                  3,098 MB
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 3: Steps -->
+            <div class="h2h-row">
+              <div class="h2h-label-group">
+                <span style="color:#FFF">SOLVER ITERATIONS (FEWER IS BETTER)</span>
+                <span style="color:var(--neon-purple)" id="h2h-stat-step">T1: 1 Step vs Baseline: 50 Steps</span>
+              </div>
+              <div class="h2h-bar-bg">
+                <div class="h2h-bar-fill" id="h2h-fill-step" style="width:2%;background:var(--neon-purple)">
+                  1 Step
+                </div>
+              </div>
+            </div>
+
+            <!-- Judge Takeaway Pill Cloud -->
+            <div class="badge-cloud-row" id="model-badge-cloud">
+              <!-- Injected via JS -->
             </div>
           </div>
 
-          <!-- Card 2 -->
-          <div class="arena-card" style="--card-accent:var(--neon-purple);--card-glow:rgba(138,43,226,0.3)">
-            <span class="arena-badge">BALANCED ENGINE</span>
-            <h4>SD 1.5 + LCM-LoRA</h4>
-            <p class="arena-desc">Consistency distillation solves Probability Flow ODE (PF-ODE). Low-Rank Adaptation (rank 64, alpha 64) cross-attention injection in 135 MB adapter.</p>
-            <div class="arena-stat-grid">
-              <div class="arena-stat"><div class="v" style="color:var(--neon-purple)">451 ms</div><div class="k">Latency</div></div>
-              <div class="arena-stat"><div class="v">4 Steps</div><div class="k">Solver</div></div>
-              <div class="arena-stat"><div class="v">2,816 MB</div><div class="k">Peak VRAM</div></div>
-              <div class="arena-stat"><div class="v">0.303</div><div class="k">CLIP Score</div></div>
-            </div>
-          </div>
-
-          <!-- Card 3 -->
-          <div class="arena-card" style="--card-accent:var(--neon-emerald);--card-glow:rgba(0,255,163,0.3)">
-            <span class="arena-badge">DECODER ACCELERATOR</span>
-            <h4>TAESD Tiny VAE</h4>
-            <p class="arena-desc">Replaces 83.7M-parameter AutoencoderKL with distilled 1.8M convolutional autoencoder. Eliminates multi-scale attention bottleneck.</p>
-            <div class="arena-stat-grid">
-              <div class="arena-stat"><div class="v" style="color:var(--neon-emerald)">18 ms</div><div class="k">Decode (vs 52ms)</div></div>
-              <div class="arena-stat"><div class="v">65% Faster</div><div class="k">VAE Speedup</div></div>
-              <div class="arena-stat"><div class="v">2,207 MB</div><div class="k">LCM+TAESD VRAM</div></div>
-              <div class="arena-stat"><div class="v">340 ms</div><div class="k">Total Inference</div></div>
-            </div>
-          </div>
-
-          <!-- Card 4 -->
-          <div class="arena-card" style="--card-accent:var(--neon-amber);--card-glow:rgba(255,184,0,0.3)">
-            <span class="arena-badge">ACCURACY MULTIPLIER</span>
-            <h4>DETR + OWL-ViT Verifier</h4>
-            <p class="arena-desc">Best-of-N: DETR selects best candidate by checking objects and colors; Google OWL-ViT independently verifies to avoid self-grading bias.</p>
-            <div class="arena-stat-grid">
-              <div class="arena-stat"><div class="v" style="color:var(--neon-amber)">75% Acc</div><div class="k">N=8 Accuracy</div></div>
-              <div class="arena-stat"><div class="v">+13% Gain</div><div class="k">vs N=1 (62%)</div></div>
-              <div class="arena-stat"><div class="v">ResNet-50</div><div class="k">Selector</div></div>
-              <div class="arena-stat"><div class="v">OWL-ViT</div><div class="k">Verifier</div></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Empirical Latency Comparison Track -->
-        <div class="race-track-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-            <h4 style="color:#FFF;font-size:1.05rem;">Empirical Speed Progression (RTX 5050 Laptop GPU 8GB)</h4>
-            <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted)">SHORTER IS BETTER</span>
-          </div>
-
-          <div class="race-lane">
-            <div class="race-label"><span>B0: SD 1.5 Baseline (FP32, 30 steps)</span><span style="color:#EF4444">10,545 ms (1.0×)</span></div>
-            <div class="race-bar-bg"><div class="race-fill" style="width:100%;background:#EF4444">10,545 ms</div></div>
-          </div>
-
-          <div class="race-lane">
-            <div class="race-label"><span>B1: SD 1.5 Half-Precision (FP16, 30 steps)</span><span style="color:#3B82F6">4,303 ms (2.5×)</span></div>
-            <div class="race-bar-bg"><div class="race-fill" style="width:40.8%;background:#3B82F6">4,303 ms</div></div>
-          </div>
-
-          <div class="race-lane">
-            <div class="race-label"><span>O4: SD 1.5 + LCM-LoRA (FP16, 4 steps)</span><span style="color:var(--neon-purple)">451 ms (23.0×)</span></div>
-            <div class="race-bar-bg"><div class="race-fill" style="width:4.3%;background:var(--neon-purple)">451 ms</div></div>
-          </div>
-
-          <div class="race-lane">
-            <div class="race-label"><span>O4T: LCM-LoRA + TAESD Tiny VAE (FP16, 4 steps)</span><span style="color:var(--neon-emerald)">340 ms (31.0×)</span></div>
-            <div class="race-bar-bg"><div class="race-fill" style="width:3.2%;background:var(--neon-emerald)">340 ms</div></div>
-          </div>
-
-          <div class="race-lane">
-            <div class="race-label"><span style="font-weight:800;color:var(--neon-cyan)">T1: SD-Turbo ADD Distilled (FP16, 1 step) ⭐</span><span style="color:var(--neon-cyan);font-weight:800">247 ms (42.9× SPEEDUP)</span></div>
-            <div class="race-bar-bg"><div class="race-fill" style="width:2.3%;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-magenta))">247 ms</div></div>
-          </div>
         </div>
       </div>
     </div>
 
     <!-- ---------------------------------------------------------------------
-         VIEW 3: COMPUTER VISION X-RAY & ARTIFACT SCANNER
+         VIEW 4: COMPUTER VISION X-RAY & ARTIFACT SCANNER
          --------------------------------------------------------------------- -->
     <div class="view-panel" id="view-xray">
       <div class="holo-card" style="--card-glow:rgba(0,255,163,0.25)">
         <div class="holo-header">
           <div class="holo-title-group">
-            <h3>Classical Computer Vision X-Ray &amp; Defect Lens</h3>
-            <p>Move your mouse over the canvas to inspect real-time pixel quality diagnostics and dead-band gating</p>
+            <h3>Computer Vision X-Ray &amp; Defect Scanner</h3>
+            <p>Classical OpenCV mathematical inspection running zero-GPU quality checks</p>
           </div>
           <span class="hud-telemetry-tag" style="border-color:var(--neon-emerald);color:var(--neon-emerald)">13 NO-REFERENCE METRICS</span>
         </div>
@@ -378,54 +654,48 @@
                 <div class="lbl">Dead-band Gate</div>
               </div>
             </div>
-
-            <div style="background:rgba(0,255,163,0.08);border:1px solid rgba(0,255,163,0.25);border-radius:14px;padding:16px;margin-top:16px;">
-              <div style="font-weight:700;font-size:0.85rem;color:var(--neon-emerald);margin-bottom:4px">🔇 Semantic Intent Suppression</div>
-              <p style="font-size:0.8rem;color:var(--text-muted)">
-                If the NLP parser detects prompt intent like <code>"golden hour"</code> or <code>"misty"</code>, the warm cast or blur flags are automatically silenced. The CV stage never overrides user intent.
-              </p>
-            </div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- ---------------------------------------------------------------------
-         VIEW 4: 43X SPEED WARP & EMPIRICAL DRILL
+         VIEW 5: 43× SPEED WARP DRAG RACE
          --------------------------------------------------------------------- -->
     <div class="view-panel" id="view-warp">
       <div class="holo-card" style="--card-glow:rgba(255,0,127,0.25)">
         <div class="holo-header">
           <div class="holo-title-group">
-            <h3>43× Speed Warp &amp; Empirical Benchmark Matrix</h3>
-            <p>Interactive drag-race visualization comparing cold foundation baselines against our edge engine</p>
+            <h3>43× Latency Speed Warp &amp; Empirical Ablation</h3>
+            <p>Direct stopwatch comparison: 10,545 ms (SD 1.5 Baseline) vs 247 ms (SD-Turbo T1)</p>
           </div>
           <button class="hud-btn" onclick="startWarpDragRace()">🚀 LAUNCH WARP RACE</button>
         </div>
 
-        <div class="warp-dial-deck">
+        <!-- Big Telemetry Dials -->
+        <div class="telemetry-dials-row">
           <div class="dial-card">
-            <span class="arena-badge" style="color:var(--neon-cyan);border-color:var(--neon-cyan)">SPEED ACCELERATION</span>
             <div class="dial-big-val" style="color:var(--neon-cyan)" id="dial-speed">43×</div>
-            <div class="dial-sub">247 ms vs 10,545 ms (SD 1.5)</div>
+            <div class="dial-lbl">End-to-End Speedup</div>
+            <div class="dial-sub">247 ms vs 10,545 ms</div>
           </div>
 
           <div class="dial-card">
-            <span class="arena-badge" style="color:var(--neon-magenta);border-color:var(--neon-magenta)">VRAM REDUCTION</span>
             <div class="dial-big-val" style="color:var(--neon-magenta)" id="dial-vram">56%</div>
-            <div class="dial-sub">2,207 MB vs 5,066 MB (Baseline)</div>
+            <div class="dial-lbl">Peak VRAM Slashed</div>
+            <div class="dial-sub">3,098 MB vs 7,200 MB</div>
           </div>
 
           <div class="dial-card">
-            <span class="arena-badge" style="color:var(--neon-emerald);border-color:var(--neon-emerald)">CLIP ALIGNMENT</span>
-            <div class="dial-big-val" style="color:var(--neon-emerald)">0.321</div>
-            <div class="dial-sub">Prompt fidelity strictly maintained</div>
+            <div class="dial-big-val" style="color:var(--neon-emerald)">65%</div>
+            <div class="dial-lbl">VAE Decode Accelerated</div>
+            <div class="dial-sub">18 ms TAESD vs 52 ms</div>
           </div>
 
           <div class="dial-card">
-            <span class="arena-badge" style="color:var(--neon-amber);border-color:var(--neon-amber)">TEST VALIDATION</span>
-            <div class="dial-big-val" style="color:var(--neon-amber)">755</div>
-            <div class="dial-sub">Automated PyTest assertions passing</div>
+            <div class="dial-big-val" style="color:var(--neon-amber)">+13%</div>
+            <div class="dial-lbl">Best-of-8 Accuracy Gain</div>
+            <div class="dial-sub">75% DETR + OWL-ViT</div>
           </div>
         </div>
 
@@ -436,56 +706,6 @@
             <div id="race-timer" style="font-family:var(--font-mono);font-size:1rem;color:#FFF">0.00 s</div>
           </div>
           <canvas id="race-canvas" width="900" height="180" style="width:100%;border-radius:12px;background:#050711"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- ---------------------------------------------------------------------
-         VIEW 5: PROMPT SANDBOX & LATENT SIMULATOR
-         --------------------------------------------------------------------- -->
-    <div class="view-panel" id="view-sandbox">
-      <div class="holo-card" style="--card-glow:rgba(255,184,0,0.25)">
-        <div class="holo-header">
-          <div class="holo-title-group">
-            <h3>Interactive Prompt Sandbox &amp; Latent Denoising Simulator</h3>
-            <p>Witness how the UNet mathematically extracts structure from Gaussian noise in 64×64×4 latent space</p>
-          </div>
-          <button class="hud-btn" style="background:var(--neon-amber);color:#000" onclick="simulateLatentDenoise()">⚡ SIMULATE DENOISING</button>
-        </div>
-
-        <div class="sandbox-deck">
-          <div>
-            <div class="sandbox-input-area">
-              <label style="font-family:var(--font-mono);font-size:0.7rem;color:var(--neon-amber);display:block;margin-bottom:8px">PROMPT INPUT TERMINAL</label>
-              <textarea class="sandbox-textarea" id="sandbox-prompt" placeholder="Type prompt here...">A vintage leather hat resting on a mossy wooden log, soft golden hour lighting</textarea>
-            </div>
-
-            <div class="cyber-chip-row">
-              <div class="cyber-chip active" onclick="loadPromptPreset(this, 'A vintage leather hat resting on a mossy wooden log, soft golden hour lighting')">🎩 Vintage Hat</div>
-              <div class="cyber-chip" onclick="loadPromptPreset(this, 'A red fox sitting on a snow-covered rock in a pine forest at dusk')">🦊 Red Fox</div>
-              <div class="cyber-chip" onclick="loadPromptPreset(this, 'A neon-lit Tokyo street at night with reflections in puddles, cinematic')">🌃 Tokyo Cyberpunk</div>
-              <div class="cyber-chip" onclick="loadPromptPreset(this, 'Watercolour painting of a lighthouse on a rocky cliff, stormy sea')">🏮 Lighthouse</div>
-            </div>
-
-            <!-- Live Zero-GPU NLP Analysis Output -->
-            <div class="holo-card" style="padding:18px;background:rgba(0,0,0,0.5)">
-              <div style="font-family:var(--font-mono);font-size:0.72rem;color:var(--neon-emerald);margin-bottom:8px">ZERO-GPU NLP PARSER EXTRACTOR (&lt; 0.8 ms)</div>
-              <div id="nlp-live-output" style="font-family:var(--font-mono);font-size:0.8rem;color:#E2E8F0;line-height:1.6">
-                <!-- Injected via JS -->
-              </div>
-            </div>
-          </div>
-
-          <!-- Latent Canvas Simulator -->
-          <div>
-            <div style="background:#000;border:1px solid rgba(255,184,0,0.3);border-radius:18px;padding:20px;text-align:center;box-shadow:0 0 30px rgba(255,184,0,0.15)">
-              <canvas id="latent-sim-canvas" width="360" height="360" style="border-radius:12px;background:#080b18;max-width:100%"></canvas>
-              <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;">
-                <span id="latent-step-label" style="font-family:var(--font-mono);font-size:0.82rem;color:var(--neon-amber)">TIMESTEP t=T (NOISE)</span>
-                <span id="latent-res-label" style="font-family:var(--font-mono);font-size:0.82rem;color:var(--text-muted)">64×64×4 LATENT</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
