@@ -5,12 +5,12 @@
  * - Interactive Particle-Filament Quantum Matrix Canvas
  * - Precision Magnetic Cursor Follower
  * - 3D Gyroscopic Tilt Physics for Portal Hub
- * - 6 Dynamic Orbital Feature Sectors
- * - 9-Stage Pipeline Scrubber with Real-Time Canvas Tensor Synthesis
- * - Computer Vision X-Ray Scanner (Laplacian, Immerkaer, Sobel, CLAHE) with Interactive Magnifier Lens
- * - 43x Empirical Latency Drag-Race Canvas Simulation
- * - Real-Time Latent Space Noise-to-Image Synthesis Simulator
- * - Samsung R&D Viva Defense Deck (Presenter 1 vs 2 Dossiers & Top 12 3D Flipping Q&A Cards)
+ * - Sector 01: Master System Architecture Circuit with Live Subsystem Inspector
+ * - Sector 02: Video-Mode 9-Stage Pipeline Player with Live Conduits & Dynamic Scrubber
+ * - Sector 03: Visual-First Model Arena with Circular SVG Radial Dials & Comparative Bars
+ * - Sector 04: Computer Vision X-Ray Scanner (Laplacian, Immerkaer, Sobel, CLAHE)
+ * - Sector 05: 43x Empirical Latency Drag-Race Canvas Simulation
+ * - Sector 06: Samsung R&D Viva Defense Deck (Presenter 1 vs 2 Dossiers & Top 12 3D Flipping Q&A Cards)
  */
 
 // =========================================================================
@@ -83,7 +83,7 @@ function playSfx(type) {
       osc.stop(t + 0.45);
     }
   } catch (err) {
-    // Audio context error guard
+    // Audio context guard
   }
 }
 
@@ -102,7 +102,6 @@ function toggleAudio() {
   if (audioEnabled) playSfx('click');
 }
 
-// Window unlock for Audio Context
 window.addEventListener('click', initAudio, { once: true });
 window.addEventListener('keydown', initAudio, { once: true });
 
@@ -138,13 +137,13 @@ function animateCursorFollower() {
 animateCursorFollower();
 
 function bindHoverSounds() {
-  const hoverables = document.querySelectorAll('button, a, .orbit-node, .hud-link, .cyber-chip, .qa-flip-card, .xray-mode-btn, .pilot-switch-btn');
+  const hoverables = document.querySelectorAll('button, a, .orbit-node, .hud-link, .cyber-chip, .qa-flip-card, .xray-mode-btn, .pilot-switch-btn, .arch-node-card, .model-tab-card, .v-btn');
   hoverables.forEach(el => {
     el.addEventListener('mouseenter', () => {
       playSfx('hover');
       if (cursorRing) {
-        cursorRing.style.width = '54px';
-        cursorRing.style.height = '54px';
+        cursorRing.style.width = '52px';
+        cursorRing.style.height = '52px';
         cursorRing.style.borderColor = 'var(--neon-magenta)';
         cursorRing.style.background = 'rgba(255,0,127,0.08)';
       }
@@ -271,7 +270,6 @@ function activateSection(secId, navEl, orbitEl) {
   if (navEl) {
     navEl.classList.add('active');
   } else {
-    // Find matching link
     hudLinks.forEach(link => {
       if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(secId)) {
         link.classList.add('active');
@@ -306,15 +304,143 @@ function activateSection(secId, navEl, orbitEl) {
 }
 
 // =========================================================================
-// 6. SECTOR 01: 9-STAGE PIPELINE SCRUBBER & CANVAS SYNTHESIZER
+// 6. SECTOR 01: SYSTEM ARCHITECTURE INTERACTIVE SUBSYSTEM INSPECTOR
+// =========================================================================
+const archSubsystems = [
+  {
+    num: "01",
+    title: "Client UI & Mobile Viewport",
+    desc: "Touch-optimized mobile PWA frontend with responsive viewports (1:1, 16:9, 9:16), prompt history caching, parameter tuning sliders, and instant Base64 preview streaming without cloud dependencies.",
+    tensor: "User Prompt String → JSON REST Payload",
+    lat: "< 1 ms",
+    vram: "0 MB (Client)",
+    file: "frontend/ / mobile PWA",
+    status: "PASSING (755)"
+  },
+  {
+    num: "02",
+    title: "FastAPI Mutex Concurrency Guard",
+    desc: "Single-flight async mutex and semaphore lock guarding backend requests. Enforces graceful HTTP 429 queuing rather than catastrophic CUDA Out-Of-Memory thrashing when multiple requests arrive on an 8GB laptop GPU.",
+    tensor: "HTTP POST /generate → Fast Validation Pydantic",
+    lat: "< 1 ms",
+    vram: "0 MB",
+    file: "backend/api/generation.py",
+    status: "PASSING (755)"
+  },
+  {
+    num: "03",
+    title: "Zero-GPU NLP Entity Parser",
+    desc: "Instant CPU regex engine decomposing natural language prompts into Subject, Style, Lighting, Atmosphere, and Quality tags. Dynamically injects positive modifiers and strips adversarial tokens in sub-millisecond latency.",
+    tensor: "Prompt String → ParsedDict {subject, style, lighting}",
+    lat: "0.8 ms",
+    vram: "0 MB (100% CPU)",
+    file: "backend/nlp/prompt_parser.py",
+    status: "PASSING (755)"
+  },
+  {
+    num: "04",
+    title: "OpenCLIP Tokenizer & Encoder",
+    desc: "OpenCLIP Byte-Pair Encoding (BPE) divides prompts into 77 discrete positional tokens, projected by the ViT-B/32 text encoder into a continuous 768-dimensional multimodal cross-attention conditioning tensor.",
+    tensor: "Tokens: [1, 77] → Context Embedding: [1, 77, 768] fp16",
+    lat: "14.2 ms",
+    vram: "340 MB",
+    file: "backend/models/mobile_clip.py",
+    status: "PASSING (755)"
+  },
+  {
+    num: "05",
+    title: "Single-Step Distillation UNet (SD-Turbo)",
+    desc: "Adversarial Diffusion Distillation (ADD) single-step UNet. Combined with PyTorch Scaled Dot-Product Attention (SDPA FlashAttention) and FP16 compilation, generates clean latents in one single forward pass without 50 iterative loops.",
+    tensor: "Noise [1, 4, 64, 64] + Embed [1, 77, 768] → Clean Latents [1, 4, 64, 64]",
+    lat: "182.4 ms",
+    vram: "2,240 MB",
+    file: "backend/models/sd_turbo.py",
+    status: "PASSING (755)"
+  },
+  {
+    num: "06",
+    title: "TAESD Tiny Autoencoder Decoder",
+    desc: "Distilled Tiny Autoencoder for Stable Diffusion replacing the 83.7M-parameter AutoencoderKL. Expands 64x64x4 latents to 512x512x3 RGB pixels in 18ms using just 110MB VRAM, completely avoiding the standard 800MB VAE OOM bottle-neck.",
+    tensor: "Latents: [1, 4, 64, 64] → RGB Image: [1, 3, 512, 512] uint8",
+    lat: "18.6 ms",
+    vram: "110 MB",
+    file: "backend/models/taesd.py",
+    status: "PASSING (755)"
+  },
+  {
+    num: "07",
+    title: "Classical CV 13-Metric Quality Gate",
+    desc: "No-reference computer vision screen evaluating Laplacian spatial blur variance (412.8), Immerkaer noise standard deviation (2.8 sigma), and Sobel edge halo index (1.02) to guarantee image sharpness and zero synthesis artifacts.",
+    tensor: "RGB Tensor [1, 3, 512, 512] → Metrics Vector (13 floats)",
+    lat: "2.3 ms",
+    vram: "2 MB",
+    file: "backend/evaluation/metrics.py",
+    status: "PASSING (755)"
+  },
+  {
+    num: "08",
+    title: "DETR & OWL-ViT Object Verifier",
+    desc: "DEtection TRansformer and zero-shot Open-World ViT confirm that the physical objects and semantic entities requested in the prompt are factually represented in the rendered image bounding boxes.",
+    tensor: "Decoded RGB → Bounding Boxes [N, 4] & Grounding Scores",
+    lat: "24.0 ms",
+    vram: "320 MB",
+    file: "backend/evaluation/detr_eval.py",
+    status: "PASSING (755)"
+  },
+  {
+    num: "09",
+    title: "Provenance Watermarking & Dispatch",
+    desc: "Embeds invisible frequency-domain cryptographic watermarks for provenance and dispatches optimized JPEG/WebP Base64 payload directly to the client interface in sub-millisecond stream response.",
+    tensor: "Validated Image → Watermarked Base64 Binary Stream",
+    lat: "4.5 ms",
+    vram: "50 MB",
+    file: "backend/safety/checker.py",
+    status: "PASSING (755)"
+  }
+];
+
+function inspectArchNode(idx) {
+  playSfx('click');
+
+  const cards = document.querySelectorAll('.arch-node-card');
+  cards.forEach((c, i) => {
+    if (i === idx) c.classList.add('active');
+    else c.classList.remove('active');
+  });
+
+  const sub = archSubsystems[idx];
+  if (!sub) return;
+
+  const n = document.getElementById('arch-inspect-num');
+  const t = document.getElementById('arch-inspect-title');
+  const d = document.getElementById('arch-inspect-desc');
+  const tv = document.getElementById('arch-tensor-val');
+  const lat = document.getElementById('arch-stat-lat');
+  const vram = document.getElementById('arch-stat-vram');
+  const file = document.getElementById('arch-stat-file');
+  const stat = document.getElementById('arch-stat-status');
+
+  if (n) n.textContent = `SUBSYSTEM ${sub.num} // 09`;
+  if (t) t.textContent = sub.title;
+  if (d) d.textContent = sub.desc;
+  if (tv) tv.textContent = sub.tensor;
+  if (lat) lat.textContent = sub.lat;
+  if (vram) vram.textContent = sub.vram;
+  if (file) file.textContent = sub.file;
+  if (stat) stat.textContent = sub.status;
+}
+
+// =========================================================================
+// 7. SECTOR 02: VIDEO-MODE PIPELINE FLOW PLAYER & CONDUITS
 // =========================================================================
 const pipelineStages = [
   {
     num: "01",
-    short: "DISPATCH",
+    short: "PROMPT",
     title: "Client Dispatch & Request Guard",
     desc: "FastAPI server receives incoming user payload. In-flight single-request concurrency lock guarantees concurrent prompts on an 8GB laptop queue gracefully without triggering fatal CUDA Out-of-Memory crashes.",
     lat: "< 1 ms",
+    cumLat: "0.8 ms",
     vram: "0 MB",
     code: "generation.py",
     tensor: "JSON (Prompt, Steps, Seed, Guidance)",
@@ -322,10 +448,11 @@ const pipelineStages = [
   },
   {
     num: "02",
-    short: "PARSING",
+    short: "NLP PARSE",
     title: "Zero-GPU Rule-Based NLP Entity Parsing",
     desc: "Instant CPU regex engine decomposes the prompt into Subject, Style, Lighting, Atmosphere, and Quality tags. Injects domain-specific positive modifiers while stripping adversarial keywords in sub-millisecond time.",
     lat: "0.8 ms",
+    cumLat: "1.6 ms",
     vram: "0 MB",
     code: "prompt_parser.py",
     tensor: "ParsedDict {subject, style, lighting}",
@@ -337,6 +464,7 @@ const pipelineStages = [
     title: "CLIP Tokenization & Positional Projection",
     desc: "OpenCLIP Byte-Pair Encoding (BPE) divides words into discrete tokens from a 49,408 vocabulary, bounded to a maximum sequence length of 77 tokens with Start-of-Sequence and End-of-Sequence sentinels.",
     lat: "2.1 ms",
+    cumLat: "3.7 ms",
     vram: "12 MB",
     code: "clip_tokenizer.py",
     tensor: "Tokens: [1, 77] int64",
@@ -344,10 +472,11 @@ const pipelineStages = [
   },
   {
     num: "04",
-    short: "ENCODER",
+    short: "EMBEDDING",
     title: "Text Transformer Semantic Embedding",
     desc: "OpenCLIP ViT-B/32 text encoder projects discrete tokens into continuous 768-dimensional multimodal semantic space, producing the cross-attention conditioning tensor required by UNet layers.",
     lat: "14.2 ms",
+    cumLat: "17.9 ms",
     vram: "340 MB",
     code: "mobile_clip.py",
     tensor: "Context: [1, 77, 768] fp16",
@@ -355,10 +484,11 @@ const pipelineStages = [
   },
   {
     num: "05",
-    short: "SEED LATENT",
+    short: "NOISE SEED",
     title: "Gaussian Latent Seed Initialization",
     desc: "Generates a 4-channel spatial noise grid in 8x downsampled latent space (64x64) using deterministic PyTorch PRNG seed. This saves 64x memory compared to operating directly in 512x512 RGB space.",
     lat: "0.3 ms",
+    cumLat: "18.2 ms",
     vram: "4 MB",
     code: "torch.randn()",
     tensor: "Latents: [1, 4, 64, 64] N(0, 1)",
@@ -370,6 +500,7 @@ const pipelineStages = [
     title: "1-Step Adversarial Distillation (SD-Turbo)",
     desc: "The primary computational workhorse. Adversarial Diffusion Distillation (ADD) UNet predicts clean image latents in a single forward pass, bypassing the traditional 50 iterative diffusion steps through distilled student-teacher loss.",
     lat: "182.4 ms",
+    cumLat: "200.6 ms",
     vram: "2,240 MB",
     code: "sd_turbo.py + SDPA",
     tensor: "Denoised Latents: [1, 4, 64, 64]",
@@ -381,6 +512,7 @@ const pipelineStages = [
     title: "TAESD Tiny Autoencoder RGB Reconstruction",
     desc: "Custom distilled Tiny Autoencoder decodes 64x64x4 latents into full 512x512x3 RGB pixels in 18ms using only 110MB VRAM, completely avoiding the standard 800MB VAE OOM bottle-neck on mobile GPUs.",
     lat: "18.6 ms",
+    cumLat: "219.2 ms",
     vram: "110 MB",
     code: "taesd.py",
     tensor: "RGB Output: [1, 3, 512, 512] uint8",
@@ -392,6 +524,7 @@ const pipelineStages = [
     title: "No-Reference CV Quality & Artifact Screen",
     desc: "13 automated OpenCV mathematical checks run in parallel: Laplacian blur variance (412.8), Crete re-blur ratio (0.24), Immerkaer noise variance (2.8 sigma), and Sobel halo index (1.02) to verify sharpness and contrast.",
     lat: "2.3 ms",
+    cumLat: "221.5 ms",
     vram: "2 MB",
     code: "metrics.py",
     tensor: "Metrics Vector (13 floats)",
@@ -399,10 +532,11 @@ const pipelineStages = [
   },
   {
     num: "09",
-    short: "AI PROOF",
+    short: "DETR / OWL",
     title: "DETR & OWL-ViT Object Verification",
     desc: "DEtection TRansformer and zero-shot Open-World ViT confirm that the physical objects and semantic entities requested in the prompt are factually represented in the rendered image bounding boxes.",
     lat: "24.0 ms",
+    cumLat: "247.0 ms",
     vram: "320 MB",
     code: "detr_eval.py / owl_vit.py",
     tensor: "Bounding Boxes & Grounding Scores",
@@ -410,57 +544,95 @@ const pipelineStages = [
   }
 ];
 
-let activeStageIdx = 0;
-let pipelineTimer = null;
+let vActiveIdx = 0;
+let vIsPlaying = false;
+let vPlayInterval = null;
+let vSpeed = 1.0;
 
-function renderPipelineScrubber() {
-  const scrubber = document.getElementById('pipeline-scrubber');
-  if (!scrubber) return;
+function renderVideoScrubberUI() {
+  const markerContainer = document.getElementById('video-stage-markers');
+  const conduitStrip = document.getElementById('video-conduit-strip');
 
-  scrubber.innerHTML = '';
-  pipelineStages.forEach((st, idx) => {
-    const stepEl = document.createElement('div');
-    stepEl.className = `scrubber-step ${idx === activeStageIdx ? 'active' : ''}`;
-    stepEl.innerHTML = `
-      <div class="step-num">${st.num}</div>
-      <div class="step-title">${st.short}</div>
-    `;
-    stepEl.addEventListener('click', () => {
-      pausePipelineAutoPlay();
-      selectPipelineStage(idx);
+  if (markerContainer) {
+    markerContainer.innerHTML = '';
+    pipelineStages.forEach((st, idx) => {
+      const m = document.createElement('div');
+      m.className = `video-stage-marker ${idx === vActiveIdx ? 'active' : ''}`;
+      m.textContent = st.short;
+      m.addEventListener('click', () => {
+        pauseVideoPlayback();
+        selectVideoStage(idx);
+      });
+      markerContainer.appendChild(m);
     });
-    scrubber.appendChild(stepEl);
-  });
+  }
+
+  if (conduitStrip) {
+    conduitStrip.innerHTML = '';
+    pipelineStages.forEach((st, idx) => {
+      const node = document.createElement('div');
+      node.className = `conduit-node ${idx === vActiveIdx ? 'active' : ''}`;
+      node.innerHTML = `<strong>${st.num}</strong> ${st.short}`;
+      node.addEventListener('click', () => {
+        pauseVideoPlayback();
+        selectVideoStage(idx);
+      });
+      conduitStrip.appendChild(node);
+
+      if (idx < pipelineStages.length - 1) {
+        const arrow = document.createElement('div');
+        arrow.className = 'conduit-arrow';
+        arrow.textContent = '➔';
+        conduitStrip.appendChild(arrow);
+      }
+    });
+  }
 }
 
-function selectPipelineStage(idx) {
-  activeStageIdx = idx;
+function selectVideoStage(idx) {
+  vActiveIdx = idx;
   playSfx('click');
 
-  const scrubberSteps = document.querySelectorAll('.scrubber-step');
-  scrubberSteps.forEach((s, i) => {
-    if (i === idx) s.classList.add('active');
-    else s.classList.remove('active');
+  // Update Progress line
+  const progressLine = document.getElementById('video-scrubber-progress');
+  if (progressLine) {
+    const pct = ((idx) / (pipelineStages.length - 1)) * 100;
+    progressLine.style.width = `${pct}%`;
+  }
+
+  // Update Markers & Conduits
+  const markers = document.querySelectorAll('.video-stage-marker');
+  markers.forEach((m, i) => {
+    if (i === idx) m.classList.add('active');
+    else m.classList.remove('active');
+  });
+
+  const conduitNodes = document.querySelectorAll('.conduit-node');
+  conduitNodes.forEach((cn, i) => {
+    if (i === idx) cn.classList.add('active');
+    else cn.classList.remove('active');
   });
 
   const st = pipelineStages[idx];
-  const badgeNum = document.getElementById('stage-badge-num');
-  const title = document.getElementById('stage-intel-title');
+  const tc = document.getElementById('video-timecode');
+  const bn = document.getElementById('stage-badge-num');
+  const tit = document.getElementById('stage-intel-title');
   const desc = document.getElementById('stage-intel-desc');
   const lat = document.getElementById('stage-intel-lat');
   const vram = document.getElementById('stage-intel-vram');
   const code = document.getElementById('stage-intel-code');
   const tensor = document.getElementById('stage-intel-tensor');
-  const caption = document.getElementById('stage-canvas-caption');
+  const cap = document.getElementById('stage-canvas-caption');
 
-  if (badgeNum) badgeNum.textContent = `STAGE ${st.num} // 09`;
-  if (title) title.textContent = st.title;
+  if (tc) tc.textContent = `00:00:${st.cumLat}`;
+  if (bn) bn.textContent = `STAGE ${st.num} // 09`;
+  if (tit) tit.textContent = st.title;
   if (desc) desc.textContent = st.desc;
   if (lat) lat.textContent = st.lat;
   if (vram) vram.textContent = st.vram;
   if (code) code.textContent = st.code;
   if (tensor) tensor.textContent = st.tensor;
-  if (caption) caption.textContent = `STAGE ${st.num} TENSOR RENDERING: ${st.tensor.toUpperCase()}`;
+  if (cap) cap.textContent = `STAGE ${st.num} TENSOR RENDERING: ${st.tensor.toUpperCase()}`;
 
   drawStageCanvas(st.type);
 }
@@ -477,7 +649,6 @@ function drawStageCanvas(type) {
   ctx.fillRect(0, 0, w, h);
 
   if (type === 'tokens' || type === 'bpe') {
-    // Glowing token array
     const tokens = ['[SOS]', 'vintage', 'leather', 'hat', 'mossy', 'log', 'golden', '[EOS]'];
     const bw = 50;
     tokens.forEach((tok, i) => {
@@ -492,7 +663,6 @@ function drawStageCanvas(type) {
       ctx.fillText(tok, x + 6, y + 24);
     });
   } else if (type === 'nlp') {
-    // NLP extracted tags
     ctx.font = '12px monospace';
     ctx.fillStyle = 'var(--neon-emerald)';
     ctx.fillText('SUBJECT: "vintage leather hat"', 30, 60);
@@ -501,7 +671,6 @@ function drawStageCanvas(type) {
     ctx.fillText('ATMOSPHERE: "cinematic depth of field"', 30, 165);
     ctx.fillText('RESOLUTION: 512x512 | NEGATIVES APPLIED', 30, 200);
   } else if (type === 'vector') {
-    // Continuous embedding heatmap grid
     const cols = 28, rows = 8;
     const cw = (w - 40) / cols;
     const ch = (h - 60) / rows;
@@ -513,7 +682,6 @@ function drawStageCanvas(type) {
       }
     }
   } else if (type === 'noise') {
-    // Pure Gaussian noise in latent space
     const idata = ctx.createImageData(w, h);
     for (let i = 0; i < idata.data.length; i += 4) {
       const n = Math.floor(Math.random() * 255);
@@ -524,7 +692,6 @@ function drawStageCanvas(type) {
     }
     ctx.putImageData(idata, 0, 0);
   } else if (type === 'unet') {
-    // UNet cross-attention curves
     ctx.strokeStyle = 'var(--neon-emerald)';
     ctx.lineWidth = 1.8;
     for (let i = 0; i < 24; i++) {
@@ -541,7 +708,6 @@ function drawStageCanvas(type) {
     ctx.font = '11px monospace';
     ctx.fillText('ADD 1-STEP UNET', w / 2 - 46, h / 2 + 5);
   } else if (type === 'taesd') {
-    // Decoded preview gradient bars
     const grad = ctx.createLinearGradient(0, 0, w, h);
     grad.addColorStop(0, '#00F0FF');
     grad.addColorStop(0.5, '#FF007F');
@@ -554,7 +720,6 @@ function drawStageCanvas(type) {
     ctx.font = '12px monospace';
     ctx.fillText('TAESD: 64x64x4 Latent -> 512x512x3 RGB (18 ms)', 50, h / 2);
   } else if (type === 'xray') {
-    // Metric radar lines
     ctx.strokeStyle = 'var(--neon-cyan)';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -564,7 +729,6 @@ function drawStageCanvas(type) {
     }
     ctx.stroke();
   } else if (type === 'detr') {
-    // Bounding box detection overlay
     ctx.strokeStyle = 'var(--neon-emerald)';
     ctx.lineWidth = 2;
     ctx.strokeRect(w * 0.25, 40, w * 0.5, 160);
@@ -577,25 +741,272 @@ function drawStageCanvas(type) {
   }
 }
 
-function startPipelineAutoPlay() {
-  playSfx('warp');
-  if (pipelineTimer) clearInterval(pipelineTimer);
-  pipelineTimer = setInterval(() => {
-    activeStageIdx = (activeStageIdx + 1) % pipelineStages.length;
-    selectPipelineStage(activeStageIdx);
-  }, 1900);
+function toggleVideoPlayback() {
+  vIsPlaying = !vIsPlaying;
+  const playIcon = document.getElementById('v-play-icon');
+  const playText = document.getElementById('v-play-text');
+  const playBtn = document.getElementById('btn-v-play');
+
+  if (vIsPlaying) {
+    if (playIcon) playIcon.textContent = '⏸';
+    if (playText) playText.textContent = 'PAUSE';
+    if (playBtn) playBtn.classList.add('active');
+    playSfx('warp');
+
+    const intervalMs = 1800 / vSpeed;
+    vPlayInterval = setInterval(() => {
+      vActiveIdx = (vActiveIdx + 1) % pipelineStages.length;
+      selectVideoStage(vActiveIdx);
+    }, intervalMs);
+  } else {
+    pauseVideoPlayback();
+  }
 }
 
-function pausePipelineAutoPlay() {
+function pauseVideoPlayback() {
+  vIsPlaying = false;
+  if (vPlayInterval) {
+    clearInterval(vPlayInterval);
+    vPlayInterval = null;
+  }
+  const playIcon = document.getElementById('v-play-icon');
+  const playText = document.getElementById('v-play-text');
+  const playBtn = document.getElementById('btn-v-play');
+  if (playIcon) playIcon.textContent = '▶';
+  if (playText) playText.textContent = 'PLAY FLOW';
+  if (playBtn) playBtn.classList.remove('active');
+}
+
+function stepVideoPipeline(dir) {
+  pauseVideoPlayback();
+  let next = vActiveIdx + dir;
+  if (next < 0) next = pipelineStages.length - 1;
+  if (next >= pipelineStages.length) next = 0;
+  selectVideoStage(next);
+}
+
+function cycleVideoSpeed() {
   playSfx('click');
-  if (pipelineTimer) {
-    clearInterval(pipelineTimer);
-    pipelineTimer = null;
+  const speedBtn = document.getElementById('btn-v-speed');
+  if (vSpeed === 1.0) vSpeed = 2.0;
+  else if (vSpeed === 2.0) vSpeed = 0.5;
+  else vSpeed = 1.0;
+
+  if (speedBtn) speedBtn.textContent = `${vSpeed.toFixed(1)}× SPEED`;
+
+  if (vIsPlaying) {
+    pauseVideoPlayback();
+    toggleVideoPlayback();
+  }
+}
+
+function seekVideoScrubber(e) {
+  pauseVideoPlayback();
+  const line = document.getElementById('video-scrubber-line');
+  if (!line) return;
+  const rect = line.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const pct = Math.max(0, Math.min(1, clickX / rect.width));
+  const nearestIdx = Math.round(pct * (pipelineStages.length - 1));
+  selectVideoStage(nearestIdx);
+}
+
+// =========================================================================
+// 8. SECTOR 03: VISUAL-FIRST MODEL ARENA & RADIAL DIALS
+// =========================================================================
+const arenaModels = [
+  {
+    name: "SD-Turbo (ADD)",
+    tag: "PRIMARY ENGINE",
+    latVal: 247,
+    latPct: 0.98,
+    latDetail: "42.9× Speedup vs Baseline",
+    stepVal: 1,
+    stepPct: 1.0,
+    stepDetail: "Single Forward Pass ADD",
+    vramVal: "3,098",
+    vramPct: 0.38,
+    vramDetail: "61% Headroom on 8GB",
+    clipVal: "0.887",
+    clipPct: 0.89,
+    clipDetail: "High Multimodal Fidelity",
+    h2hLatText: "T1: 247 ms vs Baseline: 10,545 ms (42.9× Speedup)",
+    h2hLatWidth: "2.3%",
+    h2hVramText: "T1: 3,098 MB vs Baseline: 7,200 MB (56% Reduction)",
+    h2hVramWidth: "38%",
+    h2hStepText: "T1: 1 Step vs Baseline: 50 Steps (50× Solver Gain)",
+    h2hStepWidth: "2%",
+    badges: [
+      "⚡ 43× Speed Leader",
+      "💾 3,098 MB Mobile VRAM",
+      "📱 Samsung Galaxy AI Ready",
+      "🎯 1-Step Student ADD",
+      "🔒 100% On-Device Private",
+      "🚫 Zero Cloud Queues"
+    ]
+  },
+  {
+    name: "SD 1.5 + LCM-LoRA",
+    tag: "BALANCED ENGINE",
+    latVal: 451,
+    latPct: 0.82,
+    latDetail: "23.4× Speedup vs Baseline",
+    stepVal: 4,
+    stepPct: 0.75,
+    stepDetail: "PF-ODE Multi-Step Solver",
+    vramVal: "2,816",
+    vramPct: 0.35,
+    vramDetail: "65% Headroom on 8GB",
+    clipVal: "0.871",
+    clipPct: 0.87,
+    clipDetail: "Multi-Style Adapter Versatility",
+    h2hLatText: "LCM: 451 ms vs Baseline: 10,545 ms (23.4× Speedup)",
+    h2hLatWidth: "4.3%",
+    h2hVramText: "LCM: 2,816 MB vs Baseline: 7,200 MB (61% Reduction)",
+    h2hVramWidth: "35%",
+    h2hStepText: "LCM: 4 Steps vs Baseline: 50 Steps (12.5× Gain)",
+    h2hStepWidth: "8%",
+    badges: [
+      "✨ Universal LoRA Compatibility",
+      "💾 2,816 MB Ultra-Low VRAM",
+      "⚡ 451 ms Multi-Step Latency",
+      "🧩 135 MB Rank-64 Adapter",
+      "🎨 Diverse Artistic Styles",
+      "🔄 Retains SD 1.5 Weights"
+    ]
+  },
+  {
+    name: "TAESD Tiny VAE",
+    tag: "DECODER ACCELERATOR",
+    latVal: 18,
+    latPct: 0.99,
+    latDetail: "65% Faster than 83.7M VAE",
+    stepVal: "Conv",
+    stepPct: 0.95,
+    stepDetail: "Direct 4-Layer ConvNet",
+    vramVal: "110",
+    vramPct: 0.02,
+    vramDetail: "Saves 690 MB vs Standard VAE",
+    clipVal: "31.4",
+    clipPct: 0.92,
+    clipDetail: "Visually Lossless PSNR (dB)",
+    h2hLatText: "TAESD: 18 ms vs Standard VAE: 52 ms (65% Faster)",
+    h2hLatWidth: "0.2%",
+    h2hVramText: "TAESD: 110 MB vs Standard VAE: 800 MB (86% Less)",
+    h2hVramWidth: "1.3%",
+    h2hStepText: "TAESD: Direct Conv vs Full Self-Attention",
+    h2hStepWidth: "2%",
+    badges: [
+      "🔬 1.8M Parameter Distillation",
+      "💾 110 MB Micro-Memory",
+      "⚡ 18 ms Decode Benchmark",
+      "🚫 Zero Attention OOM Risk",
+      "📱 Mobile NPU Optimized",
+      "🎯 31.4 dB Lossless PSNR"
+    ]
+  },
+  {
+    name: "SD 1.5 Baseline",
+    tag: "UNACCELERATED BASELINE",
+    latVal: "10,545",
+    latPct: 0.05,
+    latDetail: "Baseline Unaccelerated",
+    stepVal: 50,
+    stepPct: 0.02,
+    stepDetail: "Iterative DDIM Loop",
+    vramVal: "7,200",
+    vramPct: 0.90,
+    vramDetail: "DANGER: High OOM Risk on Edge",
+    clipVal: "0.882",
+    clipPct: 0.88,
+    clipDetail: "Standard Reference Point",
+    h2hLatText: "Baseline: 10,545 ms (10.55s - Unviable on Mobile)",
+    h2hLatWidth: "100%",
+    h2hVramText: "Baseline: 7,200 MB (90% GPU Allocation Thrash)",
+    h2hVramWidth: "90%",
+    h2hStepText: "Baseline: 50 Iterative UNet Steps",
+    h2hStepWidth: "100%",
+    badges: [
+      "🐢 10.55s Latency Penalty",
+      "⚠️ 7.2 GB Severe Memory Draw",
+      "🐌 50 Forward Passes",
+      "❌ Edge Mobile Crash Hazard",
+      "📉 43× Slower than ImagineAI",
+      "🔋 Heavy Battery Drain"
+    ]
+  }
+];
+
+function selectArenaModel(idx) {
+  playSfx('click');
+
+  const tabCards = document.querySelectorAll('.model-tab-card');
+  tabCards.forEach((c, i) => {
+    if (i === idx) c.classList.add('active');
+    else c.classList.remove('active');
+  });
+
+  const m = arenaModels[idx];
+  if (!m) return;
+
+  // Animate Circular Gauges (Circumference ~ 314)
+  const setGauge = (fillId, valId, detId, pct, val, det) => {
+    const el = document.getElementById(fillId);
+    const vEl = document.getElementById(valId);
+    const dEl = document.getElementById(detId);
+    if (el) {
+      const offset = 314 * (1 - pct);
+      el.style.strokeDashoffset = offset;
+    }
+    if (vEl) vEl.textContent = val;
+    if (dEl) dEl.textContent = det;
+  };
+
+  setGauge('gauge-fill-lat', 'g-val-lat', 'g-det-lat', m.latPct, m.latVal, m.latDetail);
+  setGauge('gauge-fill-step', 'g-val-step', 'g-det-step', m.stepPct, m.stepVal, m.stepDetail);
+  setGauge('gauge-fill-vram', 'g-val-vram', 'g-det-vram', m.vramPct, m.vramVal, m.vramDetail);
+  setGauge('gauge-fill-clip', 'g-val-clip', 'g-det-clip', m.clipPct, m.clipVal, m.clipDetail);
+
+  // Update Head-to-Head Comparison Bars
+  const hLat = document.getElementById('h2h-stat-lat');
+  const hVram = document.getElementById('h2h-stat-vram');
+  const hStep = document.getElementById('h2h-stat-step');
+  const fLat = document.getElementById('h2h-fill-lat');
+  const fVram = document.getElementById('h2h-fill-vram');
+  const fStep = document.getElementById('h2h-fill-step');
+
+  if (hLat) hLat.textContent = m.h2hLatText;
+  if (hVram) hVram.textContent = m.h2hVramText;
+  if (hStep) hStep.textContent = m.h2hStepText;
+
+  if (fLat) {
+    fLat.style.width = m.h2hLatWidth;
+    fLat.textContent = `${m.latVal} ms`;
+  }
+  if (fVram) {
+    fVram.style.width = m.h2hVramWidth;
+    fVram.textContent = `${m.vramVal} MB`;
+  }
+  if (fStep) {
+    fStep.style.width = m.h2hStepWidth;
+    fStep.textContent = `${m.stepVal} Steps`;
+  }
+
+  // Update Badges Cloud
+  const badgeCloud = document.getElementById('model-badge-cloud');
+  if (badgeCloud) {
+    badgeCloud.innerHTML = '';
+    m.badges.forEach(b => {
+      const pill = document.createElement('div');
+      pill.className = 'judge-pill';
+      pill.textContent = b;
+      badgeCloud.appendChild(pill);
+    });
   }
 }
 
 // =========================================================================
-// 7. SECTOR 03: CV X-RAY ARTIFACT SCANNER WITH INTERACTIVE LENS
+// 9. SECTOR 04: CV X-RAY ARTIFACT SCANNER WITH INTERACTIVE LENS
 // =========================================================================
 const xrayCanvas = document.getElementById('xray-canvas');
 const xrayLens = document.getElementById('xray-lens');
@@ -679,7 +1090,7 @@ function drawXrayCanvas() {
       const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
       const edge = Math.abs(gray - 128) * 2.4;
       d[i] = 0;
-      d[i + 1] = edge; // Neon green edges
+      d[i + 1] = edge;
       d[i + 2] = edge * 0.7;
     }
   } else if (currentXrayMode === 'noise') {
@@ -707,7 +1118,6 @@ function drawXrayCanvas() {
   ctx.putImageData(idata, 0, 0);
 }
 
-// X-Ray Interactive Magnifier Lens
 if (xrayBox && xrayLens) {
   xrayBox.addEventListener('mousemove', (e) => {
     const rect = xrayBox.getBoundingClientRect();
@@ -719,7 +1129,7 @@ if (xrayBox && xrayLens) {
 }
 
 // =========================================================================
-// 8. SECTOR 04: 43x SPEED WARP DRAG-RACE SIMULATION
+// 10. SECTOR 05: 43x SPEED WARP DRAG-RACE SIMULATION
 // =========================================================================
 const raceCanvas = document.getElementById('race-canvas');
 let raceAnimId = null;
@@ -733,15 +1143,14 @@ function startWarpDragRace() {
   const timer = document.getElementById('race-timer');
 
   const startTime = performance.now();
-  const T_OPTIMIZED = 247;    // 247 ms (SD-Turbo)
-  const T_BASELINE = 10545;  // 10,545 ms (SD 1.5 50-step)
-  const VISUAL_DURATION = 3200; // Visual demo duration
+  const T_BASELINE = 10545;
+  const VISUAL_DURATION = 3200;
 
   function anim(now) {
     const elapsed = now - startTime;
     ctx.clearRect(0, 0, w, h);
 
-    // Track 1: T1 SD-Turbo (Optimized)
+    // Track Lines
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -782,7 +1191,6 @@ function startWarpDragRace() {
     ctx.font = '11px monospace';
     ctx.fillText('🐢 B0: SD 1.5 50-step (10,545 ms)', xB0 - 20, 108);
 
-    // Update Timer
     if (timer) {
       const simulatedMs = Math.min(T_BASELINE, Math.floor((elapsed / VISUAL_DURATION) * T_BASELINE));
       timer.textContent = `${(simulatedMs / 1000).toFixed(2)} s`;
@@ -801,116 +1209,7 @@ function startWarpDragRace() {
 }
 
 // =========================================================================
-// 9. SECTOR 05: PROMPT SANDBOX & LATENT SIMULATOR
-// =========================================================================
-const latentCanvas = document.getElementById('latent-sim-canvas');
-const promptInput = document.getElementById('sandbox-prompt');
-const nlpLiveOutput = document.getElementById('nlp-live-output');
-
-function loadPromptPreset(chipEl, text) {
-  playSfx('click');
-  document.querySelectorAll('.cyber-chip').forEach(c => c.classList.remove('active'));
-  if (chipEl) chipEl.classList.add('active');
-  if (promptInput) {
-    promptInput.value = text;
-    updateNlpLive(text);
-  }
-}
-
-function updateNlpLive(text) {
-  if (!nlpLiveOutput) return;
-  const words = text.toLowerCase().split(/\s+/);
-  const subjects = words.filter(w => ['hat', 'fox', 'street', 'lighthouse', 'car', 'sunset'].includes(w));
-  const styles = words.filter(w => ['vintage', 'cinematic', 'watercolour', 'cyberpunk', 'neon'].includes(w));
-  const lightings = words.filter(w => ['golden', 'dusk', 'night', 'stormy', 'soft'].includes(w));
-
-  nlpLiveOutput.innerHTML = `
-    <div><strong>EXTRACTED ENTITIES:</strong> ${subjects.join(', ') || 'General Concept'}</div>
-    <div><strong>STYLISTIC TAGS:</strong> ${styles.join(', ') || 'Photorealistic Standard'}</div>
-    <div><strong>LIGHTING MAP:</strong> ${lightings.join(', ') || 'Ambient Diffuse'}</div>
-    <div style="color:var(--neon-cyan)"><strong>POSITIVE INJECTION:</strong> +8k uhd, sharp focus, low noise, high fidelity</div>
-    <div style="color:var(--neon-magenta)"><strong>NEGATIVE INJECTION:</strong> -blur, -grain, -artifacts, -distorted hands, -duplicate</div>
-  `;
-}
-
-if (promptInput) {
-  promptInput.addEventListener('input', (e) => updateNlpLive(e.target.value));
-  updateNlpLive(promptInput.value);
-}
-
-function simulateLatentDenoise() {
-  playSfx('warp');
-  if (!latentCanvas) return;
-  const ctx = latentCanvas.getContext('2d');
-  const w = latentCanvas.width;
-  const h = latentCanvas.height;
-  const stepLabel = document.getElementById('latent-step-label');
-
-  let step = 0;
-  const totalSteps = 12;
-
-  const anim = setInterval(() => {
-    step++;
-    const progress = step / totalSteps;
-
-    ctx.fillStyle = '#050711';
-    ctx.fillRect(0, 0, w, h);
-
-    const idata = ctx.createImageData(w, h);
-    const d = idata.data;
-    const noiseFactor = 1 - progress;
-
-    for (let y = 0; y < h; y++) {
-      for (let x = 0; x < w; x++) {
-        const idx = (y * w + x) * 4;
-        const cx = (x - w / 2) / (w / 2);
-        const cy = (y - h / 2) / (h / 2);
-        const dist = Math.sqrt(cx * cx + cy * cy);
-
-        // Target latent visual pattern
-        const tr = Math.sin(cx * 4 + dist * 5) * 127 + 128;
-        const tg = Math.cos(cy * 4 - dist * 3) * 127 + 128;
-        const tb = Math.sin(dist * 6) * 127 + 128;
-        const noise = Math.random() * 255;
-
-        d[idx] = Math.floor(tr * progress + noise * noiseFactor);
-        d[idx + 1] = Math.floor(tg * progress + noise * noiseFactor);
-        d[idx + 2] = Math.floor(tb * progress + noise * noiseFactor);
-        d[idx + 3] = 255;
-      }
-    }
-    ctx.putImageData(idata, 0, 0);
-
-    if (stepLabel) {
-      if (step < totalSteps) {
-        stepLabel.textContent = `TIMESTEP t=${Math.round(1000 * (1 - progress))} (DENOISING ${Math.round(progress * 100)}%)`;
-      } else {
-        stepLabel.textContent = `TIMESTEP t=0 (CLEAN LATENT REACHED!)`;
-        playSfx('flip');
-      }
-    }
-
-    if (step >= totalSteps) clearInterval(anim);
-  }, 90);
-}
-
-// Initial latent draw
-if (latentCanvas) {
-  const ctx = latentCanvas.getContext('2d');
-  ctx.fillStyle = '#080b18';
-  ctx.fillRect(0, 0, 360, 360);
-  const idata = ctx.createImageData(360, 360);
-  for (let i = 0; i < idata.data.length; i += 4) {
-    idata.data[i] = Math.random() * 255;
-    idata.data[i + 1] = Math.random() * 255;
-    idata.data[i + 2] = Math.random() * 255;
-    idata.data[i + 3] = 255;
-  }
-  ctx.putImageData(idata, 0, 0);
-}
-
-// =========================================================================
-// 10. SECTOR 06: SAMSUNG VIVA DEFENSE DECK & 3D Q&A CARDS
+// 11. SECTOR 06: SAMSUNG VIVA DEFENSE DECK & 3D Q&A CARDS
 // =========================================================================
 const presenterDossiers = {
   1: {
@@ -1055,12 +1354,14 @@ function renderVivaCards() {
 }
 
 // =========================================================================
-// 11. INITIALIZATION ON DOM LOAD
+// 12. INITIALIZATION ON DOM LOAD
 // =========================================================================
 document.addEventListener('DOMContentLoaded', () => {
   bindHoverSounds();
-  renderPipelineScrubber();
-  selectPipelineStage(0);
+  inspectArchNode(0);
+  renderVideoScrubberUI();
+  selectVideoStage(0);
+  selectArenaModel(0);
   drawXrayCanvas();
   switchPilot(1);
   renderVivaCards();
